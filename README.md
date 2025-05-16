@@ -15,6 +15,30 @@ This template provides a minimal setup to get React working in Vite with HMR and
 
 2.  **Try-On Studio (`/studio` - `TryOnStudio.jsx`):**
     *   Displays the user's photo alongside the selected clothing item.
+
+### Available Scripts
+
+In the project directory, you can run the following commands:
+
+#### `npm install`
+
+Installs all the project dependencies. This is typically the first command you run after cloning the repository or when new dependencies are added.
+
+#### `npm run dev`
+
+Starts the development server (usually on `http://localhost:5173`).
+The app will automatically reload if you make changes to the code.
+You will see any build errors or lint warnings in the console.
+
+#### `npm run build`
+
+Builds the app for production to the `dist` folder.
+It correctly bundles React in production mode and optimizes the build for the best performance.
+The build is minified, and the filenames include hashes for caching.
+
+#### `npm run preview`
+
+Locally serves the production build from the `dist` folder. This command is useful for verifying the build before deployment. It should be run after `npm run build`.
     *   Includes an area for users to provide custom prompts or instructions for the AI (optional).
     *   Features a "Generate Try-On" button.
     *   **Note:** Currently, the AI generation is simulated with a placeholder (`fakeGenerate` function) that uses the clothing photo as the result and adds it to the Closet.
