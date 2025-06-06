@@ -1,7 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { OpenAI } = require('openai');
+const { OpenAI, toFile } = require('openai');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -54,6 +56,33 @@ app.post('/api/generate-tryon-image', async (req, res) => {
     } else {
       res.status(500).json({ message: 'An unexpected error occurred on the server.', details: error.message });
     }
+  }
+});
+
+app.post('/api/tryon', async (req, res) => {
+  try {
+    const userPhotoPath = path.join(__dirname, '../src/assets/userPhoto.jpg');
+    const clothPhotoPath = path.join(__dirname, '../src/assets/clothPhoto.jpg');
+    const { customPrompt } = req.body;
+
+    const prompt = `Put the clothing item from the reference image onto the person in the main image. Make it photorealistic, keep pose and background unchanged. ${customPrompt || ''}`;
+
+    // Bilder als File-Objekte für OpenAI vorbereiten
+    const userPhotoFile = await toFile(fs.createReadStream(userPhotoPath), 'userPhoto.jpg', { type: 'image/jpeg' });
+    const clothPhotoFile = await toFile(fs.createReadStream(clothPhotoPath), 'clothPhoto.jpg', { type: 'image/jpeg' });
+
+    const openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const response = await openaiClient.images.edit({
+      model: 'gpt-image-1',
+      image: [userPhotoFile, clothPhotoFile],
+      prompt,
+    });
+
+    const image_base64 = response.data[0].b64_json;
+    res.json({ resultImage: `data:image/png;base64,${image_base64}` });
+  } catch (error) {
+    console.error('Error in /api/tryon:', error.message);
+    res.status(500).json({ message: 'An unexpected error occurred on the server.', details: error.message });
   }
 });
 

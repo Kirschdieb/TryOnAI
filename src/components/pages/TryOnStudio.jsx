@@ -17,21 +17,37 @@ export default function TryOnStudio() {
     return null;
   }
 
-  const fakeGenerate = async () => {
+  const generateTryOn = async () => {
     setIsGenerating(true);
-    
-    // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // For now, just use the cloth photo as the result
-    setResult(clothPhoto);
-    addOutfit({
-      id: Date.now(),
-      image: clothPhoto,
-      timestamp: new Date().toISOString(),
-    });
-    
-    setIsGenerating(false);
+    setResult(null);
+    try {
+      const response = await fetch('http://localhost:3001/api/tryon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customPrompt }),
+      });
+      if (!response.ok) {
+        // Versuche, Text-Response zu lesen
+        const errorData = await response.json();
+        if (errorData && errorData.text) {
+          alert('Error: ' + errorData.text);
+        } else {
+          throw new Error('Generation failed');
+        }
+        return;
+      }
+      const data = await response.json();
+      setResult(data.resultImage);
+      addOutfit({
+        id: Date.now(),
+        image: data.resultImage,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      alert('Error: ' + err.message);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -74,7 +90,7 @@ export default function TryOnStudio() {
                 focus:outline-none focus:ring-2 focus:ring-lavender"
             />
             <Button
-              onClick={fakeGenerate}
+              onClick={generateTryOn}
               disabled={isGenerating}
               className="w-full mt-4"
             >
