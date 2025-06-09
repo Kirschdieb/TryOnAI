@@ -1,17 +1,20 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from './App.jsx';
+import Landing from './components/pages/Landing.jsx';
 import HomeUpload from './components/pages/HomeUpload.jsx';
 import TryOnStudio from './components/pages/TryOnStudio.jsx';
 import Closet from './components/pages/Closet.jsx';
+import About from './components/pages/About.jsx';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <App />,
-    children: [
-      { index: true, element: <HomeUpload /> },
+    element: <App />,    children: [
+      { index: true, element: <Landing /> },
+      { path: '/try-on', element: <HomeUpload /> },
       { path: '/studio', element: <TryOnStudio /> },
       { path: '/closet', element: <Closet /> },
+      { path: '/about', element: <About /> },
     ],
   },
 ]);

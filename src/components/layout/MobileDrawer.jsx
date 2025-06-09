@@ -40,11 +40,9 @@ export default function MobileDrawer({ isOpen, onClose }) {
                 />
               </svg>
             </button>
-          </div>
-
-          <div className="flex flex-col space-y-4">
+          </div>          <div className="flex flex-col space-y-4">
             <Link
-              to="/"
+              to="/try-on"
               onClick={onClose}
               className="p-2 rounded-lg hover:bg-cream-200"
             >
@@ -55,14 +53,7 @@ export default function MobileDrawer({ isOpen, onClose }) {
               onClick={onClose}
               className="p-2 rounded-lg hover:bg-cream-200"
             >
-              Kleiderschrank
-            </Link>
-            <Link
-              to="/about"
-              onClick={onClose}
-              className="p-2 rounded-lg hover:bg-cream-200"
-            >
-              About
+              Closet
             </Link>
           </div>
         </div>

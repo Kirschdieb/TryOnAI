@@ -16,11 +16,11 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-600 hover:text-lavender">
+            <Link to="/try-on" className="text-gray-600 hover:text-lavender">
               Try On
             </Link>
             <Link to="/closet" className="text-gray-600 hover:text-lavender">
-              Kleiderschrank
+              Closet
             </Link>
             <Link to="/about" className="text-gray-600 hover:text-lavender">
               About
