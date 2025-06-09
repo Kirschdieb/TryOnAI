@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCloset } from '../../store/useCloset';
 import Button from '../ui/Button';
@@ -8,17 +8,48 @@ import DropZone from '../ui/DropZone';
 export default function HomeUpload() {
   const navigate = useNavigate();
   const { setUserPhoto, setClothPhoto } = useCloset();
-  const [userPhotoUrl, setUserPhotoUrl] = useState(null);
+  const [userPhotoFile, setUserPhotoFile] = useState(null); // Stores the File object
+  const [userPhotoPreviewUrl, setUserPhotoPreviewUrl] = useState(null); // For image preview
   const [clothPhotoUrl, setClothPhotoUrl] = useState(null);
   const [zalandoUrl, setZalandoUrl] = useState('');
+  const [isExtracting, setIsExtracting] = useState(false);
+  const [extractError, setExtractError] = useState(null);
 
   const handleTryOn = () => {
-    setUserPhoto(userPhotoUrl);
+    setUserPhoto(userPhotoFile); // Pass the File object to the store
     setClothPhoto(clothPhotoUrl || zalandoUrl);
     navigate('/studio');
   };
 
-  const isValid = (userPhotoUrl && (clothPhotoUrl || zalandoUrl.startsWith('https://www.zalando.')));
+  // Effect to create and revoke blob URL for preview
+  useEffect(() => {
+    if (userPhotoFile) {
+      const previewUrl = URL.createObjectURL(userPhotoFile);
+      setUserPhotoPreviewUrl(previewUrl);
+      return () => URL.revokeObjectURL(previewUrl); // Cleanup
+    } else {
+      setUserPhotoPreviewUrl(null);
+    }
+  }, [userPhotoFile]);
+
+  const isValid = (userPhotoFile && (clothPhotoUrl || zalandoUrl.startsWith('https://www.zalando.')));
+
+  const extractZalandoImage = async () => {
+    if (!zalandoUrl) return;
+    setIsExtracting(true);
+    setExtractError(null);
+    try {
+      const res = await fetch(`http://localhost:3001/api/extract?url=${encodeURIComponent(zalandoUrl)}`);
+      if (!res.ok) throw new Error(`Extraction failed (${res.status})`);
+      const data = await res.json();
+      if (data.imageUrl) setClothPhotoUrl(data.imageUrl);
+      else throw new Error(data.error || 'No image found');
+    } catch (err) {
+      setExtractError(err.message);
+    } finally {
+      setIsExtracting(false);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -32,13 +63,13 @@ export default function HomeUpload() {
           <h2 className="text-xl font-semibold mb-4">1. Upload Your Photo</h2>
           <div className="relative aspect-[3/4] mb-4">
             <DropZone
-              onFileSelect={setUserPhotoUrl}
+              onFileSelect={setUserPhotoFile} // setUserPhotoFile will receive the File object
               className="w-full h-full"
             />
-            {userPhotoUrl && (
+            {userPhotoPreviewUrl && (
               <div className="absolute inset-0 pointer-events-none">
                 <img
-                  src={userPhotoUrl}
+                  src={userPhotoPreviewUrl} // Use the blob URL for preview
                   alt="Preview"
                   className="w-full h-full object-cover rounded-lg"
                 />
@@ -64,6 +95,14 @@ export default function HomeUpload() {
               placeholder="https://www.zalando.de/..."
               className="w-full p-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender"
             />
+            <Button
+              onClick={extractZalandoImage}
+              disabled={!zalandoUrl || isExtracting}
+              className="mt-2"
+            >
+              {isExtracting ? 'Extracting...' : 'Extract Product Image'}
+            </Button>
+            {extractError && <p className="text-sm text-red-600 mt-1">{extractError}</p>}
           </div>
 
           <div className="relative">

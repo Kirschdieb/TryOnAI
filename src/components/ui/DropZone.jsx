@@ -6,8 +6,7 @@ export default function DropZone({ onFileSelect, className = '' }) {
       e.preventDefault();
       const file = e.dataTransfer?.files[0] || e.target.files[0];
       if (file && file.type.startsWith('image/')) {
-        const url = URL.createObjectURL(file);
-        onFileSelect(url);
+        onFileSelect(file); // Pass the raw File object
       }
     },
     [onFileSelect]
