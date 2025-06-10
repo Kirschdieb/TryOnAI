@@ -7,17 +7,47 @@ import DropZone from '../ui/DropZone';
 
 export default function HomeUpload() {
   const navigate = useNavigate();
-  const { setUserPhoto, setClothPhoto } = useCloset();
+  const {
+    homeZalandoUrl: storeZalandoUrl,
+    homeClothPhotoUrl: storeClothPhotoUrl,
+    setUserPhoto,
+    setClothPhoto, // For studio
+    setHomeZalandoUrl,
+    setHomeClothPhotoUrl,
+  } = useCloset();
   const [userPhotoFile, setUserPhotoFile] = useState(null); // Stores the File object
   const [userPhotoPreviewUrl, setUserPhotoPreviewUrl] = useState(null); // For image preview
-  const [clothPhotoUrl, setClothPhotoUrl] = useState(null);
-  const [zalandoUrl, setZalandoUrl] = useState('');
+  
+  // Local state for inputs, initialized from store and synced back to store
+  const [localClothPhotoUrl, setLocalClothPhotoUrl] = useState(storeClothPhotoUrl);
+  const [localZalandoUrl, setLocalZalandoUrl] = useState(storeZalandoUrl);
+
+  // Effect to update local state if store changes (e.g., browser back/forward or initial load)
+  useEffect(() => {
+    // Ensure we don't set local state to undefined if store is not fully initialized yet,
+    // though Zustand usually provides initial values.
+    if (storeZalandoUrl !== undefined) {
+        setLocalZalandoUrl(storeZalandoUrl);
+    }
+  }, [storeZalandoUrl]);
+
+  useEffect(() => {
+    if (storeClothPhotoUrl !== undefined) {
+        setLocalClothPhotoUrl(storeClothPhotoUrl);
+    }
+  }, [storeClothPhotoUrl]);
   const [isExtracting, setIsExtracting] = useState(false);
   const [extractError, setExtractError] = useState(null);
 
   const handleTryOn = () => {
-    setUserPhoto(userPhotoFile); // Pass the File object to the store
-    setClothPhoto(clothPhotoUrl || zalandoUrl);
+    setUserPhoto(userPhotoFile); // Pass the File object to the store for /studio
+    // Use local state (synced with store) for cloth photo decision
+    setClothPhoto(localClothPhotoUrl || localZalandoUrl); // Set cloth photo for /studio
+
+    // Clear the home page specific inputs from the store after they've been used for the studio
+    setHomeZalandoUrl('');
+    setHomeClothPhotoUrl(null);
+
     navigate('/studio');
   };
 
@@ -32,18 +62,22 @@ export default function HomeUpload() {
     }
   }, [userPhotoFile]);
 
-  const isValid = (userPhotoFile && (clothPhotoUrl || zalandoUrl.startsWith('https://www.zalando.')));
+  const isValid = (userPhotoFile && (localClothPhotoUrl || localZalandoUrl.startsWith('https://www.zalando.')));
 
   const extractZalandoImage = async () => {
-    if (!zalandoUrl) return;
+    if (!localZalandoUrl) return; // Use localZalandoUrl
     setIsExtracting(true);
     setExtractError(null);
     try {
-      const res = await fetch(`http://localhost:3001/api/extract?url=${encodeURIComponent(zalandoUrl)}`);
+      const res = await fetch(`http://localhost:3001/api/extract?url=${encodeURIComponent(localZalandoUrl)}`); // Use localZalandoUrl
       if (!res.ok) throw new Error(`Extraction failed (${res.status})`);
       const data = await res.json();
-      if (data.imageUrl) setClothPhotoUrl(data.imageUrl);
-      else throw new Error(data.error || 'No image found');
+      if (data.imageUrl) {
+        setLocalClothPhotoUrl(data.imageUrl);
+        setHomeClothPhotoUrl(data.imageUrl); // Update store
+      } else {
+        throw new Error(data.error || 'No image found');
+      }
     } catch (err) {
       setExtractError(err.message);
     } finally {
@@ -89,15 +123,19 @@ export default function HomeUpload() {
             </label>
             <input
               type="url"
-              value={zalandoUrl}
-              onChange={(e) => setZalandoUrl(e.target.value)}
+              value={localZalandoUrl} // Use localZalandoUrl
+              onChange={(e) => { // Update local and store state
+                const newUrl = e.target.value;
+                setLocalZalandoUrl(newUrl);
+                setHomeZalandoUrl(newUrl); // Update store
+              }}
               pattern="https://www.zalando."
               placeholder="https://www.zalando.de/..."
               className="w-full p-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender"
             />
             <Button
               onClick={extractZalandoImage}
-              disabled={!zalandoUrl || isExtracting}
+              disabled={!localZalandoUrl || isExtracting} // Use localZalandoUrl
               className="mt-2"
             >
               {isExtracting ? 'Extracting...' : 'Extract Product Image'}
@@ -118,13 +156,16 @@ export default function HomeUpload() {
           <div className="mt-6">
             <div className="relative aspect-[3/4] mb-4">
               <DropZone
-                onFileSelect={setClothPhotoUrl}
+                onFileSelect={(url) => { // Assuming DropZone provides a URL directly; update local and store state
+                  setLocalClothPhotoUrl(url);
+                  setHomeClothPhotoUrl(url); // Update store
+                }}
                 className="w-full h-full"
               />
-              {clothPhotoUrl && (
+              {localClothPhotoUrl && ( // Use localClothPhotoUrl for condition
                 <div className="absolute inset-0 pointer-events-none">
                   <img
-                    src={clothPhotoUrl}
+                    src={localClothPhotoUrl} // Use localClothPhotoUrl for src
                     alt="Preview"
                     className="w-full h-full object-cover rounded-lg"
                   />

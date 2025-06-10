@@ -1,3 +1,60 @@
+# TryOnAI
+
+## Project Structure
+
+```
+TryOnAI/
+├── .git/                       # Git repository directory
+├── .gitignore                  # Git ignore file for excluding files from version control
+├── README.md                   # Project documentation and overview
+├── eslint.config.js            # ESLint configuration for code linting
+├── index.html                  # Main HTML entry point for the application
+├── logo.png                    # Project logo image
+├── node_modules/               # Node.js dependencies
+├── package-lock.json           # Exact versions of npm dependencies
+├── package.json                # Project metadata and dependencies
+├── postcss.config.js           # PostCSS configuration for CSS processing
+├── public/                     # Static public assets
+│   └── ...
+├── server/                     # Backend server code
+│   ├── .env                    # Environment variables for server configuration
+│   ├── index.js                # Main server file, likely handling API routes and logic
+│   ├── node_modules/           # Server-specific dependencies
+│   ├── package-lock.json       # Server dependency versions
+│   ├── package.json            # Server dependency configuration
+│   ├── server/                 # Additional server-related code or configurations
+│   │   └── ...
+│   ├── temp/                   # Temporary directory for server operations
+│   ├── zalando-puppeteer.js    # Script likely for web scraping or automation with Puppeteer for Zalando
+│   └── zalando-test.js         # Test script related to Zalando functionality
+├── src/                        # Frontend source code
+│   ├── App.css                 # CSS styles for the main App component
+│   ├── App.jsx                 # Main React component for the application
+│   ├── assets/                 # Static assets like images or fonts
+│   │   └── ...
+│   ├── components/             # Reusable UI components
+│   │   ├── layout/             # Components related to layout structure
+│   │   │   ├── Footer.jsx      # Footer component for page layout
+│   │   │   ├── MobileDrawer.jsx # Mobile navigation drawer component
+│   │   │   └── Navbar.jsx      # Navigation bar component for the application
+│   │   ├── pages/              # Components representing full pages or views
+│   │   │   ├── Closet.jsx      # Page component for managing user's closet or collection
+│   │   │   ├── HomeUpload.jsx  # Home page with upload functionality
+│   │   │   └── TryOnStudio.jsx # Main studio page for virtual try-on feature
+│   │   └── ui/                 # Basic UI elements and widgets
+│   │       ├── Button.jsx      # Reusable button component
+│   │       ├── Card.jsx        # Reusable card component for displaying content
+│   │       └── DropZone.jsx    # Component for file upload drop zone
+│   ├── index.css               # Global CSS styles
+│   ├── main.jsx                # Entry point for React application
+│   ├── routes.jsx              # Route definitions for navigation
+│   ├── store/                  # State management (possibly Redux or similar)
+│   │   └── ...
+│   └── tailwind.css            # Tailwind CSS configuration or custom styles
+├── tailwind.config.js          # Tailwind CSS configuration file
+└── vite.config.js              # Vite configuration for build and development server
+```
+
 # React + Vite
 
 ## Project Setup

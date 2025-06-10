@@ -115,49 +115,64 @@ export default function TryOnStudio() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="grid md:grid-cols-2 gap-8">
-        {/* Original Photos */}
+    <div className="max-w-7xl mx-auto"> {/* Adjusted max-width for 3 columns */}
+      <div className="grid md:grid-cols-3 gap-8"> {/* Changed to 3 columns */}
+        {/* Column 1: Your Photo */}
+        <Card className="md:self-start"> {/* Added md:self-start */}
+          <h2 className="text-xl font-semibold mb-4">Your Photo</h2>
+          <div className="relative"> {/* Removed fixed height */}
+            <img
+              src={userPhotoPreviewUrl || 'https://via.placeholder.com/300x400.png?text=Your+Photo'}
+              alt="Your photo"
+              className="w-full h-auto object-contain rounded-lg block" /* Adjusted for auto height */
+            />
+          </div>
+        </Card>
+        
+        {/* Column 2: Clothing Item */}
+        <Card className="md:self-start"> {/* Added md:self-start */}
+          <h2 className="text-xl font-semibold mb-4">Clothing Item</h2>
+          <div className="relative"> {/* Removed fixed height */}
+            {isExtractingCloth ? (
+              <div className="w-full h-auto aspect-[3/4] bg-cream-200 rounded-lg animate-pulse"></div> /* Placeholder with aspect ratio */
+            ) : extractError ? (
+              <div className="w-full h-auto aspect-[3/4] bg-cream-200 rounded-lg flex items-center justify-center">
+                <p className="text-red-500">{extractError}</p>
+              </div>
+            ) : (
+              extractedClothImage && (
+                <img
+                  src={extractedClothImage}
+                  alt="Clothing"
+                  className="w-full h-auto object-contain rounded-lg block" /* Adjusted for auto height */
+                />
+              )
+            )}
+          </div>
+        </Card>
+
+        {/* Column 3: Generation Area (Result & Customization stacked) */}
         <div className="space-y-6">
-          <Card>
-            <h2 className="text-xl font-semibold mb-4">Your Photo</h2>
-            <div className="relative aspect-[3/4]">
-              <img
-                src={userPhotoPreviewUrl || 'https://via.placeholder.com/300x400.png?text=Your+Photo'}
-                alt="Your photo"
-                className="absolute inset-0 w-full h-full object-cover rounded-lg"
-              />
-            </div>
-          </Card>
-          
-          <Card>
-            <h2 className="text-xl font-semibold mb-4">Clothing Item</h2>
-            <div className="relative aspect-[3/4]">
-              {isExtractingCloth ? (
+          <Card> {/* Result Card First */}
+            <h2 className="text-xl font-semibold mb-4">Result</h2>
+            <div className="relative h-[500px]"> {/* Changed aspect ratio to fixed height */}
+              {isGenerating ? (
                 <div className="absolute inset-0 bg-cream-200 rounded-lg animate-pulse" />
-              ) : extractError ? (
-                <div className="absolute inset-0 bg-cream-200 rounded-lg flex items-center justify-center">
-                  <p className="text-red-500">{extractError}</p>
-                </div>
+              ) : result ? (
+                <img
+                  src={result}
+                  alt="Generated result"
+                  className="absolute inset-0 w-full h-full object-contain rounded-lg" /* Changed to object-contain */
+                />
               ) : (
-                extractedClothImage && (
-                  <img
-                    src={extractedClothImage}
-                    alt="Clothing"
-                    className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                  />
-                )
+                <div className="absolute inset-0 bg-cream-200 rounded-lg flex items-center justify-center">
+                  <p className="text-gray-500">Click Generate to start</p>
+                </div>
               )}
             </div>
-            <Button onClick={extractClothImage} disabled={isExtractingCloth} className="mt-2">
-              {isExtractingCloth ? 'Extracting...' : 'Extract Product Image'}
-            </Button>
           </Card>
-        </div>
 
-        {/* Generation Area */}
-        <div className="space-y-6">
-          <Card>
+          <Card> {/* Customization Card Second */}
             <h2 className="text-xl font-semibold mb-4">Customization</h2>
             <textarea
               value={customPrompt}
@@ -173,25 +188,6 @@ export default function TryOnStudio() {
             >
               {isGenerating ? 'Generating...' : 'Generate Try-On'}
             </Button>
-          </Card>
-
-          <Card>
-            <h2 className="text-xl font-semibold mb-4">Result</h2>
-            <div className="relative aspect-[3/4]">
-              {isGenerating ? (
-                <div className="absolute inset-0 bg-cream-200 rounded-lg animate-pulse" />
-              ) : result ? (
-                <img
-                  src={result}
-                  alt="Generated result"
-                  className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                />
-              ) : (
-                <div className="absolute inset-0 bg-cream-200 rounded-lg flex items-center justify-center">
-                  <p className="text-gray-500">Click Generate to start</p>
-                </div>
-              )}
-            </div>
           </Card>
         </div>
       </div>
