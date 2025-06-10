@@ -22,6 +22,9 @@ export default function Navbar() {
             <Link to="/closet" className="text-gray-600 hover:text-lavender">
               Kleiderschrank
             </Link>
+            <Link to="/profile" className="text-gray-600 hover:text-lavender">
+              Profil
+            </Link>
             <Link to="/about" className="text-gray-600 hover:text-lavender">
               About
             </Link>
