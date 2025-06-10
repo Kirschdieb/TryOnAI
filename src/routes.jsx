@@ -3,6 +3,7 @@ import App from './App.jsx';
 import HomeUpload from './components/pages/HomeUpload.jsx';
 import TryOnStudio from './components/pages/TryOnStudio.jsx';
 import Closet from './components/pages/Closet.jsx';
+import ProfilePage from './components/pages/Profile.jsx';
 
 const router = createBrowserRouter([
   {
@@ -12,6 +13,7 @@ const router = createBrowserRouter([
       { index: true, element: <HomeUpload /> },
       { path: '/studio', element: <TryOnStudio /> },
       { path: '/closet', element: <Closet /> },
+      { path: '/profile', element: <ProfilePage /> },
     ],
   },
 ]);

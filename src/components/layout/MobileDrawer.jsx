@@ -58,6 +58,13 @@ export default function MobileDrawer({ isOpen, onClose }) {
               Kleiderschrank
             </Link>
             <Link
+              to="/profile"
+              onClick={onClose}
+              className="p-2 rounded-lg hover:bg-cream-200"
+            >
+              Profil
+            </Link>
+            <Link
               to="/about"
               onClick={onClose}
               className="p-2 rounded-lg hover:bg-cream-200"
