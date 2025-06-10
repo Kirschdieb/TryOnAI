@@ -10,6 +10,12 @@ const { v4: uuidv4 } = require('uuid');
 const cheerio = require('cheerio');
 const multer = require('multer');
 
+// Node.js fetch Polyfill für serverseitige Nutzung
+let fetch = global.fetch;
+if (!fetch) {
+  fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+}
+
 const app = express();
 const port = process.env.PORT || 3001;
 
@@ -192,32 +198,112 @@ app.get('/api/extract', async (req, res) => {
   if (!targetUrl) {
     return res.status(400).json({ error: "Parameter ?url fehlt" });
   }
-  try {
-    const shopResp = await fetch(targetUrl, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml",
-      },
-    });
-    if (!shopResp.ok) {
-      return res.status(502).json({ error: `Fehler beim Laden (${shopResp.status})` });
+
+  let responded = false;
+  const respondOnce = (data, status = 200) => {
+    if (!responded) {
+      responded = true;
+      if (status === 200) res.json(data);
+      else res.status(status).json(data);
     }
-    const html = await shopResp.text();
-    const $ = cheerio.load(html);
-    const ogImg = $('meta[property="og:image"], meta[name="og:image"]').attr("content");
-    if (ogImg) {
-      const cleanImageUrl = ogImg.split('?')[0];
-      return res.json({ imageUrl: cleanImageUrl });
+  };
+
+  // --- Methode 1: Schnelle Extraktion mit fetch/cheerio ---
+  const fastExtract = async () => {
+    try {
+      console.log(`[extract] Starte fetch/cheerio für: ${targetUrl}`);
+      const shopResp = await fetch(targetUrl, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+          "Accept": "text/html,application/xhtml+xml",
+        },
+      });
+      console.log(`[extract] fetch Status: ${shopResp.status} für ${targetUrl}`);
+      if (!shopResp.ok) {
+        console.warn(`[extract] fetch fehlgeschlagen (${shopResp.status}) für ${targetUrl}`);
+        // NICHT direkt antworten, damit Puppeteer übernehmen kann
+        return;
+      }
+      const html = await shopResp.text();
+      const $ = cheerio.load(html);
+      const ogImg = $('meta[property="og:image"], meta[name="og:image"]').attr("content");
+      if (ogImg) {
+        const cleanImageUrl = ogImg.split('?')[0];
+        console.log(`[extract] fetch/cheerio: og:image gefunden: ${cleanImageUrl}`);
+        respondOnce({ imageUrl: cleanImageUrl });
+        return;
+      }
+      const img = $("picture img").first().attr("src") || $("img").first().attr("src");
+      if (img) {
+        const cleanImageUrl = img.split('?')[0];
+        console.log(`[extract] fetch/cheerio: <img> gefunden: ${cleanImageUrl}`);
+        respondOnce({ imageUrl: cleanImageUrl });
+        return;
+      }
+      console.warn(`[extract] fetch/cheerio: Kein Bild gefunden für ${targetUrl}`);
+      // Kein Bild gefunden, aber nicht direkt antworten, falls Puppeteer noch läuft
+    } catch (err) {
+      console.error(`[extract] fetch/cheerio Fehler:`, err);
+      // Fehler ignorieren, Puppeteer übernimmt ggf.
     }
-    const img = $("picture img").first().attr("src") || $("img").first().attr("src");
-    if (img) {
-      const cleanImageUrl = img.split('?')[0];
-      return res.json({ imageUrl: cleanImageUrl });
+  };
+
+  // --- Methode 2: Puppeteer als Fallback ---
+  const puppeteerExtract = async () => {
+    try {
+      console.log(`[extract] Starte Puppeteer für: ${targetUrl}`);
+      const puppeteer = require('puppeteer');
+      const browser = await puppeteer.launch({
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        headless: true,
+      });
+      const page = await browser.newPage();
+      await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36");
+      await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
+      // Warte auf irgendein Bild im DOM (max. 10s)
+      try {
+        await page.waitForSelector('img[src]', { timeout: 10000 });
+      } catch (e) {
+        console.warn('[extract] Kein <img> mit src nach 10s gefunden.');
+      }
+      // Nimm das größte Bild auf der Seite
+      const biggestImg = await page.$$eval('img[src]', imgs => {
+        let maxArea = 0, best = null;
+        for (const img of imgs) {
+          const area = (img.naturalWidth || img.width || 0) * (img.naturalHeight || img.height || 0);
+          if (img.src && area > maxArea) {
+            maxArea = area;
+            best = img.src;
+          }
+        }
+        return best;
+      });
+      await browser.close();
+      if (biggestImg) {
+        console.log(`[extract] Puppeteer: Größtes Bild gefunden: ${biggestImg.split('?')[0]}`);
+        respondOnce({ imageUrl: biggestImg.split('?')[0] });
+        return;
+      }
+      console.warn(`[extract] Puppeteer: Kein Bild gefunden für ${targetUrl}`);
+      respondOnce({ error: "Kein Bild gefunden (Puppeteer)" }, 404);
+    } catch (err) {
+      console.error(`[extract] Puppeteer Fehler:`, err);
+      respondOnce({ error: err.message || "Unbekannter Fehler (Puppeteer)" }, 500);
     }
-    return res.status(404).json({ error: "Kein Bild gefunden" });
-  } catch (err) {
-    return res.status(500).json({ error: err.message || "Unbekannter Fehler" });
-  }
+  };
+
+  // --- Ablaufsteuerung: Fast-First, dann Fallback ---
+  let fastDone = false;
+  const fastPromise = fastExtract().then(() => { fastDone = true; });
+  // Starte Puppeteer nach 2s, falls fastExtract nicht erfolgreich war
+  const puppeteerTimeout = setTimeout(() => {
+    if (!responded) puppeteerExtract();
+  }, 2000);
+
+  // Harte Timeout-Grenze (z.B. 15s)
+  setTimeout(() => {
+    if (!responded) respondOnce({ error: "Timeout bei der Bildextraktion" }, 504);
+  }, 15000);
 });
 
 (async () => {
