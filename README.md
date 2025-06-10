@@ -1,5 +1,27 @@
 # React + Vite
 
+## Project Setup
+
+This project consists of a React frontend (client) and a Node.js backend (server).
+
+### Installation
+
+To install all dependencies for both the client and the server, run the following command in the root directory:
+
+```bash
+npm run install:all
+```
+
+### Running the Development Server
+
+To start both the frontend and backend servers concurrently, use:
+
+```bash
+npm run dev
+```
+
+This will typically start the frontend on `http://localhost:5173` and the backend on `http://localhost:3000`.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 ## About TryOnAI
