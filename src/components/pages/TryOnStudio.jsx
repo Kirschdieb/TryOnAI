@@ -4,6 +4,15 @@ import { useCloset } from '../../store/useCloset';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 
+// LoadingSpinner Komponente
+function LoadingSpinner() {
+  return (
+    <div className="flex items-center justify-center h-full">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-lavender"></div>
+    </div>
+  );
+}
+
 export default function TryOnStudio() {
   const navigate = useNavigate();
   const { userPhoto, clothPhoto, addOutfit } = useCloset(); // userPhoto is now a File object or null
@@ -157,12 +166,14 @@ export default function TryOnStudio() {
             <h2 className="text-xl font-semibold mb-4">Result</h2>
             <div className="relative h-[500px]"> {/* Changed aspect ratio to fixed height */}
               {isGenerating ? (
-                <div className="absolute inset-0 bg-cream-200 rounded-lg animate-pulse" />
+                <div className="absolute inset-0 bg-cream-200 rounded-lg flex items-center justify-center">
+                  <LoadingSpinner />
+                </div>
               ) : result ? (
                 <img
                   src={result}
                   alt="Generated result"
-                  className="absolute inset-0 w-full h-full object-contain rounded-lg" /* Changed to object-contain */
+                  className="absolute inset-0 w-full h-full object-contain rounded-lg"
                 />
               ) : (
                 <div className="absolute inset-0 bg-cream-200 rounded-lg flex items-center justify-center">
@@ -186,8 +197,16 @@ export default function TryOnStudio() {
               disabled={isGenerating}
               className="w-full mt-4"
             >
-              {isGenerating ? 'Generating...' : 'Generate Try-On'}
+              {isGenerating ? (
+                <span className="flex items-center justify-center">
+                  <span className="animate-spin h-4 w-4 mr-2 border-t-2 border-b-2 border-white rounded-full"></span>
+                  Generating...
+                </span>
+              ) : (
+                'Generate Try-On'
+              )}
             </Button>
+            {isGenerating && <LoadingSpinner />} {/* Show spinner while generating */}
           </Card>
         </div>
       </div>
