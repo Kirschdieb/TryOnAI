@@ -191,8 +191,7 @@ export default function TryOnStudio() {
               placeholder="Add any specific instructions for the AI (optional)"
               className="w-full p-3 border border-cream-300 rounded-lg resize-none h-32
                 focus:outline-none focus:ring-2 focus:ring-lavender"
-            />
-            <Button
+            />            <Button
               onClick={generateTryOn}
               disabled={isGenerating}
               className="w-full mt-4"
@@ -206,7 +205,6 @@ export default function TryOnStudio() {
                 'Generate Try-On'
               )}
             </Button>
-            {isGenerating && <LoadingSpinner />} {/* Show spinner while generating */}
           </Card>
         </div>
       </div>
