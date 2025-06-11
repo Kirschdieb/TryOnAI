@@ -75,10 +75,8 @@ export default function Landing() {
                   <p className="text-gray-600 text-center">
                     Browse our catalog or paste a Zalando URL to select the clothes you want to try on virtually.
                   </p>
-                </Link>
-
-                {/* About Us */}
-                <Link to="/profile" className="relative flex flex-col items-center group hover:transform hover:scale-105 transition-transform">
+                </Link>                {/* About Us */}
+                <Link to="/about" className="relative flex flex-col items-center group hover:transform hover:scale-105 transition-transform">
                   <div className="mb-4 h-16 w-16 bg-lavender rounded-full flex items-center justify-center group-hover:bg-purple-600 transition-colors">
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
