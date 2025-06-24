@@ -50,9 +50,8 @@ export default function Landing() {
           <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
             <div className="py-12 md:py-20">
               <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
-              <div className="mx-auto grid max-w-sm items-start gap-8 md:max-w-none md:grid-cols-3 lg:gap-16">
-                {/* Upload Photo */}
-                <Link to="/try-on" className="relative flex flex-col items-center group hover:transform hover:scale-105 transition-transform">
+              <div className="mx-auto grid max-w-sm items-start gap-8 md:max-w-none md:grid-cols-3 lg:gap-16">                {/* Upload Photo */}
+                <Link to="/profile" className="relative flex flex-col items-center group hover:transform hover:scale-105 transition-transform">
                   <div className="mb-4 h-16 w-16 bg-lavender rounded-full flex items-center justify-center group-hover:bg-purple-600 transition-colors">
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
@@ -62,10 +61,8 @@ export default function Landing() {
                   <p className="text-gray-600 text-center">
                     Start by uploading a full-body photo of yourself in a neutral pose. Our AI will process your image for the perfect fit.
                   </p>
-                </Link>
-
-                {/* Choose Clothing */}
-                <Link to="/try-on" className="relative flex flex-col items-center group hover:transform hover:scale-105 transition-transform">
+                </Link>                {/* Choose Clothing */}
+                <Link to="/browse" className="relative flex flex-col items-center group hover:transform hover:scale-105 transition-transform">
                   <div className="mb-4 h-16 w-16 bg-lavender rounded-full flex items-center justify-center group-hover:bg-purple-600 transition-colors">
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -75,7 +72,7 @@ export default function Landing() {
                   <p className="text-gray-600 text-center">
                     Browse our catalog or paste a Zalando URL to select the clothes you want to try on virtually.
                   </p>
-                </Link>                {/* About Us */}
+                </Link>{/* About Us */}
                 <Link to="/about" className="relative flex flex-col items-center group hover:transform hover:scale-105 transition-transform">
                   <div className="mb-4 h-16 w-16 bg-lavender rounded-full flex items-center justify-center group-hover:bg-purple-600 transition-colors">
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,13 +91,13 @@ export default function Landing() {
       </div>
 
       {/* Demo Animation Section */}
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 pb-16">
-        <div className="relative aspect-video rounded-2xl bg-gray-900 px-5 py-3 shadow-xl">
-          <div className="flex h-full items-center justify-center rounded-xl">
-            <div className="text-center text-white">
-              <p className="text-lg font-semibold">Experience our AI technology in action</p>
-              <p className="text-sm opacity-80">Watch how TryOnAI transforms online shopping</p>
-            </div>
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 pb-16">        <div className="relative aspect-video rounded-2xl bg-gray-900 px-5 py-3 shadow-xl">
+          <div className="flex h-full items-center justify-center rounded-xl overflow-hidden">
+            <img 
+              src="/src/assets/Präsentation1.gif" 
+              alt="TryOnAI Demo - Experience our AI technology in action" 
+              className="w-full h-full object-cover rounded-xl"
+            />
           </div>
           {/* Border animation effect */}
           <div className="pointer-events-none absolute -inset-px">
