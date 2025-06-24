@@ -1,9 +1,12 @@
+import { useLanguage } from '../../contexts/LanguageContext';
 import Card from '../ui/Card';
 
 export default function About() {
+  const { t } = useLanguage();
+  
   return (
     <div className="max-w-4xl mx-auto px-4">
-      <h1 className="text-4xl font-bold text-center mb-12">About TryOnAI</h1>
+      <h1 className="text-4xl font-bold text-center mb-12">{t('about.title')}</h1>
 
       <div className="space-y-8">
         <Card>

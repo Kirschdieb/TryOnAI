@@ -10,14 +10,14 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
+  "license": "ISC",  "dependencies": {
     "axios": "^1.6.0",
     "cheerio": "^1.0.0-rc.12",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "multer": "^1.4.5-lts.1",
+    "node-fetch": "^2.7.0",
     "openai": "^4.104.0",
     "puppeteer": "^24.10.0",
     "tryonai": "file:..",

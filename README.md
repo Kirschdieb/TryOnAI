@@ -22,11 +22,8 @@ TryOnAI/
 │   ├── node_modules/           # Server-specific dependencies
 │   ├── package-lock.json       # Server dependency versions
 │   ├── package.json            # Server dependency configuration
-│   ├── server/                 # Additional server-related code or configurations
-│   │   └── ...
 │   ├── temp/                   # Temporary directory for server operations
-│   ├── zalando-puppeteer.js    # Script likely for web scraping or automation with Puppeteer for Zalando
-│   └── zalando-test.js         # Test script related to Zalando functionality
+│   └── zalando-puppeteer.js    # Script for web scraping with Puppeteer for Zalando
 ├── src/                        # Frontend source code
 │   ├── App.css                 # CSS styles for the main App component
 │   ├── App.jsx                 # Main React component for the application

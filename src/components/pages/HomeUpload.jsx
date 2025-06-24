@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCloset } from '../../store/useCloset';
+import { useLanguage } from '../../contexts/LanguageContext';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import DropZone from '../ui/DropZone';
 
 export default function HomeUpload() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const {
     homeZalandoUrl: storeZalandoUrl,
     homeClothPhotoUrl: storeClothPhotoUrl,
@@ -20,7 +22,37 @@ export default function HomeUpload() {
   
   // Local state for inputs, initialized from store and synced back to store
   const [localClothPhotoUrl, setLocalClothPhotoUrl] = useState(storeClothPhotoUrl);
-  const [localZalandoUrl, setLocalZalandoUrl] = useState(storeZalandoUrl);
+  const [localZalandoUrl, setLocalZalandoUrl] = useState(storeZalandoUrl);  // Check clipboard on component mount - prevent showing popup for the same URL multiple times
+  useEffect(() => {
+    const checkClipboard = async () => {
+      try {
+        const clipboardText = await navigator.clipboard.readText();
+        // Check if clipboard contains any URL (not just Zalando)
+        const urlPattern = /^https?:\/\/.+/i;
+        if (clipboardText && urlPattern.test(clipboardText.trim())) {
+          // Check if we've already shown popup for this URL in this session
+          const lastPromptedUrl = sessionStorage.getItem('lastPromptedUrl');
+          if (lastPromptedUrl === clipboardText.trim()) {
+            return; // Don't show popup for the same URL again
+          }
+          
+          // Mark this URL as prompted before showing the popup
+          sessionStorage.setItem('lastPromptedUrl', clipboardText.trim());
+          
+          const shouldUse = window.confirm(t('home.clipboardPrompt') + '\n\n' + clipboardText);
+          if (shouldUse) {
+            setLocalZalandoUrl(clipboardText.trim());
+            setHomeZalandoUrl(clipboardText.trim());
+          }
+        }
+      } catch (error) {
+        // Clipboard access might be denied, ignore silently
+        console.log('Clipboard access not available');
+      }
+    };
+
+    checkClipboard();
+  }, [t, setHomeZalandoUrl]);
 
   // Effect to update local state if store changes (e.g., browser back/forward or initial load)
   useEffect(() => {

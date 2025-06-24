@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function MobileDrawer({ isOpen, onClose }) {
+  const { language, toggleLanguage, t } = useLanguage();
+
   return (
     <>
       {/* Backdrop */}
@@ -44,33 +47,51 @@ export default function MobileDrawer({ isOpen, onClose }) {
 
           <div className="flex flex-col space-y-4">
             <Link
-              to="/"
+              to="/try-on"
               onClick={onClose}
               className="p-2 rounded-lg hover:bg-cream-200"
             >
-              Try On
+              {t('nav.tryOn')}
+            </Link>
+            <Link
+              to="/browse"
+              onClick={onClose}
+              className="p-2 rounded-lg hover:bg-cream-200"
+            >
+              {t('nav.browse')}
             </Link>
             <Link
               to="/closet"
               onClick={onClose}
               className="p-2 rounded-lg hover:bg-cream-200"
             >
-              Kleiderschrank
+              {t('nav.closet')}
             </Link>
             <Link
               to="/profile"
               onClick={onClose}
               className="p-2 rounded-lg hover:bg-cream-200"
             >
-              Profil
+              {t('nav.profile')}
             </Link>
             <Link
               to="/about"
               onClick={onClose}
               className="p-2 rounded-lg hover:bg-cream-200"
             >
-              About
+              {t('nav.about')}
             </Link>
+            
+            {/* Language Switcher for Mobile */}
+            <button
+              onClick={() => {
+                toggleLanguage();
+                onClose();
+              }}
+              className="p-2 text-left border border-lavender text-lavender hover:bg-lavender hover:text-white rounded-lg transition-colors duration-200"
+            >
+              {language === 'de' ? t('nav.switchToEnglish') : t('nav.switchToGerman')}
+            </button>
           </div>
         </div>
       </div>
