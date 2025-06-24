@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCloset } from '../../store/useCloset';
-import { useLanguage } from '../../contexts/LanguageContext';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 
@@ -15,7 +14,6 @@ function LoadingSpinner() {
 }
 
 export default function TryOnStudio() {
-  const { t } = useLanguage();
   const navigate = useNavigate();
   const { userPhoto, clothPhoto, addOutfit } = useCloset(); // userPhoto is now a File object or null
   const [customPrompt, setCustomPrompt] = useState('');
@@ -179,7 +177,7 @@ export default function TryOnStudio() {
                 />
               ) : (
                 <div className="absolute inset-0 bg-cream-200 rounded-lg flex items-center justify-center">
-                  <p className="text-gray-500">{t('studio.clickGenerate')}</p>
+                  <p className="text-gray-500">Click Generate to start</p>
                 </div>
               )}
             </div>
@@ -190,7 +188,7 @@ export default function TryOnStudio() {
             <textarea
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value)}
-              placeholder={t('studio.customPrompt')}
+              placeholder="Add any specific instructions for the AI (optional)"
               className="w-full p-3 border border-cream-300 rounded-lg resize-none h-32
                 focus:outline-none focus:ring-2 focus:ring-lavender"
             />            <Button
@@ -200,10 +198,11 @@ export default function TryOnStudio() {
             >
               {isGenerating ? (
                 <span className="flex items-center justify-center">
-                  <span className="animate-spin h-4 w-4 mr-2 border-t-2 border-b-2 border-white rounded-full"></span>                  {t('studio.generating')}
+                  <span className="animate-spin h-4 w-4 mr-2 border-t-2 border-b-2 border-white rounded-full"></span>
+                  Generating...
                 </span>
               ) : (
-                t('home.generateButton')
+                'Generate Try-On'
               )}
             </Button>
           </Card>

@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import { useLanguage } from '../../contexts/LanguageContext';
 
-export default function ProfilePage() {
-  const { t } = useLanguage();const [profile, setProfile] = useState({
+export default function ProfilePage() {  const [profile, setProfile] = useState({
     name: "Max Mustermann",
     email: "",
     phone: "",
@@ -49,7 +47,7 @@ export default function ProfilePage() {
     const hasBackPhoto = profile.tryonImageBack !== null;
     
     if ((hasFrontPhoto && !hasBackPhoto) || (!hasFrontPhoto && hasBackPhoto)) {
-      const confirmSingle = window.confirm(t('profile.confirmSingle'));
+      const confirmSingle = window.confirm("Sind Sie sicher, dass Sie kein Bild der Rückseite hochladen wollen?");
       if (!confirmSingle) {
         return; // Don't save if user wants to add the missing photo
       }
@@ -77,7 +75,7 @@ export default function ProfilePage() {
               onClick={() => document.getElementById('profileImage').click()}
               className="flex items-center gap-2 border-2 border-blue-500 text-blue-500 px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition"
             >
-              <span className="text-xl">+</span> {t('profile.upload')}
+              <span className="text-xl">+</span> Upload Photo
             </button>
             <input
               id="profileImage"

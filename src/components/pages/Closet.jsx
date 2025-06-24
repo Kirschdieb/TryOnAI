@@ -1,22 +1,27 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCloset } from '../../store/useCloset';
-import { useLanguage } from '../../contexts/LanguageContext';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 
 export default function Closet() {
-  const { t } = useLanguage();
   const { outfits } = useCloset();
   const [selectedOutfit, setSelectedOutfit] = useState(null);
 
-  return (    <div className="max-w-6xl mx-auto">      <h1 className="text-4xl font-bold text-center mb-8">{t('closet.title')}</h1>      {outfits.length === 0 ? (
+  return (    <div className="max-w-6xl mx-auto">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-bold">Your Virtual Closet</h1>
+        <Link to="/browse">
+          <Button variant="primary" className="px-6 py-3">
+            Browse Clothes
+          </Button>
+        </Link>
+      </div>      {outfits.length === 0 ? (
         <Card className="text-center py-12">
-          <p className="text-gray-500 mb-6">{t('closet.empty')}</p>
-          <p className="text-gray-400 mb-6">{t('closet.emptySubtitle')}</p>
+          <p className="text-gray-500 mb-6">Your closet is empty. Try on some clothes to get started!</p>
           <Link to="/browse">
             <Button variant="primary">
-              {t('closet.browseClothes')}
+              Browse Clothes
             </Button>
           </Link>
         </Card>

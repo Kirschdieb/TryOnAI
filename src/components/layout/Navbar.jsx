@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useLanguage } from '../../contexts/LanguageContext';
 import MobileDrawer from './MobileDrawer';
 
 export default function Navbar() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { language, toggleLanguage, t } = useLanguage();
 
   return (
     <nav className="sticky top-0 bg-cream-100 shadow-sm z-50">
@@ -18,26 +16,18 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/try-on" className="text-gray-600 hover:text-lavender">
-              {t('nav.tryOn')}
+            <Link to="/" className="text-gray-600 hover:text-lavender">
+              Try On
             </Link>
             <Link to="/closet" className="text-gray-600 hover:text-lavender">
-              {t('nav.closet')}
+              Kleiderschrank
             </Link>
             <Link to="/profile" className="text-gray-600 hover:text-lavender">
-              {t('nav.profile')}
+              Profil
             </Link>
             <Link to="/about" className="text-gray-600 hover:text-lavender">
-              {t('nav.about')}
+              About
             </Link>
-            
-            {/* Language Switcher */}
-            <button
-              onClick={toggleLanguage}
-              className="px-3 py-1 text-sm border border-lavender text-lavender hover:bg-lavender hover:text-white rounded-md transition-colors duration-200"
-            >
-              {language === 'de' ? 'EN' : 'DE'}
-            </button>
           </div>
 
           {/* Mobile Menu Button */}
