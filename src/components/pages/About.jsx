@@ -10,24 +10,22 @@ export default function About() {
 
       <div className="space-y-8">
         <Card>
-          <h2 className="text-2xl font-semibold mb-4">Our Mission</h2>
+          <h2 className="text-2xl font-semibold mb-4">{t('about.mission')}</h2>
           <p className="text-gray-600 leading-relaxed">
-            TryOnAI aims to revolutionize online shopping by providing a seamless virtual try-on experience. 
-            Our platform combines cutting-edge AI technology with an intuitive interface to help you visualize 
-            how clothes will look on you before making a purchase.
+            {t('about.missionText')}
           </p>
         </Card>
 
         <Card>
-          <h2 className="text-2xl font-semibold mb-4">How It Works</h2>
+          <h2 className="text-2xl font-semibold mb-4">{t('about.howItWorks')}</h2>
           <div className="space-y-4">
             <div className="flex items-start gap-4">
               <div className="w-8 h-8 bg-lavender rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-semibold">1</span>
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Upload Your Photo</h3>
-                <p className="text-gray-600">Start by uploading a full-body photo of yourself in a neutral pose.</p>
+                <h3 className="font-semibold mb-1">{t('about.step1Title')}</h3>
+                <p className="text-gray-600">{t('about.step1Text')}</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
@@ -35,8 +33,8 @@ export default function About() {
                 <span className="text-white font-semibold">2</span>
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Select Clothing</h3>
-                <p className="text-gray-600">Choose clothing items by uploading an image or pasting a Zalando product URL.</p>
+                <h3 className="font-semibold mb-1">{t('about.step2Title')}</h3>
+                <p className="text-gray-600">{t('about.step2Text')}</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
@@ -44,32 +42,30 @@ export default function About() {
                 <span className="text-white font-semibold">3</span>
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Generate Preview</h3>
-                <p className="text-gray-600">Our AI technology will create a realistic preview of how the clothing looks on you.</p>
+                <h3 className="font-semibold mb-1">{t('about.step3Title')}</h3>
+                <p className="text-gray-600">{t('about.step3Text')}</p>
               </div>
             </div>
           </div>
         </Card>
 
         <Card>
-          <h2 className="text-2xl font-semibold mb-4">Technology</h2>
+          <h2 className="text-2xl font-semibold mb-4">{t('about.technology')}</h2>
           <p className="text-gray-600 leading-relaxed mb-4">
-            TryOnAI is built using modern web technologies and AI:
+            {t('about.technologyText')}
           </p>
           <ul className="list-disc list-inside space-y-2 text-gray-600">
-            <li>React and Vite for a responsive frontend</li>
-            <li>Tailwind CSS for beautiful, custom styling</li>
-            <li>State management with Zustand</li>
-            <li>AI-powered image processing for realistic try-on results</li>
+            <li>{t('about.tech1')}</li>
+            <li>{t('about.tech2')}</li>
+            <li>{t('about.tech3')}</li>
+            <li>{t('about.tech4')}</li>
           </ul>
         </Card>
 
         <Card>
-          <h2 className="text-2xl font-semibold mb-4">Privacy & Security</h2>
+          <h2 className="text-2xl font-semibold mb-4">{t('about.privacy')}</h2>
           <p className="text-gray-600 leading-relaxed">
-            We take your privacy seriously. All uploaded photos are processed securely and are not stored 
-            permanently on our servers. The virtual try-on results are saved only in your local browser 
-            storage for your convenience.
+            {t('about.privacyText')}
           </p>
         </Card>
       </div>

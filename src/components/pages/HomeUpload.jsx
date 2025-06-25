@@ -120,13 +120,13 @@ export default function HomeUpload() {
   return (
     <div className="max-w-4xl mx-auto">
       <h1 className="text-4xl font-bold text-center mb-8">
-        Virtual Try-On Experience
+        {t('home.virtualTryOn')}
       </h1>
       
       <div className="grid md:grid-cols-2 gap-8">
         {/* User Photo Upload */}
         <Card>
-          <h2 className="text-xl font-semibold mb-4">1. Upload Your Photo</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('home.uploadYourPhoto')}</h2>
           <div className="relative aspect-[3/4] mb-4">
             <DropZone
               onFileSelect={setUserPhotoFile} // setUserPhotoFile will receive the File object
@@ -146,12 +146,12 @@ export default function HomeUpload() {
 
         {/* Clothing Upload */}
         <Card>
-          <h2 className="text-xl font-semibold mb-4">2. Choose Clothing</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('home.chooseClothing')}</h2>
           
           {/* Zalando URL Input */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Paste Zalando URL
+              {t('home.pasteZalandoUrl')}
             </label>
             <input
               type="url"
@@ -162,7 +162,7 @@ export default function HomeUpload() {
                 setHomeZalandoUrl(newUrl); // Update store
               }}
               pattern="https://www.zalando."
-              placeholder="https://www.zalando.de/..."
+              placeholder={t('home.zalandoPlaceholder')}
               className="w-full p-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender"
             />
             <Button
@@ -170,7 +170,7 @@ export default function HomeUpload() {
               disabled={!localZalandoUrl || isExtracting} // Use localZalandoUrl
               className="mt-2"
             >
-              {isExtracting ? 'Extracting...' : 'Extract Product Image'}
+              {isExtracting ? t('home.extracting') : t('home.extractImage')}
             </Button>
             {extractError && <p className="text-sm text-red-600 mt-1">{extractError}</p>}
           </div>
@@ -179,7 +179,7 @@ export default function HomeUpload() {
             <div className="absolute inset-x-0 top-1/2 -translate-y-1/2">
               <div className="border-t border-cream-300"></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="bg-cream-100 px-2 text-sm text-gray-500">OR</span>
+                <span className="bg-cream-100 px-2 text-sm text-gray-500">{t('home.or')}</span>
               </div>
             </div>
           </div>
@@ -215,7 +215,7 @@ export default function HomeUpload() {
           disabled={!isValid}
           className="w-full md:w-auto"
         >
-          Try On
+          {t('home.tryOn')}
         </Button>
       </div>
     </div>
