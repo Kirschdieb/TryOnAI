@@ -14,11 +14,8 @@ export default function ProfilePage() {
     address: "",
     height: "",
     size: "",
-    image: null,
     imageUrl: "",
-    tryonImageFront: null,
     tryonImageFrontUrl: "",
-    tryonImageBack: null,
     tryonImageBackUrl: ""
   });
 
@@ -31,9 +28,16 @@ export default function ProfilePage() {
       setIsLoggedIn(true);
       try {
         const parsedProfile = JSON.parse(savedProfile);
-        setProfile(parsedProfile);
+        // Ensure we only use base64 image URLs
+        setProfile({
+          ...parsedProfile,
+          imageUrl: parsedProfile.imageUrl || "",
+          tryonImageFrontUrl: parsedProfile.tryonImageFrontUrl || "",
+          tryonImageBackUrl: parsedProfile.tryonImageBackUrl || ""
+        });
       } catch (error) {
         console.error('Error parsing saved profile:', error);
+        handleLogout(); // Reset if corrupted
       }
     } else {
       setShowModal(true);
@@ -54,39 +58,61 @@ export default function ProfilePage() {
     });
   };
 
+  const isValidBase64Image = (str) => {
+    return str && str.startsWith('data:image/') && str.includes('base64,');
+  };
+
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const base64 = await convertFileToBase64(file);
-      setProfile((prev) => ({ 
-        ...prev, 
-        image: base64, 
-        imageUrl: URL.createObjectURL(file) 
-      }));
+      try {
+        const base64 = await convertFileToBase64(file);
+        setProfile((prev) => ({ 
+          ...prev, 
+          imageUrl: base64 
+        }));
+        // Immediately save to localStorage
+        const updatedProfile = { ...profile, imageUrl: base64 };
+        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+      } catch (error) {
+        alert('Error converting image. Please try again.');
+      }
     }
   };
 
   const handleTryonFrontImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const base64 = await convertFileToBase64(file);
-      setProfile((prev) => ({ 
-        ...prev, 
-        tryonImageFront: base64, 
-        tryonImageFrontUrl: URL.createObjectURL(file) 
-      }));
+      try {
+        const base64 = await convertFileToBase64(file);
+        setProfile((prev) => ({ 
+          ...prev, 
+          tryonImageFrontUrl: base64 
+        }));
+        // Immediately save to localStorage
+        const updatedProfile = { ...profile, tryonImageFrontUrl: base64 };
+        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+      } catch (error) {
+        alert('Error converting image. Please try again.');
+      }
     }
   };
 
   const handleTryonBackImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const base64 = await convertFileToBase64(file);
-      setProfile((prev) => ({ 
-        ...prev, 
-        tryonImageBack: base64, 
-        tryonImageBackUrl: URL.createObjectURL(file) 
-      }));
+      try {
+        const base64 = await convertFileToBase64(file);
+        setProfile((prev) => ({ 
+          ...prev, 
+          tryonImageBackUrl: base64 
+        }));
+        // Immediately save to localStorage
+        const updatedProfile = { ...profile, tryonImageBackUrl: base64 };
+        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+      } catch (error) {
+        alert('Error converting image. Please try again.');
+      }
     }
   };
 
@@ -100,14 +126,27 @@ export default function ProfilePage() {
         try {
           const text = await file.text();
           const importedProfile = JSON.parse(text);
-          setProfile(importedProfile);
-          localStorage.setItem('userProfile', JSON.stringify(importedProfile));
+          
+          // Clean the imported profile to ensure only base64 images
+          const cleanProfile = {
+            name: importedProfile.name || "",
+            email: importedProfile.email || "",
+            phone: importedProfile.phone || "",
+            address: importedProfile.address || "",
+            height: importedProfile.height || "",
+            size: importedProfile.size || "",
+            imageUrl: (importedProfile.imageUrl && isValidBase64Image(importedProfile.imageUrl)) ? importedProfile.imageUrl : "",
+            tryonImageFrontUrl: (importedProfile.tryonImageFrontUrl && isValidBase64Image(importedProfile.tryonImageFrontUrl)) ? importedProfile.tryonImageFrontUrl : "",
+            tryonImageBackUrl: (importedProfile.tryonImageBackUrl && isValidBase64Image(importedProfile.tryonImageBackUrl)) ? importedProfile.tryonImageBackUrl : ""
+          };
+          
+          setProfile(cleanProfile);
+          localStorage.setItem('userProfile', JSON.stringify(cleanProfile));
           localStorage.setItem('isLoggedIn', 'true');
           setIsLoggedIn(true);
           setShowModal(false);
           alert(t('profile.importSuccess'));
         } catch (error) {
-          console.error('Error importing profile:', error);
           alert(t('profile.importError'));
         }
       }
@@ -123,11 +162,8 @@ export default function ProfilePage() {
       address: "",
       height: "",
       size: "",
-      image: null,
       imageUrl: "",
-      tryonImageFront: null,
       tryonImageFrontUrl: "",
-      tryonImageBack: null,
       tryonImageBackUrl: ""
     };
     setProfile(newProfile);
@@ -148,49 +184,54 @@ export default function ProfilePage() {
       address: "",
       height: "",
       size: "",
-      image: null,
       imageUrl: "",
-      tryonImageFront: null,
       tryonImageFrontUrl: "",
-      tryonImageBack: null,
       tryonImageBackUrl: ""
     });
     setShowModal(true);
   };
 
   const handleExportProfile = () => {
-    const dataStr = JSON.stringify(profile, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
-    const exportFileDefaultName = `profile_${profile.name || 'user'}_${new Date().toISOString().split('T')[0]}.json`;
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-    
-    alert(t('profile.exportSuccess'));
+    try {
+      // Only export base64 images
+      const exportData = {
+        ...profile,
+        exportDate: new Date().toISOString()
+      };
+      
+      const dataStr = JSON.stringify(exportData, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      
+      const exportFileDefaultName = `profile_${profile.name || 'user'}_${new Date().toISOString().split('T')[0]}.json`;
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+      
+      alert(t('profile.exportSuccess'));
+    } catch (error) {
+      alert('Error exporting profile: ' + error.message);
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Check if only one TryOn photo is uploaded
-    const hasFrontPhoto = profile.tryonImageFront !== null;
-    const hasBackPhoto = profile.tryonImageBack !== null;
-    
-    if ((hasFrontPhoto && !hasBackPhoto) || (!hasFrontPhoto && hasBackPhoto)) {
-      const confirmSingle = window.confirm(t('profile.confirmSingle'));
-      if (!confirmSingle) {
-        return; // Don't save if user wants to add the missing photo
+    try {
+      // Save profile to localStorage
+      localStorage.setItem('userProfile', JSON.stringify(profile));
+      
+      // Export profile as JSON
+      handleExportProfile();
+    } catch (error) {
+      if (error.name === 'QuotaExceededError') {
+        alert('Storage full! Profile will only be exported as file, not saved locally.');
+        handleExportProfile();
+      } else {
+        alert('Error saving profile: ' + error.message);
       }
     }
-    
-    // Save profile to localStorage
-    localStorage.setItem('userProfile', JSON.stringify(profile));
-    
-    // Export profile as JSON
-    handleExportProfile();
   };
 
   if (showModal && !isLoggedIn) {
@@ -241,8 +282,12 @@ export default function ProfilePage() {
       <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-10">
         <div className="flex flex-col items-center flex-1">
           <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border-2 border-gray-300 mb-2">
-            {profile.imageUrl ? (
-              <img src={profile.imageUrl} alt={t('profile.profileImage')} className="object-cover w-full h-full" />
+            {profile.imageUrl && isValidBase64Image(profile.imageUrl) ? (
+              <img 
+                src={profile.imageUrl} 
+                alt="Profilbild" 
+                className="object-cover w-full h-full"
+              />
             ) : (
               <span className="text-gray-400">{t('profile.profileImage')}</span>
             )}
@@ -362,8 +407,12 @@ export default function ProfilePage() {
               {/* Front Photo */}
               <div className="flex flex-col items-center">
                 <div className="w-40 h-56 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                  {profile.tryonImageFrontUrl ? (
-                    <img src={profile.tryonImageFrontUrl} alt={t('profile.tryOnFront')} className="object-cover w-full h-full" />
+                  {profile.tryonImageFrontUrl && isValidBase64Image(profile.tryonImageFrontUrl) ? (
+                    <img 
+                      src={profile.tryonImageFrontUrl} 
+                      alt="TryOn Vorne" 
+                      className="object-cover w-full h-full"
+                    />
                   ) : (
                     <span className="text-gray-400">{t('profile.tryOnFront')}</span>
                   )}
@@ -387,8 +436,12 @@ export default function ProfilePage() {
               {/* Back Photo */}
               <div className="flex flex-col items-center">
                 <div className="w-40 h-56 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                  {profile.tryonImageBackUrl ? (
-                    <img src={profile.tryonImageBackUrl} alt={t('profile.tryOnBack')} className="object-cover w-full h-full" />
+                  {profile.tryonImageBackUrl && isValidBase64Image(profile.tryonImageBackUrl) ? (
+                    <img 
+                      src={profile.tryonImageBackUrl} 
+                      alt="TryOn Hinten" 
+                      className="object-cover w-full h-full"
+                    />
                   ) : (
                     <span className="text-gray-400">{t('profile.tryOnBack')}</span>
                   )}
