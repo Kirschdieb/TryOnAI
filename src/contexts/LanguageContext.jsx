@@ -104,6 +104,24 @@ const translations = {
     'profile.req2': 'Max. 2MB',
     'profile.req3': 'Gesamter Körper von Vorne, Seiten oder Hinten',
     'profile.req4': 'Gesicht muss nicht erkennbar sein',
+
+    // Profile Modal
+    'profile.modal.welcome': 'Willkommen bei TryOnAI',
+    'profile.modal.subtitle': 'Erstelle oder lade dein Profil',
+    'profile.modal.login': 'Profil laden',
+    'profile.modal.register': 'Neues Profil erstellen',
+    'profile.modal.loginDesc': 'Lade ein vorhandenes Profil',
+    'profile.modal.registerDesc': 'Erstelle ein neues Profil',
+    'profile.modal.close': 'Schließen',
+    'profile.import': 'Profil importieren',
+    'profile.export': 'Profil exportieren',
+    'profile.exportDesc': 'Exportiere dein Profil als JSON-Datei',
+    'profile.importDesc': 'Importiere ein Profil aus einer JSON-Datei',
+    'profile.logout': 'Abmelden',
+    'profile.name': 'Name',
+    'profile.exportSuccess': 'Profil erfolgreich exportiert!',
+    'profile.importSuccess': 'Profil erfolgreich importiert!',
+    'profile.importError': 'Fehler beim Importieren des Profils',
     
     // Try-On Studio
     'studio.generating': 'Generiere...',
@@ -237,6 +255,24 @@ const translations = {
     'profile.req2': 'Max. 2MB',
     'profile.req3': 'Full body from front, side or back',
     'profile.req4': 'Face doesn\'t need to be visible',
+
+    // Profile Modal
+    'profile.modal.welcome': 'Welcome to TryOnAI',
+    'profile.modal.subtitle': 'Create or load your profile',
+    'profile.modal.login': 'Load Profile',
+    'profile.modal.register': 'Create New Profile',
+    'profile.modal.loginDesc': 'Load an existing profile',
+    'profile.modal.registerDesc': 'Create a new profile',
+    'profile.modal.close': 'Close',
+    'profile.import': 'Import Profile',
+    'profile.export': 'Export Profile',
+    'profile.exportDesc': 'Export your profile as JSON file',
+    'profile.importDesc': 'Import a profile from JSON file',
+    'profile.logout': 'Logout',
+    'profile.name': 'Name',
+    'profile.exportSuccess': 'Profile exported successfully!',
+    'profile.importSuccess': 'Profile imported successfully!',
+    'profile.importError': 'Error importing profile',
     
     // Try-On Studio
     'studio.generating': 'Generating...',
