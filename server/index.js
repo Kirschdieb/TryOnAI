@@ -9,10 +9,12 @@ const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
 const cheerio = require('cheerio');
 const multer = require('multer');
+// Node.js fetch Polyfill für serverseitige Nutzung
+let fetch = global.fetch;
+if (!fetch) {
+  fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+}
 const puppeteer = require('puppeteer');
-
-// Import fetch for Node.js
-const fetch = require('node-fetch');
 
 const app = express();
 const port = process.env.PORT || 3001;
