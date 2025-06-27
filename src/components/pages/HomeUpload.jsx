@@ -20,6 +20,9 @@ export default function HomeUpload() {
   const [userPhotoFile, setUserPhotoFile] = useState(null); // Stores the File object
   const [userPhotoPreviewUrl, setUserPhotoPreviewUrl] = useState(null); // For image preview
   
+  // Cloth photo file state for direct upload
+  const [clothPhotoFile, setClothPhotoFile] = useState(null);
+  
   // Local state for inputs, initialized from store and synced back to store
   const [localClothPhotoUrl, setLocalClothPhotoUrl] = useState(storeClothPhotoUrl);
   const [localZalandoUrl, setLocalZalandoUrl] = useState(storeZalandoUrl);  // Check clipboard on component mount - prevent showing popup for the same URL multiple times
@@ -94,12 +97,24 @@ export default function HomeUpload() {
     }
   }, [userPhotoFile]);
 
+  // Effect to create and revoke blob URL for cloth photo file preview
+  useEffect(() => {
+    if (clothPhotoFile) {
+      const previewUrl = URL.createObjectURL(clothPhotoFile);
+      setLocalClothPhotoUrl(previewUrl);
+      setHomeClothPhotoUrl(previewUrl);
+      return () => URL.revokeObjectURL(previewUrl);
+    }
+  }, [clothPhotoFile, setHomeClothPhotoUrl]);
+
   const isValid = (userPhotoFile && (localClothPhotoUrl || localZalandoUrl.startsWith('https://www.zalando.')));
 
   const extractZalandoImage = async () => {
     if (!localZalandoUrl) return; // Use localZalandoUrl
     setIsExtracting(true);
     setExtractError(null);
+    // Cloth File zurücksetzen wenn Zalando URL verwendet wird
+    setClothPhotoFile(null);
     try {
       const res = await fetch(`http://localhost:3001/api/extract?url=${encodeURIComponent(localZalandoUrl)}`); // Use localZalandoUrl
       if (!res.ok) throw new Error(`Extraction failed (${res.status})`);
@@ -188,9 +203,11 @@ export default function HomeUpload() {
           <div className="mt-6">
             <div className="relative aspect-[3/4] mb-4">
               <DropZone
-                onFileSelect={(url) => { // Assuming DropZone provides a URL directly; update local and store state
-                  setLocalClothPhotoUrl(url);
-                  setHomeClothPhotoUrl(url); // Update store
+                onFileSelect={(file) => {
+                  setClothPhotoFile(file);
+                  // Zalando URL zurücksetzen wenn File hochgeladen wird
+                  setLocalZalandoUrl('');
+                  setHomeZalandoUrl('');
                 }}
                 className="w-full h-full"
               />
