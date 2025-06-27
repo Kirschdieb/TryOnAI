@@ -70,39 +70,43 @@ export default function TryOnStudio() {
     extractClothImage();
   }, [clothPhoto]);
 
+  // Speichert das aktuelle Try-On Ergebnis im Closet
+  const saveToCloset = () => {
+    if (!result) return;
+    addOutfit({
+      userPhoto: userPhotoPreviewUrl,
+      clothPhoto: extractedClothImage,
+      resultImageUrl: result,
+      customPrompt: customPrompt,
+      createdAt: new Date().toISOString(),
+    });
+  };
+
   const generateTryOn = async () => {
     setIsGenerating(true);
     setResult(null);
-
     if (!userPhoto) {
       alert(t('home.pleaseUpload'));
       setIsGenerating(false);
       return;
     }
-
     try {
       const formData = new FormData();
       formData.append('customPrompt', customPrompt);
       formData.append('userPhoto', userPhoto); // userPhoto is a File object
-      
       const clothImageSource = extractedClothImage || clothPhoto;
       if (clothImageSource) {
-        // We send clothImageUrl; backend will download if it's a URL or process if it's a data URL (though less likely now)
-        // If clothImageSource were a File object (e.g., direct cloth upload), we'd append it as 'clothPhotoFile'
         formData.append('clothImageUrl', clothImageSource);
       } else {
         alert(t('home.pleaseProvide'));
         setIsGenerating(false);
         return;
       }
-
       const response = await fetch('http://localhost:3001/api/tryon', {
         method: 'POST',
-        // 'Content-Type' header is set automatically by the browser for FormData
         body: formData,
       });
       if (!response.ok) {
-        // Versuche, Text-Response zu lesen
         const errorData = await response.json();
         if (errorData && errorData.text) {
           alert(t('home.error') + ' ' + errorData.text);
@@ -113,13 +117,13 @@ export default function TryOnStudio() {
       }
       const data = await response.json();
       setResult(data.imageUrl);
-      
-      // Add try-on to recent history
-      addRecentTryOn({
+      // Speichere Try-On in Closet
+      addOutfit({
         userPhoto: userPhotoPreviewUrl,
         clothPhoto: extractedClothImage,
         resultImageUrl: data.imageUrl,
         customPrompt: customPrompt,
+        createdAt: new Date().toISOString(),
       });
     } catch (err) {
       alert(t('home.error') + ' ' + err.message);
@@ -175,11 +179,11 @@ export default function TryOnStudio() {
                   <LoadingSpinner />
                 </div>
               ) : result ? (
-                <div className="relative">
+                <div className="relative h-full">
                   <img
                     src={result}
                     alt="Generated result"
-                    className="absolute inset-0 w-full h-full object-contain rounded-lg"
+                    className="w-full h-full object-contain rounded-lg"
                   />
                   <Button
                     onClick={saveToCloset}
