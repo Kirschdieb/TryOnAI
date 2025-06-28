@@ -14,6 +14,7 @@ function LoadingSpinner() {
   );
 }
 
+
 export default function TryOnStudio() {
   const { t } = useLanguage();
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ export default function TryOnStudio() {
   const [isExtractingCloth, setIsExtractingCloth] = useState(false);
   const [extractError, setExtractError] = useState(null);
   const [userPhotoPreviewUrl, setUserPhotoPreviewUrl] = useState(null);
+  const [showSaved, setShowSaved] = useState(false);
 
   // Effect to create and revoke blob URL for userPhoto preview if it's a File object
   useEffect(() => {
@@ -76,10 +78,12 @@ export default function TryOnStudio() {
     addOutfit({
       userPhoto: userPhotoPreviewUrl,
       clothPhoto: extractedClothImage,
-      resultImageUrl: result,
+      image: result, // für Closet
       customPrompt: customPrompt,
-      createdAt: new Date().toISOString(),
+      timestamp: new Date().toISOString(), // für Closet
     });
+    setShowSaved(true);
+    setTimeout(() => setShowSaved(false), 2000);
   };
 
   const generateTryOn = async () => {
@@ -133,26 +137,31 @@ export default function TryOnStudio() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto"> {/* Adjusted max-width for 3 columns */}
-      <div className="grid md:grid-cols-3 gap-8"> {/* Changed to 3 columns */}
+    <div className="max-w-7xl mx-auto">
+      {/* Snackbar/Toast für Bestätigung */}
+      {showSaved && (
+        <div className="fixed top-6 left-1/2 z-50 -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transition-all animate-fade-in">
+          <span className="font-semibold">{t('studio.savedToCloset')}</span>
+        </div>
+      )}
+      <div className="grid md:grid-cols-3 gap-8">
         {/* Column 1: Your Photo */}
-        <Card className="md:self-start"> {/* Added md:self-start */}
+        <Card className="md:self-start">
           <h2 className="text-xl font-semibold mb-4">{t('studio.yourPhoto')}</h2>
-          <div className="relative"> {/* Removed fixed height */}
+          <div className="relative">
             <img
               src={userPhotoPreviewUrl || 'https://via.placeholder.com/300x400.png?text=Your+Photo'}
               alt="Your photo"
-              className="w-full h-auto object-contain rounded-lg block" /* Adjusted for auto height */
+              className="w-full h-auto object-contain rounded-lg block"
             />
           </div>
         </Card>
-        
         {/* Column 2: Clothing Item */}
-        <Card className="md:self-start"> {/* Added md:self-start */}
+        <Card className="md:self-start">
           <h2 className="text-xl font-semibold mb-4">{t('studio.clothingItem')}</h2>
-          <div className="relative"> {/* Removed fixed height */}
+          <div className="relative">
             {isExtractingCloth ? (
-              <div className="w-full h-auto aspect-[3/4] bg-cream-200 rounded-lg animate-pulse"></div> /* Placeholder with aspect ratio */
+              <div className="w-full h-auto aspect-[3/4] bg-cream-200 rounded-lg animate-pulse"></div>
             ) : extractError ? (
               <div className="w-full h-auto aspect-[3/4] bg-cream-200 rounded-lg flex items-center justify-center">
                 <p className="text-red-500">{extractError}</p>
@@ -162,18 +171,17 @@ export default function TryOnStudio() {
                 <img
                   src={extractedClothImage}
                   alt="Clothing"
-                  className="w-full h-auto object-contain rounded-lg block" /* Adjusted for auto height */
+                  className="w-full h-auto object-contain rounded-lg block"
                 />
               )
             )}
           </div>
         </Card>
-
         {/* Column 3: Generation Area (Result & Customization stacked) */}
         <div className="space-y-6">
-          <Card> {/* Result Card First */}
+          <Card>
             <h2 className="text-xl font-semibold mb-4">{t('studio.result')}</h2>
-            <div className="relative h-[500px]"> {/* Changed aspect ratio to fixed height */}
+            <div className="relative h-[500px]">
               {isGenerating ? (
                 <div className="absolute inset-0 bg-cream-200 rounded-lg flex items-center justify-center">
                   <LoadingSpinner />
@@ -199,23 +207,23 @@ export default function TryOnStudio() {
               )}
             </div>
           </Card>
-
-          <Card> {/* Customization Card Second */}
+          <Card>
             <h2 className="text-xl font-semibold mb-4">{t('studio.customization')}</h2>
             <textarea
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value)}
               placeholder={t('studio.customPrompt')}
-              className="w-full p-3 border border-cream-300 rounded-lg resize-none h-32
-                focus:outline-none focus:ring-2 focus:ring-lavender"
-            />            <Button
+              className="w-full p-3 border border-cream-300 rounded-lg resize-none h-32 focus:outline-none focus:ring-2 focus:ring-lavender"
+            />
+            <Button
               onClick={generateTryOn}
               disabled={isGenerating}
               className="w-full mt-4"
             >
               {isGenerating ? (
                 <span className="flex items-center justify-center">
-                  <span className="animate-spin h-4 w-4 mr-2 border-t-2 border-b-2 border-white rounded-full"></span>                  {t('studio.generating')}
+                  <span className="animate-spin h-4 w-4 mr-2 border-t-2 border-b-2 border-white rounded-full"></span>
+                  {t('studio.generating')}
                 </span>
               ) : (
                 t('home.generateButton')

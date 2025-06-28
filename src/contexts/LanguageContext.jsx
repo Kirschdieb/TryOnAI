@@ -78,6 +78,8 @@ const translations = {
     'closet.empty': 'Dein Kleiderschrank ist leer',
     'closet.emptySubtitle': 'Beginne damit, Outfits zu erstellen!',
     'closet.browseClothes': 'Kleidung durchsuchen',
+    'closet.browseBoxTitle': 'Weitere Kleidung entdecken',
+    'closet.browseBoxDesc': 'Hier kannst du weitere Kleidungsideen über Zalando durchstöbern und Inspiration für deinen Kleiderschrank sammeln.',
     
     // Profile Page
     'profile.title': 'Profil',
@@ -229,6 +231,8 @@ const translations = {
     'closet.empty': 'Your closet is empty',
     'closet.emptySubtitle': 'Start creating outfits!',
     'closet.browseClothes': 'Browse Clothes',
+    'closet.browseBoxTitle': 'Discover more clothing',
+    'closet.browseBoxDesc': 'Here you can browse more clothing ideas via Zalando and get inspiration for your closet.',
     
     // Profile Page
     'profile.title': 'Profile',

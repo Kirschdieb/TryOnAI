@@ -14,38 +14,57 @@ export default function Closet() {
     <div className="max-w-6xl mx-auto">
       <h1 className="text-4xl font-bold text-center mb-8">{t('closet.title')}</h1>
       
-      {outfits.length === 0 ? (
-        <Card className="text-center py-12">
-          <p className="text-gray-500 mb-6">{t('closet.empty')}</p>
-          <p className="text-gray-400 mb-6">{t('closet.emptySubtitle')}</p>
-          <Link to="/browse">
-            <Button variant="primary">
-              {t('closet.browseClothes')}
-            </Button>
-          </Link>
-        </Card>
-      ) : (
-        <div className="columns-1 sm:columns-2 lg:columns-4 gap-4 space-y-4">
-          {outfits.map((outfit) => (
-            <Card
-              key={outfit.id}
-              onClick={() => setSelectedOutfit(outfit)}
-              className="break-inside-avoid"
-            >
-              <div className="relative aspect-[3/4]">
-                <img
-                  src={outfit.image}
-                  alt={`Outfit from ${new Date(outfit.timestamp).toLocaleDateString()}`}
-                  className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                />
+      {(() => {
+        // Filter only valid outfits (must have image and timestamp)
+        const validOutfits = outfits.filter(
+          (o) => o && typeof o.image === 'string' && o.image && typeof o.timestamp === 'string' && !isNaN(Date.parse(o.timestamp))
+        );
+        return (
+          <>
+            {validOutfits.length === 0 ? (
+              <Card className="text-center py-12">
+                <p className="text-gray-500 mb-6">{t('closet.empty')}</p>
+                <p className="text-gray-400 mb-6">{t('closet.emptySubtitle')}</p>
+              </Card>
+            ) : (
+              <div className="columns-1 sm:columns-2 lg:columns-4 gap-4 space-y-4 mb-10">
+                {validOutfits.map((outfit, idx) => (
+                  <Card
+                    key={outfit.id || idx}
+                    onClick={() => setSelectedOutfit(outfit)}
+                    className="break-inside-avoid"
+                  >
+                    <div className="relative aspect-[3/4]">
+                      <img
+                        src={outfit.image}
+                        alt={`Outfit from ${new Date(outfit.timestamp).toLocaleDateString()}`}
+                        className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                      />
+                    </div>
+                    <p className="mt-2 text-sm text-gray-500 text-center">
+                      {new Date(outfit.timestamp).toLocaleDateString()}
+                    </p>
+                  </Card>
+                ))}
               </div>
-              <p className="mt-2 text-sm text-gray-500 text-center">
-                {new Date(outfit.timestamp).toLocaleDateString()}
-              </p>
-            </Card>
-          ))}
-        </div>
-      )}
+            )}
+            {/* Zalando Browse Box */}
+            <div className="flex justify-center mt-8">
+              <div className="bg-white rounded-xl shadow-lg px-8 py-8 max-w-xl w-full flex flex-col items-center border border-gray-200">
+                <h2 className="text-lg font-semibold mb-2 text-center">{t('closet.browseBoxTitle') || 'Weitere Kleidung entdecken'}</h2>
+                <p className="text-gray-500 mb-6 text-center">
+                  {t('closet.browseBoxDesc') || 'Hier kannst du weitere Kleidungsideen über Zalando durchstöbern und Inspiration für deinen Kleiderschrank sammeln.'}
+                </p>
+                <Link to="/browse" className="w-full flex justify-center">
+                  <Button variant="primary">
+                    {t('closet.browseClothes')}
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </>
+        );
+      })()}
 
       {/* Modal */}
       {selectedOutfit && (
