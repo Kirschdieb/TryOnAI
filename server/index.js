@@ -388,9 +388,17 @@ async function scrapeZalandoWithPuppeteer(category = 'all') {
         
         // First try to get name from URL - this is more reliable for Zalando
         if (productUrl) {
-          const urlParts = productUrl.split('/').pop().split('-');
-          // Remove the last part which is usually the product code
-          const nameParts = urlParts.slice(0, -1);
+          const urlParts = productUrl.split('/').pop().replace(/\.html.*/, '').split('-');
+          // Entferne von hinten ALLE Teile, die wie Produktcodes aussehen (enthalten Ziffern oder sind sehr kurz)
+          let nameParts = [...urlParts];
+          while (
+            nameParts.length > 2 && (
+              /\d/.test(nameParts[nameParts.length - 1]) ||
+              nameParts[nameParts.length - 1].length <= 3
+            )
+          ) {
+            nameParts.pop();
+          }
           name = nameParts
             .join(' ')
             .replace(/[^a-zA-ZäöüÄÖÜß\s]/g, '') // Keep German characters
@@ -585,9 +593,17 @@ async function scrapeZalandoProducts(category = 'alle') {
       
       // First try to get name from URL - this is more reliable for Zalando
       if (productUrl) {
-        const urlParts = productUrl.split('/').pop().split('-');
-        // Remove the last part which is usually the product code
-        const nameParts = urlParts.slice(0, -1);
+        const urlParts = productUrl.split('/').pop().replace(/\.html.*/, '').split('-');
+        // Entferne von hinten ALLE Teile, die wie Produktcodes aussehen (enthalten Ziffern oder sind sehr kurz)
+        let nameParts = [...urlParts];
+        while (
+          nameParts.length > 2 && (
+            /\d/.test(nameParts[nameParts.length - 1]) ||
+            nameParts[nameParts.length - 1].length <= 3
+          )
+        ) {
+          nameParts.pop();
+        }
         name = nameParts
           .join(' ')
           .replace(/[^a-zA-ZäöüÄÖÜß\s]/g, '') // Keep German characters

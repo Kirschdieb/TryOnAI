@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useCloset } from '../../store/useCloset';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 
 export default function Browse() {
   const { t } = useLanguage();
   const [clothingItems, setClothingItems] = useState([]);
-  const [loading, setLoading] = useState(true);  const [selectedCategory, setSelectedCategory] = useState('alle');
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState('alle');
   const navigate = useNavigate();
+  const { setHomeZalandoUrl, setHomeClothPhotoUrl } = useCloset();
   // Fetch products from server
   useEffect(() => {
     const fetchProducts = async () => {
@@ -45,18 +48,12 @@ export default function Browse() {
     fetchProducts();
   }, [selectedCategory]); // Re-fetch when category changes
 
-  const handleTryOn = async (item) => {
-    try {
-      // Copy URL to clipboard
-      await navigator.clipboard.writeText(item.url);
-      // Navigate to try-on page
-      navigate('/try-on');
-    } catch (error) {
-      console.error('Failed to copy to clipboard:', error);
-      // Still navigate to try-on page even if clipboard fails
-      navigate('/try-on');
-    }
-  };  
+  const handleTryOn = (item) => {
+    // Set Zalando URL in store for HomeUpload
+    setHomeZalandoUrl(item.url);
+    setHomeClothPhotoUrl(null); // Reset any previous cloth photo
+    navigate('/try-on');
+  };
 
   const categories = [
     { key: 'alle', label: t('browse.categories.all') },

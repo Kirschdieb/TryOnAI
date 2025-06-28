@@ -25,37 +25,22 @@ export default function HomeUpload() {
   
   // Local state for inputs, initialized from store and synced back to store
   const [localClothPhotoUrl, setLocalClothPhotoUrl] = useState(storeClothPhotoUrl);
-  const [localZalandoUrl, setLocalZalandoUrl] = useState(storeZalandoUrl);  // Check clipboard on component mount - prevent showing popup for the same URL multiple times
-  useEffect(() => {
-    const checkClipboard = async () => {
-      try {
-        const clipboardText = await navigator.clipboard.readText();
-        // Check if clipboard contains any URL (not just Zalando)
-        const urlPattern = /^https?:\/\/.+/i;
-        if (clipboardText && urlPattern.test(clipboardText.trim())) {
-          // Check if we've already shown popup for this URL in this session
-          const lastPromptedUrl = sessionStorage.getItem('lastPromptedUrl');
-          if (lastPromptedUrl === clipboardText.trim()) {
-            return; // Don't show popup for the same URL again
-          }
-          
-          // Mark this URL as prompted before showing the popup
-          sessionStorage.setItem('lastPromptedUrl', clipboardText.trim());
-          
-          const shouldUse = window.confirm(t('home.clipboardPrompt') + '\n\n' + clipboardText);
-          if (shouldUse) {
-            setLocalZalandoUrl(clipboardText.trim());
-            setHomeZalandoUrl(clipboardText.trim());
-          }
-        }
-      } catch (error) {
-        // Clipboard access might be denied, ignore silently
-        console.log('Clipboard access not available');
+  const [localZalandoUrl, setLocalZalandoUrl] = useState(storeZalandoUrl);
+  // Clipboard-Check entfernt, stattdessen Button unten
+  const handlePasteFromClipboard = async () => {
+    try {
+      const clipboardText = await navigator.clipboard.readText();
+      const urlPattern = /^https?:\/\/.+/i;
+      if (clipboardText && urlPattern.test(clipboardText.trim())) {
+        setLocalZalandoUrl(clipboardText.trim());
+        setHomeZalandoUrl(clipboardText.trim());
+      } else {
+        alert(t('home.error') + ' ' + t('home.zalandoPlaceholder'));
       }
-    };
-
-    checkClipboard();
-  }, [t, setHomeZalandoUrl]);
+    } catch (error) {
+      alert(t('home.error') + ' Clipboard not available');
+    }
+  };
 
   // Effect to update local state if store changes (e.g., browser back/forward or initial load)
   useEffect(() => {
@@ -168,21 +153,31 @@ export default function HomeUpload() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {t('home.pasteZalandoUrl')}
             </label>
-            <input
-              type="url"
-              value={localZalandoUrl} // Use localZalandoUrl
-              onChange={(e) => { // Update local and store state
-                const newUrl = e.target.value;
-                setLocalZalandoUrl(newUrl);
-                setHomeZalandoUrl(newUrl); // Update store
-              }}
-              pattern="https://www.zalando."
-              placeholder={t('home.zalandoPlaceholder')}
-              className="w-full p-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender"
-            />
+            <div className="flex gap-2">
+              <input
+                type="url"
+                value={localZalandoUrl}
+                onChange={(e) => {
+                  const newUrl = e.target.value;
+                  setLocalZalandoUrl(newUrl);
+                  setHomeZalandoUrl(newUrl);
+                }}
+                pattern="https://www.zalando."
+                placeholder={t('home.zalandoPlaceholder')}
+                className="w-full p-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handlePasteFromClipboard}
+                title="Aus Zwischenablage einfügen"
+              >
+                📋
+              </Button>
+            </div>
             <Button
               onClick={extractZalandoImage}
-              disabled={!localZalandoUrl || isExtracting} // Use localZalandoUrl
+              disabled={!localZalandoUrl || isExtracting}
               className="mt-2"
             >
               {isExtracting ? t('home.extracting') : t('home.extractImage')}
