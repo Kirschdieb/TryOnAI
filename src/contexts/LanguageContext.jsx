@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { useCloset } from '../store/useCloset';
 
 const LanguageContext = createContext();
 
@@ -163,7 +164,17 @@ const translations = {
     'common.back': 'Zurück',
     'common.next': 'Weiter',
     'common.cancel': 'Abbrechen',
-    'common.ok': 'OK'
+    'common.ok': 'OK',
+    
+    // Albums
+    'albums.generated': 'Generierte Bilder',
+    'albums.summer': 'Sommer',
+    'albums.autumn': 'Herbst',
+    'albums.winter': 'Winter',
+    'albums.spring': 'Frühling',
+    'albums.formal': 'Formal & Business',
+    'albums.casual': 'Casual & Alltag',
+    'albums.sport': 'Sport & Fitness'
   },
   en: {    // Navigation
     'nav.tryOn': 'Try On',
@@ -316,7 +327,17 @@ const translations = {
     'common.back': 'Back',
     'common.next': 'Next',
     'common.cancel': 'Cancel',
-    'common.ok': 'OK'
+    'common.ok': 'OK',
+    
+    // Albums
+    'albums.generated': 'Generated Pictures',
+    'albums.summer': 'Summer',
+    'albums.autumn': 'Autumn',
+    'albums.winter': 'Winter',
+    'albums.spring': 'Spring',
+    'albums.formal': 'Formal & Business',
+    'albums.casual': 'Casual & Everyday',
+    'albums.sport': 'Sport & Fitness'
   }
 };
 
@@ -327,10 +348,19 @@ export const LanguageProvider = ({ children }) => {
     return saved || 'de';
   });
 
+  const updateAlbumLanguage = useCloset(state => state.updateAlbumLanguage);
+
   // Save language preference to localStorage
   useEffect(() => {
     localStorage.setItem('preferred-language', language);
   }, [language]);
+
+  // Update album names when language changes
+  useEffect(() => {
+    if (updateAlbumLanguage) {
+      updateAlbumLanguage(language);
+    }
+  }, [language, updateAlbumLanguage]);
 
   const t = (key) => {
     return translations[language]?.[key] || key;
