@@ -4,6 +4,7 @@ import { useCloset } from '../../store/useCloset';
 import { useLanguage } from '../../contexts/LanguageContext';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
+import { BeachIcon, RainIcon, SnowIcon, OriginalIcon } from '../ui/BackgroundIcon';
 
 // LoadingSpinner Komponente
 function LoadingSpinner() {
@@ -29,6 +30,16 @@ const Studio = () => {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveDisabled, setSaveDisabled] = useState(false);
   const [resultAspect, setResultAspect] = useState({ width: 3, height: 4 });
+  // Hintergrundauswahl
+  const [selectedBackground, setSelectedBackground] = useState('original');
+
+  // Hintergrundoptionen
+  const backgroundOptions = [
+    { value: 'original', label: 'Originalen Hintergrund beibehalten', icon: <OriginalIcon /> },
+    { value: 'summer', label: 'Sommerliches Strandambiente', icon: <BeachIcon /> },
+    { value: 'autumn', label: 'Herbstliche Regenszene', icon: <RainIcon /> },
+    { value: 'winter', label: 'Winterliche Schneelandschaft', icon: <SnowIcon /> },
+  ];
 
   // Effect to create and revoke blob URL for userPhoto preview if it's a File object
   useEffect(() => {
@@ -125,7 +136,27 @@ const Studio = () => {
     }
     try {
       const formData = new FormData();
-      formData.append('customPrompt', customPrompt);
+      // Prompt für Hintergrund generieren
+      let backgroundPrompt = '';
+      switch (selectedBackground) {
+        case 'summer':
+          backgroundPrompt = 'Bitte generiere das Bild mit einem sommerlichen Strandambiente als Hintergrund. Körper und Gesicht sollen exakt wie auf dem Originalfoto bleiben.';
+          break;
+        case 'autumn':
+          backgroundPrompt = 'Bitte generiere das Bild mit einer herbstlichen Regenszene als Hintergrund. Körper und Gesicht sollen exakt wie auf dem Originalfoto bleiben.';
+          break;
+        case 'winter':
+          backgroundPrompt = 'Bitte generiere das Bild mit einer winterlichen Schneelandschaft als Hintergrund. Körper und Gesicht sollen exakt wie auf dem Originalfoto bleiben.';
+          break;
+        case 'original':
+        default:
+          backgroundPrompt = 'Bitte generiere das Bild mit dem originalen Hintergrund. Körper und Gesicht sollen exakt wie auf dem Originalfoto bleiben.';
+      }
+      // Prompt kombinieren
+      const fullPrompt = customPrompt
+        ? backgroundPrompt + ' ' + customPrompt
+        : backgroundPrompt;
+      formData.append('customPrompt', fullPrompt);
       formData.append('userPhoto', userPhoto); // userPhoto is a File object
       const clothImageSource = extractedClothImage || clothPhoto;
       if (clothImageSource) {
@@ -167,20 +198,40 @@ const Studio = () => {
     <>
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-3 gap-8">
-          {/* Column 1: Your Photo */}
-          <Card className="md:self-start">
-            <h2 className="text-xl font-semibold mb-4">{t('studio.yourPhoto')}</h2>
-            <div
-              className="relative w-full flex items-center justify-center bg-cream-100 rounded-lg"
-              style={{ aspectRatio: `${resultAspect.width} / ${resultAspect.height}`, height: 400 * (resultAspect.height / resultAspect.width) }}
-            >
-              <img
-                src={userPhotoPreviewUrl || 'https://via.placeholder.com/300x400.png?text=Your+Photo'}
-                alt="Your photo"
-                className="w-full h-full object-contain rounded-lg block"
-              />
-            </div>
-          </Card>
+          {/* Column 1: Your Photo + Hintergrundauswahl */}
+          <div className="flex flex-col gap-6">
+            <Card className="md:self-start">
+              <h2 className="text-xl font-semibold mb-4">{t('studio.yourPhoto')}</h2>
+              <div
+                className="relative w-full flex items-center justify-center bg-cream-100 rounded-lg"
+                style={{ aspectRatio: `${resultAspect.width} / ${resultAspect.height}`, height: 400 * (resultAspect.height / resultAspect.width) }}
+              >
+                <img
+                  src={userPhotoPreviewUrl || 'https://via.placeholder.com/300x400.png?text=Your+Photo'}
+                  alt="Your photo"
+                  className="w-full h-full object-contain rounded-lg block"
+                />
+              </div>
+            </Card>
+            {/* Hintergrundauswahl-Kachel */}
+            <Card>
+              <h2 className="text-xl font-semibold mb-4">Hintergrund wählen</h2>
+              <div className="flex flex-col gap-2">
+                {backgroundOptions.map((option) => (
+                  <Button
+                    key={option.value}
+                    type="button"
+                    variant={selectedBackground === option.value ? 'primary' : 'secondary'}
+                    className={`flex items-center w-full justify-start text-left !rounded-lg ${selectedBackground === option.value ? '' : 'bg-white border border-cream-300'} ${selectedBackground === option.value ? '' : 'hover:bg-cream-100'}`}
+                    onClick={() => setSelectedBackground(option.value)}
+                  >
+                    {option.icon}
+                    {option.label}
+                  </Button>
+                ))}
+              </div>
+            </Card>
+          </div>
           {/* Column 2: Clothing Item + Anpassung */}
           <div className="flex flex-col gap-6">
             <Card className="md:self-start">
