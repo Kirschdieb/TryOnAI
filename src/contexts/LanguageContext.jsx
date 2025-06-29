@@ -138,6 +138,17 @@ const translations = {
     'studio.result': 'Ergebnis',
     'studio.customization': 'Anpassung',
     
+    // Try-On Studio Poses
+    'studio.pose.standing': 'Stehend',
+    'studio.pose.sitting': 'Sitzend',
+    'studio.pose.pockets': 'Hände in den Taschen',
+    'studio.pose.armscrossed': 'Arme verschränkt',
+    // Try-On Studio Backgrounds
+    'studio.background.original': 'Originalen Hintergrund beibehalten',
+    'studio.background.summer': 'Sommerliches Strandambiente',
+    'studio.background.autumn': 'Herbstliche Regenszene',
+    'studio.background.winter': 'Winterliche Schneelandschaft',
+    
     // About Page
     'about.title': 'Über TryOnAI',
     'about.mission': 'Unsere Mission',
@@ -174,7 +185,16 @@ const translations = {
     'albums.spring': 'Frühling',
     'albums.formal': 'Formal & Business',
     'albums.casual': 'Casual & Alltag',
-    'albums.sport': 'Sport & Fitness'
+    'albums.sport': 'Sport & Fitness',
+
+    // Try-On Studio Section Titles & Save
+    'studio.backgroundTitle': 'Hintergrund wählen',
+    'studio.poseTitle': 'Pose wählen',
+    'studio.saveTitle': 'Bild speichern',
+    'studio.saveInfo1': 'Das Bild wird immer im Album',
+    'studio.saveInfo2': 'gespeichert.',
+    'studio.saveInfo3': 'Optional: Zusätzlich in Album speichern',
+    'studio.saveInfo4': 'Kein weiteres Album',
   },
   en: {    // Navigation
     'nav.tryOn': 'Try On',
@@ -301,6 +321,17 @@ const translations = {
     'studio.result': 'Result',
     'studio.customization': 'Customization',
     
+    // Try-On Studio Poses
+    'studio.pose.standing': 'Standing',
+    'studio.pose.sitting': 'Sitting',
+    'studio.pose.pockets': 'Hands in pockets',
+    'studio.pose.armscrossed': 'Arms crossed',
+    // Try-On Studio Backgrounds
+    'studio.background.original': 'Keep original background',
+    'studio.background.summer': 'Summer beach scene',
+    'studio.background.autumn': 'Autumn rain scene',
+    'studio.background.winter': 'Winter snow landscape',
+    
     // About Page
     'about.title': 'About TryOnAI',
     'about.mission': 'Our Mission',
@@ -337,7 +368,16 @@ const translations = {
     'albums.spring': 'Spring',
     'albums.formal': 'Formal & Business',
     'albums.casual': 'Casual & Everyday',
-    'albums.sport': 'Sport & Fitness'
+    'albums.sport': 'Sport & Fitness',
+
+    // Try-On Studio Section Titles & Save
+    'studio.backgroundTitle': 'Choose background',
+    'studio.poseTitle': 'Choose pose',
+    'studio.saveTitle': 'Save image',
+    'studio.saveInfo1': 'The image is always saved in the',
+    'studio.saveInfo2': 'album.',
+    'studio.saveInfo3': 'Optional: Also save in album',
+    'studio.saveInfo4': 'No additional album',
   }
 };
 

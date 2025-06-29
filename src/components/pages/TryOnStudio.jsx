@@ -16,15 +16,15 @@ function LoadingSpinner() {
 }
 
 const Studio = () => {
+  const { t } = useLanguage();
   // Pose-Optionen
   const [selectedPose, setSelectedPose] = useState('standing');
   const poseOptions = [
-    { value: 'standing', label: 'Stehend', icon: <StandingIcon /> },
-    { value: 'sitting', label: 'Sitzend', icon: <SittingIcon /> },
-    { value: 'pockets', label: 'Hände in den Taschen', icon: <HandsInPocketsIcon /> },
-    { value: 'armscrossed', label: 'Arme verschränkt', icon: <ArmsCrossedIcon /> },
+    { value: 'standing', label: t('studio.pose.standing'), icon: <StandingIcon /> },
+    { value: 'sitting', label: t('studio.pose.sitting'), icon: <SittingIcon /> },
+    { value: 'pockets', label: t('studio.pose.pockets'), icon: <HandsInPocketsIcon /> },
+    { value: 'armscrossed', label: t('studio.pose.armscrossed'), icon: <ArmsCrossedIcon /> },
   ];
-  const { t } = useLanguage();
   const navigate = useNavigate();
   const { userPhoto, clothPhoto, albums, addGeneratedImage, addImageToAlbum } = useCloset();
   const [customPrompt, setCustomPrompt] = useState('');
@@ -43,10 +43,10 @@ const Studio = () => {
 
   // Hintergrundoptionen
   const backgroundOptions = [
-    { value: 'original', label: 'Originalen Hintergrund beibehalten', icon: <OriginalIcon /> },
-    { value: 'summer', label: 'Sommerliches Strandambiente', icon: <BeachIcon /> },
-    { value: 'autumn', label: 'Herbstliche Regenszene', icon: <RainIcon /> },
-    { value: 'winter', label: 'Winterliche Schneelandschaft', icon: <SnowIcon /> },
+    { value: 'original', label: t('studio.background.original'), icon: <OriginalIcon /> },
+    { value: 'summer', label: t('studio.background.summer'), icon: <BeachIcon /> },
+    { value: 'autumn', label: t('studio.background.autumn'), icon: <RainIcon /> },
+    { value: 'winter', label: t('studio.background.winter'), icon: <SnowIcon /> },
   ];
 
   // Effect to create and revoke blob URL for userPhoto preview if it's a File object
@@ -247,7 +247,7 @@ const Studio = () => {
             </Card>
             {/* Hintergrundauswahl-Kachel */}
             <Card>
-              <h2 className="text-xl font-semibold mb-4">Hintergrund wählen</h2>
+              <h2 className="text-xl font-semibold mb-4">{t('studio.backgroundTitle')}</h2>
               <div className="flex flex-col gap-2">
                 {backgroundOptions.map((option) => (
                   <Button
@@ -292,7 +292,7 @@ const Studio = () => {
             </Card>
             {/* Pose-Auswahl-Kachel */}
             <Card>
-              <h2 className="text-xl font-semibold mb-4">Pose wählen</h2>
+              <h2 className="text-xl font-semibold mb-4">{t('studio.poseTitle')}</h2>
               <div className="flex flex-col gap-2">
                 {poseOptions.map((option) => (
                   <Button
@@ -338,17 +338,17 @@ const Studio = () => {
             </Card>
             {result && (
               <Card>
-                <h3 className="text-lg font-semibold mb-2">Bild speichern</h3>
-                <p className="mb-2">Das Bild wird immer im Album <b>Generierte Bilder</b> gespeichert.</p>
+                <h3 className="text-lg font-semibold mb-2">{t('studio.saveTitle')}</h3>
+                <p className="mb-2">{t('studio.saveInfo1')} <b>{t('albums.generated')}</b> {t('studio.saveInfo2')}</p>
                 <div className="mb-4">
-                  <label className="block mb-1">Optional: Zusätzlich in Album speichern</label>
+                  <label className="block mb-1">{t('studio.saveInfo3')}</label>
                   <select
                     className="w-full border rounded px-2 py-1"
                     value={selectedAlbumId}
                     onChange={e => setSelectedAlbumId(e.target.value)}
                     disabled={saveDisabled}
                   >
-                    <option value="">Kein weiteres Album</option>
+                    <option value="">{t('studio.saveInfo4')}</option>
                     {albums.filter(a => a.id !== 'generated').map(album => (
                       <option key={album.id} value={album.id}>{album.name}</option>
                     ))}
@@ -362,11 +362,11 @@ const Studio = () => {
                     className="w-full max-w-xs bg-lavender hover:bg-lavender-dark text-white px-4 py-2 rounded shadow-lg"
                     style={{ boxShadow: '0 4px 24px 0 rgba(80, 80, 180, 0.10)' }}
                   >
-                    {saveDisabled ? 'Gespeichert' : 'Speichern'}
+                    {saveDisabled ? t('studio.savedToCloset') : t('studio.saveToCloset')}
                   </Button>
                   {saveSuccess && (
                     <div className="mt-3 bg-green-100 text-green-800 px-4 py-2 rounded-lg text-center font-semibold transition-all animate-fade-in">
-                      Bild gespeichert!
+                      {t('studio.savedToCloset')}
                     </div>
                   )}
                 </div>
