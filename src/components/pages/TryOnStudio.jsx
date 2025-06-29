@@ -4,7 +4,7 @@ import { useCloset } from '../../store/useCloset';
 import { useLanguage } from '../../contexts/LanguageContext';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
-import { BeachIcon, RainIcon, SnowIcon, OriginalIcon } from '../ui/BackgroundIcon';
+import { BeachIcon, RainIcon, SnowIcon, OriginalIcon, StandingIcon, SittingIcon, HandsInPocketsIcon, ArmsCrossedIcon } from '../ui/BackgroundIcon';
 
 // LoadingSpinner Komponente
 function LoadingSpinner() {
@@ -16,6 +16,14 @@ function LoadingSpinner() {
 }
 
 const Studio = () => {
+  // Pose-Optionen
+  const [selectedPose, setSelectedPose] = useState('standing');
+  const poseOptions = [
+    { value: 'standing', label: 'Stehend', icon: <StandingIcon /> },
+    { value: 'sitting', label: 'Sitzend', icon: <SittingIcon /> },
+    { value: 'pockets', label: 'Hände in den Taschen', icon: <HandsInPocketsIcon /> },
+    { value: 'armscrossed', label: 'Arme verschränkt', icon: <ArmsCrossedIcon /> },
+  ];
   const { t } = useLanguage();
   const navigate = useNavigate();
   const { userPhoto, clothPhoto, albums, addGeneratedImage, addImageToAlbum } = useCloset();
@@ -136,6 +144,24 @@ const Studio = () => {
     }
     try {
       const formData = new FormData();
+      // Prompt für Pose generieren
+      let posePrompt = '';
+      switch (selectedPose) {
+        case 'standing':
+          posePrompt = 'Die Person soll auf dem Bild stehen.';
+          break;
+        case 'sitting':
+          posePrompt = 'Die Person soll auf dem Bild sitzen.';
+          break;
+        case 'pockets':
+          posePrompt = 'Die Person soll die Hände in den Taschen haben.';
+          break;
+        case 'armscrossed':
+          posePrompt = 'Die Person soll die Arme verschränken.';
+          break;
+        default:
+          posePrompt = '';
+      }
       // Prompt für Hintergrund generieren
       let backgroundPrompt = '';
       switch (selectedBackground) {
@@ -153,10 +179,16 @@ const Studio = () => {
           backgroundPrompt = 'Bitte generiere das Bild mit dem originalen Hintergrund. Körper und Gesicht sollen exakt wie auf dem Originalfoto bleiben.';
       }
       // Prompt kombinieren
-      const fullPrompt = customPrompt
-        ? backgroundPrompt + ' ' + customPrompt
-        : backgroundPrompt;
-      formData.append('customPrompt', fullPrompt);
+      let fullPrompt = '';
+      if (posePrompt) {
+        fullPrompt = posePrompt + ' ' + backgroundPrompt;
+      } else {
+        fullPrompt = backgroundPrompt;
+      }
+      if (customPrompt) {
+        fullPrompt += ' ' + customPrompt;
+      }
+      formData.append('customPrompt', fullPrompt.trim());
       formData.append('userPhoto', userPhoto); // userPhoto is a File object
       const clothImageSource = extractedClothImage || clothPhoto;
       if (clothImageSource) {
@@ -198,7 +230,7 @@ const Studio = () => {
     <>
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-3 gap-8">
-          {/* Column 1: Your Photo + Hintergrundauswahl */}
+          {/* Column 1: Dein Foto + Hintergrund */}
           <div className="flex flex-col gap-6">
             <Card className="md:self-start">
               <h2 className="text-xl font-semibold mb-4">{t('studio.yourPhoto')}</h2>
@@ -232,8 +264,9 @@ const Studio = () => {
               </div>
             </Card>
           </div>
-          {/* Column 2: Clothing Item + Anpassung */}
+          {/* Column 2: Kleidungsstück + Pose */}
           <div className="flex flex-col gap-6">
+            {/* Clothing Item */}
             <Card className="md:self-start">
               <h2 className="text-xl font-semibold mb-4">{t('studio.clothingItem')}</h2>
               <div
@@ -257,28 +290,23 @@ const Studio = () => {
                 )}
               </div>
             </Card>
+            {/* Pose-Auswahl-Kachel */}
             <Card>
-              <h2 className="text-xl font-semibold mb-4">{t('studio.customization')}</h2>
-              <textarea
-                value={customPrompt}
-                onChange={(e) => setCustomPrompt(e.target.value)}
-                placeholder={t('studio.customPrompt')}
-                className="w-full p-3 border border-cream-300 rounded-lg resize-none h-32 focus:outline-none focus:ring-2 focus:ring-lavender"
-              />
-              <Button
-                onClick={generateTryOn}
-                disabled={isGenerating}
-                className="w-full mt-4"
-              >
-                {isGenerating ? (
-                  <span className="flex items-center justify-center">
-                    <span className="animate-spin h-4 w-4 mr-2 border-t-2 border-b-2 border-white rounded-full"></span>
-                    {t('studio.generating')}
-                  </span>
-                ) : (
-                  t('home.generateButton')
-                )}
-              </Button>
+              <h2 className="text-xl font-semibold mb-4">Pose wählen</h2>
+              <div className="flex flex-col gap-2">
+                {poseOptions.map((option) => (
+                  <Button
+                    key={option.value}
+                    type="button"
+                    variant={selectedPose === option.value ? 'primary' : 'secondary'}
+                    className={`flex items-center w-full justify-start text-left !rounded-lg ${selectedPose === option.value ? '' : 'bg-white border border-cream-300'} ${selectedPose === option.value ? '' : 'hover:bg-cream-100'}`}
+                    onClick={() => setSelectedPose(option.value)}
+                  >
+                    {option.icon}
+                    {option.label}
+                  </Button>
+                ))}
+              </div>
             </Card>
           </div>
           {/* Column 3: Ergebnis + Speichern */}
@@ -346,8 +374,24 @@ const Studio = () => {
             )}
           </div>
         </div>
+        {/* Anprobe generieren Button unter allen Kacheln */}
+        <div className="flex w-full justify-center mt-8">
+          <Button
+            onClick={generateTryOn}
+            disabled={isGenerating}
+            className="w-full max-w-2xl text-lg py-4"
+          >
+            {isGenerating ? (
+              <span className="flex items-center justify-center">
+                <span className="animate-spin h-4 w-4 mr-2 border-t-2 border-b-2 border-white rounded-full"></span>
+                {t('studio.generating')}
+              </span>
+            ) : (
+              t('home.generateButton')
+            )}
+          </Button>
+        </div>
       </div>
-      
     </>
   );
 }

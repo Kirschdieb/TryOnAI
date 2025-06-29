@@ -1,3 +1,51 @@
+// Pose Icons
+export function StandingIcon({ className = "w-5 h-5 mr-2 inline-block align-middle" }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <circle cx="12" cy="6" r="2" fill="#90CAF9" />
+      <rect x="10.5" y="8" width="3" height="7" rx="1.5" fill="#1976D2" />
+      <rect x="9" y="15" width="2" height="5" rx="1" fill="#1976D2" />
+      <rect x="13" y="15" width="2" height="5" rx="1" fill="#1976D2" />
+    </svg>
+  );
+}
+
+export function SittingIcon({ className = "w-5 h-5 mr-2 inline-block align-middle" }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <circle cx="12" cy="6" r="2" fill="#90CAF9" />
+      <rect x="10.5" y="8" width="3" height="5" rx="1.5" fill="#1976D2" />
+      <rect x="13" y="13" width="4" height="2" rx="1" fill="#1976D2" />
+      <rect x="9" y="13" width="2" height="5" rx="1" fill="#1976D2" />
+    </svg>
+  );
+}
+
+export function HandsInPocketsIcon({ className = "w-5 h-5 mr-2 inline-block align-middle" }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <circle cx="12" cy="6" r="2" fill="#90CAF9" />
+      <rect x="10.5" y="8" width="3" height="7" rx="1.5" fill="#1976D2" />
+      <rect x="9" y="15" width="2" height="4" rx="1" fill="#1976D2" />
+      <rect x="13" y="15" width="2" height="4" rx="1" fill="#1976D2" />
+      <rect x="8" y="13" width="2" height="2" rx="1" fill="#1976D2" />
+      <rect x="14" y="13" width="2" height="2" rx="1" fill="#1976D2" />
+    </svg>
+  );
+}
+
+export function ArmsCrossedIcon({ className = "w-5 h-5 mr-2 inline-block align-middle" }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <circle cx="12" cy="6" r="2" fill="#90CAF9" />
+      <rect x="10.5" y="8" width="3" height="7" rx="1.5" fill="#1976D2" />
+      <rect x="9" y="15" width="2" height="4" rx="1" fill="#1976D2" />
+      <rect x="13" y="15" width="2" height="4" rx="1" fill="#1976D2" />
+      <rect x="10" y="12" width="4" height="2" rx="1" fill="#1976D2" transform="rotate(20 12 13)" />
+      <rect x="10" y="12" width="4" height="2" rx="1" fill="#1976D2" transform="rotate(-20 12 13)" />
+    </svg>
+  );
+}
 // Simple icons for backgrounds
 export function BeachIcon({ className = "w-5 h-5 mr-2 inline-block align-middle" }) {
   return (
