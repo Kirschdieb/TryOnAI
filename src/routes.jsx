@@ -7,19 +7,24 @@ import Closet from './components/pages/Closet.jsx';
 import ProfilePage from './components/pages/Profile.jsx';
 import About from './components/pages/About.jsx';
 import Browse from './components/pages/Browse.jsx';
+import Login from './components/pages/Login.jsx';
+import Register from './components/pages/Register.jsx';
+import RequireAuth from './components/layout/RequireAuth.jsx';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <App />,
+    element: <App />, // Note: ensure AuthProvider wraps Routes
     children: [
       { index: true, element: <Landing /> },
-      { path: '/try-on', element: <HomeUpload /> },
-      { path: '/studio', element: <TryOnStudio /> },
-      { path: '/closet', element: <Closet /> },
-      { path: '/profile', element: <ProfilePage /> },
+      { path: '/try-on', element: <RequireAuth><HomeUpload /></RequireAuth> },
+      { path: '/studio', element: <RequireAuth><TryOnStudio /></RequireAuth> },
+      { path: '/closet', element: <RequireAuth><Closet /></RequireAuth> },
+      { path: '/profile', element: <RequireAuth><ProfilePage /></RequireAuth> },
       { path: '/about', element: <About /> },
-      { path: '/browse', element: <Browse /> },
+      { path: '/browse', element: <RequireAuth><Browse /></RequireAuth> },
+      { path: '/login', element: <Login /> },
+      { path: '/register', element: <Register /> },
     ],
   },
 ]);

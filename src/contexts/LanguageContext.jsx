@@ -13,7 +13,16 @@ export const useLanguage = () => {
 
 // Translation object
 const translations = {
-  de: {    // Navigation
+  de: {
+    // Auth Pages
+    'auth.loginTitle': 'Anmelden',
+    'auth.registerTitle': 'Registrieren',
+    'auth.loginButton': 'Anmelden',
+    'auth.registerButton': 'Registrieren',
+    'auth.noAccount': 'Noch keinen Account?',
+    'auth.haveAccount': 'Schon einen Account?',
+    'auth.password': 'Passwort',
+    // Navigation
     'nav.tryOn': 'Try On',
     'nav.closet': 'Kleiderschrank',
     'nav.profile': 'Profil',
@@ -196,7 +205,15 @@ const translations = {
     'studio.saveInfo3': 'Optional: Zusätzlich in Album speichern',
     'studio.saveInfo4': 'Kein weiteres Album',
   },
-  en: {    // Navigation
+  en: {    // Auth Pages
+    'auth.loginTitle': 'Login',
+    'auth.registerTitle': 'Register',
+    'auth.loginButton': 'Login',
+    'auth.registerButton': 'Register',
+    'auth.noAccount': "Don't have an account?", 
+    'auth.haveAccount': 'Already have an account?',
+    'auth.password': 'Password',
+    // Navigation
     'nav.tryOn': 'Try On',
     'nav.closet': 'Closet',
     'nav.profile': 'Profile',

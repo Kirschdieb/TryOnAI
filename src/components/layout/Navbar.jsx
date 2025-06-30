@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useAuth } from '../../contexts/AuthContext';
 import MobileDrawer from './MobileDrawer';
 
 export default function Navbar() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { language, toggleLanguage, t } = useLanguage();
+  const { user, signOut } = useAuth();
 
   return (
     <nav className="sticky top-0 bg-cream-100 shadow-sm z-50">
@@ -30,6 +32,15 @@ export default function Navbar() {
             <Link to="/about" className="text-gray-600 hover:text-lavender">
               {t('nav.about')}
             </Link>
+            {user ? (
+              <button onClick={signOut} className="text-gray-600 hover:text-lavender">
+                {t('profile.logout')}
+              </button>
+            ) : (
+              <Link to="/login" className="text-gray-600 hover:text-lavender">
+                {t('auth.loginTitle')}
+              </Link>
+            )}
             
             {/* Language Switcher */}
             <button

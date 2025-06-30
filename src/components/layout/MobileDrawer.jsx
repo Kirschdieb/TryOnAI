@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function MobileDrawer({ isOpen, onClose }) {
   const { language, toggleLanguage, t } = useLanguage();
+  const { user, signOut } = useAuth();
 
   return (
     <>
@@ -81,7 +83,32 @@ export default function MobileDrawer({ isOpen, onClose }) {
             >
               {t('nav.about')}
             </Link>
-            
+            {user ? (
+              <button
+                onClick={() => { signOut(); onClose(); }}
+                className="p-2 text-left w-full rounded-lg hover:bg-cream-200"
+              >
+                {t('profile.logout')}
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                onClick={onClose}
+                className="p-2 rounded-lg hover:bg-cream-200"
+              >
+                {t('profile.modal.login')}
+              </Link>
+            )}
+            {!user && (
+              <Link
+                to="/register"
+                onClick={onClose}
+                className="p-2 rounded-lg hover:bg-cream-200"
+              >
+                {t('profile.modal.register')}
+              </Link>
+            )}
+
             {/* Language Switcher for Mobile */}
             <button
               onClick={() => {
