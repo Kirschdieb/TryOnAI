@@ -85,36 +85,74 @@ export default function Landing() {
             <div className="py-12 md:py-20">
               <h2 className={`text-3xl font-bold text-center mb-12 transition-colors duration-300 ${isFeaturesOnPurple ? 'text-white' : 'text-black'}`}>{t('landing.howItWorks')}</h2>
               <div className="mx-auto grid max-w-sm items-start gap-8 md:max-w-none md:grid-cols-3 lg:gap-16">
-                {/* Upload Photo */}
-                <Link to="/profile" className="relative flex flex-col items-center group hover:transform hover:scale-105 transition-transform">
-                  <div className="mb-4 h-16 w-16 bg-lavender rounded-full flex items-center justify-center group-hover:bg-purple-600 transition-colors">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                    </svg>
+                {/* Upload Photo - Interactive Flip Card */}
+                <div className="relative h-64 w-full [perspective:1000px] group">
+                  <div className="relative h-full w-full transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                    {/* Front Side */}
+                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-center justify-center p-6 border ${!isFeaturesOnPurple ? 'bg-gradient-to-br from-purple-500 to-pink-500 border-purple-300' : 'bg-white border-gray-100'}`}>
+                      <h3 className={`text-2xl font-bold transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.uploadPhoto')}</h3>
+                    </div>
+                    {/* Back Side */}
+                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-xl shadow-lg flex flex-col items-center justify-center p-6 transition-all duration-300 ${!isFeaturesOnPurple ? 'bg-gradient-to-br from-purple-500 to-pink-500 text-white' : 'bg-white text-purple-700 border border-gray-100'}`}>
+                      <div className="mb-4">
+                        <svg className={`w-12 h-12 transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white opacity-80' : 'text-purple-500 opacity-80'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <h4 className="text-lg font-bold mb-2">{t('landing.uploadPhoto')}</h4>
+                      <p className={`text-sm text-center mb-4 transition-colors duration-300 ${!isFeaturesOnPurple ? 'opacity-90' : 'opacity-80'}`}>{t('landing.uploadPhotoDesc')}</p>
+                      <Link to="/profile" className={`px-4 py-2 rounded-lg transition-colors duration-300 ${!isFeaturesOnPurple ? 'bg-white text-purple-600 hover:bg-gray-100' : 'bg-purple-600 text-white hover:bg-purple-700'}`}>
+                        {t('landing.getStarted')} →
+                      </Link>
+                    </div>
                   </div>
-                  <h3 className={`text-xl font-bold mb-2 transition-colors duration-300 ${isFeaturesOnPurple ? 'text-white' : 'text-black'}`}>{t('landing.uploadPhoto')}</h3>
-                  <p className={`text-center transition-colors duration-300 ${isFeaturesOnPurple ? 'text-purple-100' : 'text-gray-700'}`}>{t('landing.uploadPhotoDesc')}</p>
-                </Link>
-                {/* Choose Clothing */}
-                <Link to="/browse" className="relative flex flex-col items-center group hover:transform hover:scale-105 transition-transform">
-                  <div className="mb-4 h-16 w-16 bg-lavender rounded-full flex items-center justify-center group-hover:bg-purple-600 transition-colors">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                </div>
+
+                {/* Choose Clothing - Interactive Flip Card */}
+                <div className="relative h-64 w-full [perspective:1000px] group">
+                  <div className="relative h-full w-full transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                    {/* Front Side */}
+                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-center justify-center p-6 border ${!isFeaturesOnPurple ? 'bg-gradient-to-br from-blue-500 to-purple-500 border-blue-300' : 'bg-white border-gray-100'}`}>
+                      <h3 className={`text-2xl font-bold transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.chooseClothing')}</h3>
+                    </div>
+                    {/* Back Side */}
+                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-xl shadow-lg flex flex-col items-center justify-center p-6 transition-all duration-300 ${!isFeaturesOnPurple ? 'bg-gradient-to-br from-blue-500 to-purple-500 text-white' : 'bg-white text-purple-700 border border-gray-100'}`}>
+                      <div className="mb-4">
+                        <svg className={`w-12 h-12 transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white opacity-80' : 'text-purple-500 opacity-80'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                      </div>
+                      <h4 className="text-lg font-bold mb-2">{t('landing.chooseClothing')}</h4>
+                      <p className={`text-sm text-center mb-4 transition-colors duration-300 ${!isFeaturesOnPurple ? 'opacity-90' : 'opacity-80'}`}>{t('landing.chooseClothingDesc')}</p>
+                      <Link to="/browse" className={`px-4 py-2 rounded-lg transition-colors duration-300 ${!isFeaturesOnPurple ? 'bg-white text-blue-600 hover:bg-gray-100' : 'bg-purple-600 text-white hover:bg-purple-700'}`}>
+                        {t('browse.tryNow')} →
+                      </Link>
+                    </div>
                   </div>
-                  <h3 className={`text-xl font-bold mb-2 transition-colors duration-300 ${isFeaturesOnPurple ? 'text-white' : 'text-black'}`}>{t('landing.chooseClothing')}</h3>
-                  <p className={`text-center transition-colors duration-300 ${isFeaturesOnPurple ? 'text-purple-100' : 'text-gray-700'}`}>{t('landing.chooseClothingDesc')}</p>
-                </Link>
-                {/* About Us */}
-                <Link to="/about" className="relative flex flex-col items-center group hover:transform hover:scale-105 transition-transform">
-                  <div className="mb-4 h-16 w-16 bg-lavender rounded-full flex items-center justify-center group-hover:bg-purple-600 transition-colors">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                </div>
+
+                {/* AI Magic - Interactive Flip Card */}
+                <div className="relative h-64 w-full [perspective:1000px] group">
+                  <div className="relative h-full w-full transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+                    {/* Front Side */}
+                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-center justify-center p-6 border ${!isFeaturesOnPurple ? 'bg-gradient-to-br from-green-500 to-blue-500 border-green-300' : 'bg-white border-gray-100'}`}>
+                      <h3 className={`text-2xl font-bold transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.aiMagic')}</h3>
+                    </div>
+                    {/* Back Side */}
+                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-xl shadow-lg flex flex-col items-center justify-center p-6 transition-all duration-300 ${!isFeaturesOnPurple ? 'bg-gradient-to-br from-green-500 to-blue-500 text-white' : 'bg-white text-purple-700 border border-gray-100'}`}>
+                      <div className="mb-4">
+                        <svg className={`w-12 h-12 transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white opacity-80' : 'text-purple-500 opacity-80'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                      </div>
+                      <h4 className="text-lg font-bold mb-2">{t('landing.aiMagic')}</h4>
+                      <p className={`text-sm text-center mb-4 transition-colors duration-300 ${!isFeaturesOnPurple ? 'opacity-90' : 'opacity-80'}`}>{t('landing.aiMagicDesc')}</p>
+                      <Link to="/try-on" className={`px-4 py-2 rounded-lg transition-colors duration-300 ${!isFeaturesOnPurple ? 'bg-white text-green-600 hover:bg-gray-100' : 'bg-purple-600 text-white hover:bg-purple-700'}`}>
+                        {t('landing.tryNow')} →
+                      </Link>
+                    </div>
                   </div>
-                  <h3 className={`text-xl font-bold mb-2 transition-colors duration-300 ${isFeaturesOnPurple ? 'text-white' : 'text-black'}`}>{t('landing.aboutUs')}</h3>
-                  <p className={`text-center transition-colors duration-300 ${isFeaturesOnPurple ? 'text-purple-100' : 'text-gray-700'}`}>{t('landing.aboutUsDesc')}</p>
-                </Link>
+                </div>
               </div>
             </div>
           </div>
