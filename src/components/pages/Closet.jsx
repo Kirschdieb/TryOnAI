@@ -51,7 +51,9 @@ export default function Closet() {
     renameAlbum,
     deleteAlbum,
     addImageToAlbum,
-    removeImageFromAlbum
+    removeImageFromAlbum,
+    getSessionImage,
+    hasSessionImage
   } = useCloset();
   const [selectedAlbumId, setSelectedAlbumId] = useState(null);
   const [newAlbumName, setNewAlbumName] = useState('');
@@ -61,6 +63,19 @@ export default function Closet() {
 
   // Album Auswahl: Standardmäßig erstes Album auswählen
   const selectedAlbum = albums.find(a => a.id === selectedAlbumId) || albums[0];
+
+  // Helper function to get image source for display
+  const getImageSrc = (img) => {
+    if (img.hasSessionData && hasSessionImage(img.id)) {
+      const sessionData = getSessionImage(img.id);
+      return sessionData?.mainImage || null;
+    } else if (img.url) {
+      return img.url;
+    } else if (img.image) {
+      return img.image;
+    }
+    return null;
+  };
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -105,25 +120,36 @@ export default function Closet() {
       )}
       {selectedAlbum && selectedAlbum.images.length > 0 && (
         <div className="columns-1 sm:columns-2 lg:columns-4 gap-4 space-y-4 mb-10">
-          {selectedAlbum.images.map((img, idx) => (
-            <Card
-              key={img.id || idx}
-              onClick={() => setSelectedImage(img)}
-              className="break-inside-avoid"
-            >
-              <div className="relative aspect-[3/4]">
-                <img
-                  src={img.image}
-                  alt={img.customPrompt || 'Try-On'}
-                  className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                />
-              </div>
-              <p className="mt-2 text-sm text-gray-500 text-center">
-                {img.timestamp ? new Date(img.timestamp).toLocaleDateString() : ''}
-              </p>
-              <button onClick={e => { e.stopPropagation(); removeImageFromAlbum(selectedAlbum.id, img.id); }} className="absolute top-2 right-2 text-red-500 hover:text-red-700 bg-white bg-opacity-80 rounded-full p-1">🗑️</button>
-            </Card>
-          ))}
+          {selectedAlbum.images.map((img, idx) => {
+            const imageSrc = getImageSrc(img);
+            return (
+              <Card
+                key={img.id || idx}
+                onClick={() => setSelectedImage(img)}
+                className="break-inside-avoid"
+              >
+                <div className="relative aspect-[3/4]">
+                  {imageSrc ? (
+                    <img
+                      src={imageSrc}
+                      alt={img.customPrompt || 'Try-On'}
+                      className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
+                      <span className="text-gray-500">
+                        {img.hasSessionData ? 'Image not available (session expired)' : 'No image data'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <p className="mt-2 text-sm text-gray-500 text-center">
+                  {img.timestamp ? new Date(img.timestamp).toLocaleDateString() : ''}
+                </p>
+                <button onClick={e => { e.stopPropagation(); removeImageFromAlbum(selectedAlbum.id, img.id); }} className="absolute top-2 right-2 text-red-500 hover:text-red-700 bg-white bg-opacity-80 rounded-full p-1">🗑️</button>
+              </Card>
+            );
+          })}
         </div>
       )}
 
@@ -166,11 +192,22 @@ export default function Closet() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <img
-                  src={selectedImage.image}
-                  alt="Try-On"
-                  className="w-full rounded-lg"
-                />
+                {(() => {
+                  const imageSrc = getImageSrc(selectedImage);
+                  return imageSrc ? (
+                    <img
+                      src={imageSrc}
+                      alt="Try-On"
+                      className="w-full rounded-lg"
+                    />
+                  ) : (
+                    <div className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+                      <span className="text-gray-500">
+                        {selectedImage.hasSessionData ? 'Image not available (session expired)' : 'No image data'}
+                      </span>
+                    </div>
+                  );
+                })()}
               </div>
               <div className="space-y-2">
                 <p><strong>Erstellt:</strong> {selectedImage.timestamp ? new Date(selectedImage.timestamp).toLocaleString() : ''}</p>

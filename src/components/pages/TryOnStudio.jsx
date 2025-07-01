@@ -6,6 +6,54 @@ import Button from '../ui/Button';
 import Card from '../ui/Card';
 import { BeachIcon, RainIcon, SnowIcon, OriginalIcon, StandingIcon, SittingIcon, HandsInPocketsIcon, ArmsCrossedIcon } from '../ui/BackgroundIcon';
 
+// Image compression utility function
+const compressImage = async (file, maxSizeMB = 10, quality = 0.8) => {
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      // Calculate new dimensions while maintaining aspect ratio
+      const maxWidth = 1920; // Max width for try-on images
+      const maxHeight = 1920; // Max height for try-on images
+      
+      let { width, height } = img;
+      
+      if (width > maxWidth) {
+        height = (height * maxWidth) / width;
+        width = maxWidth;
+      }
+      
+      if (height > maxHeight) {
+        width = (width * maxHeight) / height;
+        height = maxHeight;
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      
+      // Draw and compress
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      canvas.toBlob(
+        (blob) => {
+          console.log(`[TryOnStudio] Compressed image from ${(file.size / 1024 / 1024).toFixed(2)}MB to ${(blob.size / 1024 / 1024).toFixed(2)}MB`);
+          resolve(blob);
+        },
+        'image/jpeg',
+        quality
+      );
+    };
+    
+    if (file instanceof File) {
+      img.src = URL.createObjectURL(file);
+    } else if (typeof file === 'string' && file.startsWith('data:')) {
+      img.src = file;
+    }
+  });
+};
+
 // LoadingSpinner Komponente
 function LoadingSpinner() {
   return (
@@ -26,7 +74,28 @@ const Studio = () => {
     { value: 'armscrossed', label: t('studio.pose.armscrossed'), icon: <ArmsCrossedIcon /> },
   ];
   const navigate = useNavigate();
-  const { userPhoto, clothPhoto, albums, addGeneratedImage, addImageToAlbum } = useCloset();
+  const { userPhoto, clothPhoto, albums, addGeneratedImage, addImageToAlbum, loadAlbumsFromProfile, currentProfileId } = useCloset();
+  
+  // Ensure profile is loaded when component mounts
+  useEffect(() => {
+    const checkAndLoadProfile = () => {
+      const savedProfile = localStorage.getItem('userProfile');
+      const loginStatus = localStorage.getItem('isLoggedIn');
+      
+      if (loginStatus === 'true' && savedProfile && !currentProfileId) {
+        try {
+          const parsedProfile = JSON.parse(savedProfile);
+          console.log('Loading profile in TryOnStudio:', parsedProfile);
+          loadAlbumsFromProfile(parsedProfile);
+        } catch (error) {
+          console.error('Error loading profile in TryOnStudio:', error);
+        }
+      }
+    };
+    
+    checkAndLoadProfile();
+  }, [loadAlbumsFromProfile, currentProfileId]);
+
   const [customPrompt, setCustomPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState(null);
@@ -108,7 +177,9 @@ const Studio = () => {
   const handleSave = () => {
     if (!result || saveDisabled) return;
     
-    console.log('handleSave called'); // Debug log
+    console.log('handleSave called - saving image'); // Debug log
+    console.log('Current albums:', albums); // Debug log
+    console.log('Selected album ID:', selectedAlbumId); // Debug log
     setSaveDisabled(true);
     
     const imageObj = {
@@ -119,9 +190,14 @@ const Studio = () => {
       timestamp: new Date().toISOString(),
     };
     
+    console.log('Image object to save:', imageObj); // Debug log
+    
     // Speichere im State (temporär für die Sitzung)
     addGeneratedImage(imageObj);
+    
+    // Zusätzlich in gewähltes Album speichern
     if (selectedAlbumId && selectedAlbumId !== 'generated') {
+      console.log('Also saving to album:', selectedAlbumId); // Debug log
       addImageToAlbum(selectedAlbumId, { ...imageObj, id: Date.now().toString() + Math.random().toString(36).substr(2, 5) });
     }
     
@@ -189,8 +265,29 @@ const Studio = () => {
         fullPrompt += ' ' + customPrompt;
       }
       formData.append('customPrompt', fullPrompt.trim());
-      formData.append('userPhoto', userPhoto); // userPhoto is a File object
+      
+      // Handle userPhoto - compress and convert to blob if needed
+      let userPhotoBlob;
+      if (userPhoto instanceof File) {
+        // Compress the file before upload
+        userPhotoBlob = await compressImage(userPhoto);
+        console.log('[TryOnStudio] Compressed File userPhoto for API submission');
+      } else if (typeof userPhoto === 'string' && userPhoto.startsWith('data:')) {
+        // Compress base64 image
+        userPhotoBlob = await compressImage(userPhoto);
+        console.log('[TryOnStudio] Compressed base64 userPhoto for API submission');
+      } else {
+        alert('Invalid user photo format. Please try uploading again.');
+        setIsGenerating(false);
+        return;
+      }
+      
+      formData.append('userPhoto', userPhotoBlob, 'user-photo.jpg');
       const clothImageSource = extractedClothImage || clothPhoto;
+      console.log('[TryOnStudio] clothPhoto:', typeof clothPhoto, clothPhoto?.substring(0, 50) + '...');
+      console.log('[TryOnStudio] extractedClothImage:', typeof extractedClothImage, extractedClothImage?.substring(0, 50) + '...');
+      console.log('[TryOnStudio] clothImageSource:', typeof clothImageSource, clothImageSource?.substring(0, 50) + '...');
+      
       if (clothImageSource) {
         formData.append('clothImageUrl', clothImageSource);
       } else {
@@ -204,11 +301,18 @@ const Studio = () => {
       });
       if (!response.ok) {
         const errorData = await response.json();
-        if (errorData && errorData.text) {
+        console.error('[TryOnStudio] API Error:', response.status, errorData);
+        
+        if (response.status === 413) {
+          alert('Image file too large. Please try with a smaller image or let the app compress it automatically.');
+        } else if (errorData && errorData.message) {
+          alert(t('home.error') + ' ' + errorData.message);
+        } else if (errorData && errorData.text) {
           alert(t('home.error') + ' ' + errorData.text);
         } else {
-          throw new Error(t('home.generationFailed'));
+          alert(t('home.generationFailed') + ` (${response.status})`);
         }
+        setIsGenerating(false);
         return;
       }
       const data = await response.json();
@@ -220,7 +324,12 @@ const Studio = () => {
       };
       img.src = data.imageUrl;
     } catch (err) {
-      alert(t('home.error') + ' ' + err.message);
+      console.error('[TryOnStudio] Generation Error:', err);
+      if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        alert('Network error. Please check if the server is running and try again.');
+      } else {
+        alert(t('home.error') + ' ' + err.message);
+      }
     } finally {
       setIsGenerating(false);
     }

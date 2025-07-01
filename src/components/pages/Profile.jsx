@@ -4,7 +4,13 @@ import { useCloset } from '../../store/useCloset';
 
 export default function ProfilePage() {
   const { t } = useLanguage();
-  const { loadAlbumsFromProfile, saveAlbumsToProfile, albums } = useCloset();
+  const { 
+    loadAlbumsFromProfile, 
+    saveAlbumsToProfile, 
+    albums, 
+    exportProfileWithImages, 
+    importProfileWithImages 
+  } = useCloset();
   
   const [showModal, setShowModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -27,10 +33,13 @@ export default function ProfilePage() {
     const savedProfile = localStorage.getItem('userProfile');
     const loginStatus = localStorage.getItem('isLoggedIn');
     
+    console.log('[Profile] Checking login status:', { loginStatus, hasProfile: !!savedProfile });
+    
     if (loginStatus === 'true' && savedProfile) {
       setIsLoggedIn(true);
       try {
         const parsedProfile = JSON.parse(savedProfile);
+        console.log('[Profile] Loaded profile:', parsedProfile.name, 'ID:', parsedProfile.id);
         
         // Ensure profile has an ID
         if (!parsedProfile.id) {
@@ -48,26 +57,46 @@ export default function ProfilePage() {
         
         setProfile(profileWithDefaults);
         
-        // Load user's albums into closet store (this will merge with defaults)
-        loadAlbumsFromProfile(profileWithDefaults);
-        
-        // After loading, save the merged albums back to localStorage
-        setTimeout(() => {
-          saveAlbumsToProfile();
-        }, 100);
+        // Only load albums if they haven't been loaded already (e.g., from ZIP import)
+        // Check if albums are already loaded in the store
+        const storeState = useCloset.getState();
+        if (!storeState.isAlbumDataLoaded || storeState.currentProfileId !== profileWithDefaults.id) {
+          console.log('[Profile] Loading albums from profile...');
+          // Load user's albums into closet store (this will merge with defaults)
+          loadAlbumsFromProfile(profileWithDefaults);
+          
+          // After loading, save the merged albums back to localStorage
+          setTimeout(() => {
+            saveAlbumsToProfile();
+          }, 100);
+        } else {
+          console.log('[Profile] Albums already loaded, skipping loadAlbumsFromProfile');
+        }
         
       } catch (error) {
-        console.error('Error parsing saved profile:', error);
+        console.error('[Profile] Error parsing saved profile:', error);
         handleLogout(); // Reset if corrupted
       }
     } else {
+      console.log('[Profile] No valid login found, showing modal');
       setShowModal(true);
     }
   }, [loadAlbumsFromProfile, saveAlbumsToProfile]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setProfile((prev) => ({ ...prev, [name]: value }));
+    setProfile((prev) => {
+      const updatedProfile = { ...prev, [name]: value };
+      // Save the updated profile to localStorage with error handling
+      try {
+        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+        console.log(`[Profile] ${name} field updated and saved to localStorage`);
+      } catch (storageError) {
+        console.warn('[Profile] Could not save profile to localStorage:', storageError);
+        // Continue without localStorage - profile will still work in current session
+      }
+      return updatedProfile;
+    });
   };
 
   const convertFileToBase64 = (file) => {
@@ -88,14 +117,20 @@ export default function ProfilePage() {
     if (file) {
       try {
         const base64 = await convertFileToBase64(file);
-        setProfile((prev) => ({ 
-          ...prev, 
-          imageUrl: base64 
-        }));
-        // Immediately save to localStorage
-        const updatedProfile = { ...profile, imageUrl: base64 };
-        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+        setProfile((prev) => {
+          const updatedProfile = { ...prev, imageUrl: base64 };
+          // Save the updated profile to localStorage with error handling
+          try {
+            localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+            console.log('[Profile] Profile image updated and saved to localStorage');
+          } catch (storageError) {
+            console.warn('[Profile] Could not save profile to localStorage (quota exceeded?):', storageError);
+            // Continue without localStorage - profile will still work in current session
+          }
+          return updatedProfile;
+        });
       } catch (error) {
+        console.error('[Profile] Error converting image:', error);
         alert('Error converting image. Please try again.');
       }
     }
@@ -106,14 +141,20 @@ export default function ProfilePage() {
     if (file) {
       try {
         const base64 = await convertFileToBase64(file);
-        setProfile((prev) => ({ 
-          ...prev, 
-          tryonImageFrontUrl: base64 
-        }));
-        // Immediately save to localStorage
-        const updatedProfile = { ...profile, tryonImageFrontUrl: base64 };
-        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+        setProfile((prev) => {
+          const updatedProfile = { ...prev, tryonImageFrontUrl: base64 };
+          // Save the updated profile to localStorage with error handling
+          try {
+            localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+            console.log('[Profile] Front tryon image updated and saved to localStorage');
+          } catch (storageError) {
+            console.warn('[Profile] Could not save profile to localStorage (quota exceeded?):', storageError);
+            // Continue without localStorage - profile will still work in current session
+          }
+          return updatedProfile;
+        });
       } catch (error) {
+        console.error('[Profile] Error converting tryon front image:', error);
         alert('Error converting image. Please try again.');
       }
     }
@@ -124,14 +165,20 @@ export default function ProfilePage() {
     if (file) {
       try {
         const base64 = await convertFileToBase64(file);
-        setProfile((prev) => ({ 
-          ...prev, 
-          tryonImageBackUrl: base64 
-        }));
-        // Immediately save to localStorage
-        const updatedProfile = { ...profile, tryonImageBackUrl: base64 };
-        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+        setProfile((prev) => {
+          const updatedProfile = { ...prev, tryonImageBackUrl: base64 };
+          // Save the updated profile to localStorage with error handling
+          try {
+            localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+            console.log('[Profile] Back tryon image updated and saved to localStorage');
+          } catch (storageError) {
+            console.warn('[Profile] Could not save profile to localStorage (quota exceeded?):', storageError);
+            // Continue without localStorage - profile will still work in current session
+          }
+          return updatedProfile;
+        });
       } catch (error) {
+        console.error('[Profile] Error converting tryon back image:', error);
         alert('Error converting image. Please try again.');
       }
     }
@@ -140,46 +187,29 @@ export default function ProfilePage() {
   const handleLogin = () => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.json';
+    input.accept = '.zip';
     input.onchange = async (e) => {
       const file = e.target.files[0];
       if (file) {
         try {
-          const text = await file.text();
-          const importedProfile = JSON.parse(text);
-          
-          // Clean the imported profile to ensure only base64 images
-          const cleanProfile = {
-            name: importedProfile.name || "",
-            email: importedProfile.email || "",
-            phone: importedProfile.phone || "",
-            address: importedProfile.address || "",
-            height: importedProfile.height || "",
-            size: importedProfile.size || "",
-            imageUrl: (importedProfile.imageUrl && isValidBase64Image(importedProfile.imageUrl)) ? importedProfile.imageUrl : "",
-            tryonImageFrontUrl: (importedProfile.tryonImageFrontUrl && isValidBase64Image(importedProfile.tryonImageFrontUrl)) ? importedProfile.tryonImageFrontUrl : "",
-            tryonImageBackUrl: (importedProfile.tryonImageBackUrl && isValidBase64Image(importedProfile.tryonImageBackUrl)) ? importedProfile.tryonImageBackUrl : "",
-            albums: importedProfile.albums || [],
-            id: importedProfile.id || Date.now().toString()
-          };
-          
-          setProfile(cleanProfile);
-          localStorage.setItem('userProfile', JSON.stringify(cleanProfile));
-          localStorage.setItem('isLoggedIn', 'true');
-          setIsLoggedIn(true);
-          setShowModal(false);
-          
-          // Load imported albums into store (this will merge with defaults)
-          loadAlbumsFromProfile(cleanProfile);
-          
-          // Save the merged albums (with defaults) back to localStorage
-          setTimeout(() => {
-            saveAlbumsToProfile();
-          }, 100);
-          
-          alert(t('profile.importSuccess'));
+          const result = await importProfileWithImages(file);
+          if (result.success) {
+            // Update local state with imported profile
+            setProfile(result.profile);
+            setIsLoggedIn(true);
+            setShowModal(false);
+            
+            // IMPORTANT: Save both profile AND login status to localStorage
+            localStorage.setItem('userProfile', JSON.stringify(result.profile));
+            localStorage.setItem('isLoggedIn', 'true');
+            
+            console.log('[Profile] Profile imported and login status saved to localStorage');
+            
+            alert(`✅ Profile imported successfully!\n\n👤 Profile: ${result.profile.name}\n📁 Albums: ${result.albumCount}\n🖼️ Images: ${result.imageCount}\n\n🎉 All your albums and images have been restored!`);
+          }
         } catch (error) {
-          alert(t('profile.importError'));
+          console.error('ZIP import error:', error);
+          alert('❌ Error importing profile from ZIP: ' + error.message + '\n\nPlease make sure you selected a valid TryOnAI export file.');
         }
       }
     };
@@ -216,6 +246,7 @@ export default function ProfilePage() {
   };
 
   const handleLogout = () => {
+    console.log('[Profile] Logout triggered');
     localStorage.removeItem('userProfile');
     localStorage.removeItem('isLoggedIn');
     setIsLoggedIn(false);
@@ -234,122 +265,8 @@ export default function ProfilePage() {
     setShowModal(true);
   };
 
-  const handleExportProfile = () => {
-    try {
-      // Get current album references from localStorage (not loaded URLs)
-      const savedProfile = localStorage.getItem('userProfile');
-      const profileData = savedProfile ? JSON.parse(savedProfile) : profile;
-      
-      const exportData = {
-        ...profileData,
-        exportDate: new Date().toISOString()
-      };
-      
-      const dataStr = JSON.stringify(exportData, null, 2);
-      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-      
-      const exportFileDefaultName = `profile_${profile.name || 'user'}_${new Date().toISOString().split('T')[0]}.json`;
-      
-      const linkElement = document.createElement('a');
-      linkElement.setAttribute('href', dataUri);
-      linkElement.setAttribute('download', exportFileDefaultName);
-      linkElement.click();
-      
-      alert(t('profile.exportSuccess'));
-    } catch (error) {
-      alert('Error exporting profile: ' + error.message);
-    }
-  };
-
-  // Function to save profile to assets folder as default
-  const handleSaveProfileToAssets = () => {
-    try {
-      // Get current profile from localStorage (should have latest albums)
-      const savedProfile = localStorage.getItem('userProfile');
-      const profileData = savedProfile ? JSON.parse(savedProfile) : profile;
-      
-      const exportData = {
-        ...profileData,
-        exportDate: new Date().toISOString()
-      };
-      
-      const dataStr = JSON.stringify(exportData, null, 2);
-      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-      
-      // Default save to assets folder with user name
-      const exportFileDefaultName = `profile_${profile.name || 'user'}_${new Date().toISOString().split('T')[0]}.json`;
-      
-      const linkElement = document.createElement('a');
-      linkElement.setAttribute('href', dataUri);
-      linkElement.setAttribute('download', exportFileDefaultName);
-      linkElement.click();
-      
-      // Clear instructions for Windows file path
-      const projectAssetsPath = 'c:\\Users\\Geiler Stecher\\Documents\\unikram\\python\\DPI_Projekt\\TryOnAI\\src\\assets\\';
-      const downloadPath = `%USERPROFILE%\\Downloads\\${exportFileDefaultName}`;
-      
-      const instructions = `✅ Profile downloaded successfully!
-
-📁 TO MOVE TO PROJECT ASSETS:
-
-1. Open File Explorer
-2. Go to your Downloads folder
-3. Find: ${exportFileDefaultName}
-4. Cut the file (Ctrl+X)
-5. Navigate to: ${projectAssetsPath}
-6. Paste the file (Ctrl+V)
-
-🎯 The profile is now ready for use in your project!`;
-      
-      alert(instructions);
-    } catch (error) {
-      alert('Error saving profile: ' + error.message);
-    }
-  };
-
-  // Alternative: Copy profile data to clipboard for easy pasting into assets
-  const handleCopyProfileToClipboard = () => {
-    try {
-      // Get current profile from localStorage (should have latest albums)
-      const savedProfile = localStorage.getItem('userProfile');
-      const profileData = savedProfile ? JSON.parse(savedProfile) : profile;
-      
-      const exportData = {
-        ...profileData,
-        exportDate: new Date().toISOString()
-      };
-      
-      const dataStr = JSON.stringify(exportData, null, 2);
-      
-      // Copy to clipboard
-      navigator.clipboard.writeText(dataStr).then(() => {
-        const filename = `profile_${profile.name || 'user'}_${new Date().toISOString().split('T')[0]}.json`;
-        const projectAssetsPath = 'c:\\Users\\Geiler Stecher\\Documents\\unikram\\python\\DPI_Projekt\\TryOnAI\\src\\assets\\';
-        
-        const instructions = `✅ Profile copied to clipboard!
-
-📋 TO CREATE FILE IN PROJECT ASSETS:
-
-1. Open VS Code or File Explorer
-2. Navigate to: ${projectAssetsPath}
-3. Create new file: ${filename}
-4. Paste the content (Ctrl+V)
-5. Save the file
-
-🎯 The profile is now ready for use in your project!`;
-        
-        alert(instructions);
-      }).catch(() => {
-        // Fallback to download if clipboard fails
-        alert('Clipboard access failed. Switching to download method...');
-        handleSaveProfileToAssets();
-      });
-    } catch (error) {
-      alert('Error copying profile: ' + error.message);
-    }
-  };
-
-  const handleExportWithInstructions = () => {
+  // ZIP Export/Import handlers
+  const handleZipExport = async () => {
     try {
       // Auto-save current albums to profile first
       saveAlbumsToProfile();
@@ -357,25 +274,14 @@ export default function ProfilePage() {
       // Update profile in localStorage
       localStorage.setItem('userProfile', JSON.stringify(profile));
       
-      // Then export
-      handleSaveProfileToAssets();
+      // Export as ZIP with images
+      const result = await exportProfileWithImages();
+      if (result.success) {
+        alert(`✅ Profile exported successfully!\n\n📦 ZIP file: ${result.fileName}\n🖼️ Images included: ${result.imageCount}\n\n💾 You can now import this ZIP file on any device to restore your complete profile with all images and albums.`);
+      }
     } catch (error) {
-      alert('Error exporting profile: ' + error.message);
-    }
-  };
-
-  const handleCopyWithInstructions = () => {
-    try {
-      // Auto-save current albums to profile first
-      saveAlbumsToProfile();
-      
-      // Update profile in localStorage
-      localStorage.setItem('userProfile', JSON.stringify(profile));
-      
-      // Then copy to clipboard
-      handleCopyProfileToClipboard();
-    } catch (error) {
-      alert('Error copying profile: ' + error.message);
+      console.error('ZIP export error:', error);
+      alert('❌ Error exporting profile as ZIP: ' + error.message);
     }
   };
 
@@ -383,17 +289,18 @@ export default function ProfilePage() {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-8 max-w-md w-mx-4">
-          <h2 className="text-2xl font-bold mb-2 text-center">{t('profile.modal.welcome')}</h2>
-          <p className="text-gray-600 mb-6 text-center">{t('profile.modal.subtitle')}</p>
+          <h2 className="text-2xl font-bold mb-2 text-center">Welcome to TryOnAI</h2>
+          <p className="text-gray-600 mb-6 text-center">Load an existing profile or create a new one</p>
           
           <div className="space-y-4">
             <button
               onClick={handleLogin}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition"
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition flex items-center justify-center gap-2"
             >
-              {t('profile.modal.login')}
+              <span>📦</span>
+              Load Profile from Backup
             </button>
-            <p className="text-sm text-gray-500 text-center">{t('profile.modal.loginDesc')}</p>
+            <p className="text-sm text-gray-500 text-center">Import your complete profile with all images from a ZIP backup</p>
             
             <hr className="my-4" />
             
@@ -401,9 +308,9 @@ export default function ProfilePage() {
               onClick={handleRegister}
               className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition"
             >
-              {t('profile.modal.register')}
+              Create New Profile
             </button>
-            <p className="text-sm text-gray-500 text-center">{t('profile.modal.registerDesc')}</p>
+            <p className="text-sm text-gray-500 text-center">Start fresh with a new profile and default albums</p>
           </div>
         </div>
       </div>
@@ -627,38 +534,28 @@ export default function ProfilePage() {
         </div>
         
         <div className="flex flex-col gap-4">
-          {/* Save & Export Options */}
+          {/* Single ZIP Export Section */}
           <div>
-            <h3 className="text-lg font-semibold mb-3 text-center">Save Profile</h3>
+            <h3 className="text-lg font-semibold mb-3 text-center">� Save & Backup Profile</h3>
             <p className="text-sm text-gray-600 mb-4 text-center">
-              Choose how to save your profile. Both options will automatically save all changes and albums.
+              Export your complete profile including all albums, images, and generated content as a ZIP backup file.
+              Perfect for creating backups or moving to another device.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              {/* Download Option */}
+            <div className="flex justify-center">
               <button
                 type="button"
-                onClick={handleExportWithInstructions}
-                className="flex-1 sm:flex-none bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded transition flex items-center justify-center gap-2"
+                onClick={handleZipExport}
+                className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-4 px-8 rounded-lg transition flex items-center justify-center gap-3 text-lg"
               >
-                <span>📥</span>
-                Save & Download
-              </button>
-              
-              {/* Clipboard Option */}
-              <button
-                type="button"
-                onClick={handleCopyWithInstructions}
-                className="flex-1 sm:flex-none bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-6 rounded transition flex items-center justify-center gap-2"
-              >
-                <span>📋</span>
-                Save & Copy
+                <span className="text-xl">�</span>
+                Export Profile as ZIP
               </button>
             </div>
             
-            <div className="mt-3 text-xs text-gray-500 text-center">
-              <p><strong>Save & Download:</strong> Downloads profile file to move to assets folder</p>
-              <p><strong>Save & Copy:</strong> Copies profile JSON to create new file in assets folder</p>
+            <div className="mt-4 text-sm text-gray-500 text-center">
+              <p>💡 <strong>Tip:</strong> Save this ZIP file to backup your complete TryOnAI profile</p>
+              <p>📱 Use the same ZIP file to restore your profile on any device</p>
             </div>
           </div>
         </div>

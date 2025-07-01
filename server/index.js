@@ -21,12 +21,13 @@ const port = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors()); // Enable CORS for all routes
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' })); // Increase JSON payload limit for large base64 images
+app.use(express.urlencoded({ extended: true, limit: '50mb' })); // Increase URL-encoded payload limit
 
 const TEMP_DIR = path.join(__dirname, 'temp');
 // TEMP_DIR will be created asynchronously before server listen
 
-// Multer setup for file uploads
+// Multer setup for file uploads with increased size limits
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, TEMP_DIR);
@@ -35,7 +36,53 @@ const storage = multer.diskStorage({
     cb(null, `${file.fieldname}-${uuidv4()}${path.extname(file.originalname)}`);
   }
 });
-const upload = multer({ storage: storage });
+
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 50 * 1024 * 1024, // 50MB max file size
+    fieldSize: 50 * 1024 * 1024, // 50MB max field size (for base64 data)
+    fields: 10, // Max 10 non-file fields
+    files: 5    // Max 5 files
+  }
+});
+
+// Multer error handling middleware
+function handleMulterError(error, req, res, next) {
+  if (error instanceof multer.MulterError) {
+    console.error('Multer Error:', error.code, error.message);
+    
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(413).json({ 
+        message: 'File too large. Maximum size is 50MB.',
+        error: 'LIMIT_FILE_SIZE'
+      });
+    }
+    
+    if (error.code === 'LIMIT_FIELD_SIZE') {
+      return res.status(413).json({ 
+        message: 'Field data too large. Maximum size is 50MB.',
+        error: 'LIMIT_FIELD_SIZE'
+      });
+    }
+    
+    if (error.code === 'LIMIT_UNEXPECTED_FILE') {
+      return res.status(400).json({ 
+        message: 'Unexpected file field.',
+        error: 'LIMIT_UNEXPECTED_FILE'
+      });
+    }
+    
+    // Generic multer error
+    return res.status(400).json({ 
+      message: 'File upload error: ' + error.message,
+      error: error.code
+    });
+  }
+  
+  // Not a multer error, pass to next error handler
+  next(error);
+}
 
 // Check if API Key is loaded
 if (!process.env.OPENAI_API_KEY) {
@@ -48,7 +95,7 @@ const openai = new OpenAI({
 });
 
 // API Endpoint for image generation
-app.post('/api/generate-tryon-image', express.json({ limit: '10mb' }), async (req, res) => {
+app.post('/api/generate-tryon-image', express.json({ limit: '50mb' }), async (req, res) => {
   try {
     const { userPhotoUrl, clothPhotoUrl, customPrompt } = req.body;
 
@@ -99,7 +146,7 @@ async function downloadImageAsTempFile(imageUrl, baseName) {
   }
 }
 
-app.post('/api/tryon', upload.single('userPhoto'), async (req, res) => { // 'userPhoto' is the field name from FormData
+app.post('/api/tryon', upload.single('userPhoto'), handleMulterError, async (req, res) => { // 'userPhoto' is the field name from FormData
   console.log('--- /api/tryon request received ---');
   console.log('req.file (userPhoto):', req.file);
   console.log('req.body (customPrompt, clothImageUrl):', req.body);
@@ -112,15 +159,35 @@ app.post('/api/tryon', upload.single('userPhoto'), async (req, res) => { // 'use
   }
   userPhotoUploadedPath = req.file.path; // Path to the uploaded user photo by multer
 
-  if (!clothImageUrl || typeof clothImageUrl !== 'string' || !clothImageUrl.startsWith('http')) {
-     // For now, we expect clothImageUrl to be an HTTP/S URL from Zalando extraction or direct input
+  if (!clothImageUrl || typeof clothImageUrl !== 'string' || 
+      (!clothImageUrl.startsWith('http') && !clothImageUrl.startsWith('data:'))) {
+     // Accept both HTTP/S URLs and base64 data URLs
     if (userPhotoUploadedPath) await fsp.unlink(userPhotoUploadedPath).catch(err => console.error('Failed to delete temp user photo on cloth error:', err));
-    return res.status(400).json({ message: 'clothImageUrl must be a valid HTTP/S URL string.' });
+    return res.status(400).json({ message: 'clothImageUrl must be a valid HTTP/S URL string or base64 data URL.' });
   }
 
   try {
-    // clothImageUrl is a URL, so we need to download it.
-    clothPhotoDownloadedPath = await downloadImageAsTempFile(clothImageUrl, 'cloth-image');
+    // Handle cloth image: either download from URL or save base64 data
+    if (clothImageUrl.startsWith('data:')) {
+      // Handle base64 data URL
+      console.log('[/api/tryon] Processing base64 cloth image');
+      const base64Data = clothImageUrl.split(',')[1];
+      const mimeType = clothImageUrl.split(';')[0].split(':')[1];
+      const extension = mimeType === 'image/jpeg' ? '.jpg' : 
+                       mimeType === 'image/png' ? '.png' : 
+                       mimeType === 'image/webp' ? '.webp' : '.jpg';
+      
+      const uniqueFilename = `cloth-image-${uuidv4()}${extension}`;
+      clothPhotoDownloadedPath = path.join(TEMP_DIR, uniqueFilename);
+      
+      const buffer = Buffer.from(base64Data, 'base64');
+      await fsp.writeFile(clothPhotoDownloadedPath, buffer);
+      console.log(`[/api/tryon] Base64 cloth image saved to: ${clothPhotoDownloadedPath}`);
+    } else {
+      // Handle HTTP/HTTPS URL - download it
+      console.log('[/api/tryon] Downloading cloth image from URL');
+      clothPhotoDownloadedPath = await downloadImageAsTempFile(clothImageUrl, 'cloth-image');
+    }
 
     const promptText = `Put the clothing item from the reference image onto the person in the main image. Make it photorealistic, keep pose and background unchanged. ${customPrompt || ''}`;
 

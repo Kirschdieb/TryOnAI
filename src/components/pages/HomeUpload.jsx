@@ -23,6 +23,16 @@ export default function HomeUpload() {
   // Cloth photo file state for direct upload
   const [clothPhotoFile, setClothPhotoFile] = useState(null);
   
+  // Helper function to convert file to base64
+  const convertFileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  };
+  
   // Local state for inputs, initialized from store and synced back to store
   const [localClothPhotoUrl, setLocalClothPhotoUrl] = useState(storeClothPhotoUrl);
   const [localZalandoUrl, setLocalZalandoUrl] = useState(storeZalandoUrl);
@@ -59,36 +69,61 @@ export default function HomeUpload() {
   const [isExtracting, setIsExtracting] = useState(false);
   const [extractError, setExtractError] = useState(null);
 
-  const handleTryOn = () => {
-    setUserPhoto(userPhotoFile); // Pass the File object to the store for /studio
-    // Use local state (synced with store) for cloth photo decision
-    setClothPhoto(localClothPhotoUrl || localZalandoUrl); // Set cloth photo for /studio
+  const handleTryOn = async () => {
+    try {
+      // Convert user photo to base64 if it's a file
+      let userPhotoData = userPhotoFile;
+      if (userPhotoFile instanceof File) {
+        userPhotoData = await convertFileToBase64(userPhotoFile);
+        console.log('[HomeUpload] User photo converted to base64 for studio');
+      }
+      
+      setUserPhoto(userPhotoData); // Pass base64 data to the store for /studio
+      // Use local state (synced with store) for cloth photo decision
+      setClothPhoto(localClothPhotoUrl || localZalandoUrl); // Set cloth photo for /studio
 
-    // Clear the home page specific inputs from the store after they've been used for the studio
-    setHomeZalandoUrl('');
-    setHomeClothPhotoUrl(null);
+      // Clear the home page specific inputs from the store after they've been used for the studio
+      setHomeZalandoUrl('');
+      setHomeClothPhotoUrl(null);
 
-    navigate('/studio');
+      navigate('/studio');
+    } catch (error) {
+      console.error('[HomeUpload] Error converting user photo to base64:', error);
+      alert('Error processing user photo. Please try again.');
+    }
   };
 
-  // Effect to create and revoke blob URL for preview
+  // Effect to create preview URL for user photo
   useEffect(() => {
     if (userPhotoFile) {
-      const previewUrl = URL.createObjectURL(userPhotoFile);
-      setUserPhotoPreviewUrl(previewUrl);
-      return () => URL.revokeObjectURL(previewUrl); // Cleanup
+      if (userPhotoFile instanceof File) {
+        const previewUrl = URL.createObjectURL(userPhotoFile);
+        setUserPhotoPreviewUrl(previewUrl);
+        return () => URL.revokeObjectURL(previewUrl); // Cleanup
+      } else if (typeof userPhotoFile === 'string' && userPhotoFile.startsWith('data:')) {
+        // If it's already a base64 string, use it directly
+        setUserPhotoPreviewUrl(userPhotoFile);
+      }
     } else {
       setUserPhotoPreviewUrl(null);
     }
   }, [userPhotoFile]);
 
-  // Effect to create and revoke blob URL for cloth photo file preview
+  // Effect to convert cloth photo file to base64 for persistent storage
   useEffect(() => {
     if (clothPhotoFile) {
-      const previewUrl = URL.createObjectURL(clothPhotoFile);
-      setLocalClothPhotoUrl(previewUrl);
-      setHomeClothPhotoUrl(previewUrl);
-      return () => URL.revokeObjectURL(previewUrl);
+      const convertAndStore = async () => {
+        try {
+          const base64 = await convertFileToBase64(clothPhotoFile);
+          setLocalClothPhotoUrl(base64);
+          setHomeClothPhotoUrl(base64);
+          console.log('[HomeUpload] Cloth photo converted to base64 for persistent storage');
+        } catch (error) {
+          console.error('[HomeUpload] Error converting cloth photo to base64:', error);
+          alert('Error processing image. Please try again.');
+        }
+      };
+      convertAndStore();
     }
   }, [clothPhotoFile, setHomeClothPhotoUrl]);
 
