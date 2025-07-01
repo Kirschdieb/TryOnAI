@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCloset } from '../../store/useCloset';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { FaUpload, FaTrash, FaPlus, FaCheck } from 'react-icons/fa';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import { BeachIcon, RainIcon, SnowIcon, OriginalIcon, StandingIcon, SittingIcon, HandsInPocketsIcon, ArmsCrossedIcon } from '../ui/BackgroundIcon';
@@ -40,6 +41,15 @@ const Studio = () => {
   const [resultAspect, setResultAspect] = useState({ width: 3, height: 4 });
   // Hintergrundauswahl
   const [selectedBackground, setSelectedBackground] = useState('original');
+  // Bildqualität
+  const [imageQuality, setImageQuality] = useState('medium');
+
+  // Bildqualität-Optionen
+  const qualityOptions = [
+    { value: 'low', label: t('studio.qualityLow') },
+    { value: 'medium', label: t('studio.qualityMedium') },
+    { value: 'high', label: t('studio.qualityHigh') },
+  ];
 
   // Hintergrundoptionen
   const backgroundOptions = [
@@ -63,8 +73,13 @@ const Studio = () => {
   }, [userPhoto]);
 
   // Redirect if no photos
+  useEffect(() => {
+    if (!userPhoto || !clothPhoto) {
+      navigate('/');
+    }
+  }, [userPhoto, clothPhoto, navigate]);
+
   if (!userPhoto || !clothPhoto) {
-    navigate('/');
     return null;
   }
 
@@ -189,6 +204,7 @@ const Studio = () => {
         fullPrompt += ' ' + customPrompt;
       }
       formData.append('customPrompt', fullPrompt.trim());
+      formData.append('imageQuality', imageQuality);
       formData.append('userPhoto', userPhoto); // userPhoto is a File object
       const clothImageSource = extractedClothImage || clothPhoto;
       if (clothImageSource) {
@@ -230,152 +246,189 @@ const Studio = () => {
     <>
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-3 gap-8">
-          {/* Column 1: Dein Foto + Hintergrund */}
-          <div className="flex flex-col gap-6">
-            <Card className="md:self-start">
-              <h2 className="text-xl font-semibold mb-4">{t('studio.yourPhoto')}</h2>
-              <div
-                className="relative w-full flex items-center justify-center bg-cream-100 rounded-lg"
-                style={{ aspectRatio: `${resultAspect.width} / ${resultAspect.height}`, height: 400 * (resultAspect.height / resultAspect.width) }}
-              >
-                <img
-                  src={userPhotoPreviewUrl || 'https://via.placeholder.com/300x400.png?text=Your+Photo'}
-                  alt="Your photo"
-                  className="w-full h-full object-contain rounded-lg block"
-                />
-              </div>
-            </Card>
-            {/* Hintergrundauswahl-Kachel */}
+          {/* Column 1: Dein Foto */}
+          <Card>
+            <h2 className="text-xl font-semibold mb-4">{t('studio.yourPhoto')}</h2>
+            <div
+              className="relative w-full flex items-center justify-center bg-cream-100 rounded-lg"
+              style={{ aspectRatio: `${resultAspect.width} / ${resultAspect.height}`, height: 400 * (resultAspect.height / resultAspect.width) }}
+            >
+              <img
+                src={userPhotoPreviewUrl || 'https://via.placeholder.com/300x400.png?text=Your+Photo'}
+                alt="Your photo"
+                className="w-full h-full object-contain rounded-lg block"
+              />
+            </div>
+          </Card>
+
+          {/* Column 2: Kleidungsstück */}
+          <Card>
+            <h2 className="text-xl font-semibold mb-4">{t('studio.clothingItem')}</h2>
+            <div
+              className="relative w-full flex items-center justify-center bg-cream-100 rounded-lg"
+              style={{ aspectRatio: `${resultAspect.width} / ${resultAspect.height}`, height: 400 * (resultAspect.height / resultAspect.width) }}
+            >
+              {isExtractingCloth ? (
+                <div className="w-full h-full bg-cream-200 rounded-lg animate-pulse"></div>
+              ) : extractError ? (
+                <div className="w-full h-full bg-cream-200 rounded-lg flex items-center justify-center">
+                  <p className="text-red-500">{extractError}</p>
+                </div>
+              ) : (
+                extractedClothImage && (
+                  <img
+                    src={extractedClothImage}
+                    alt="Clothing"
+                    className="w-full h-full object-contain rounded-lg block"
+                  />
+                )
+              )}
+            </div>
+          </Card>
+
+          {/* Column 3: Ergebnis */}
+          <Card>
+            <h2 className="text-xl font-semibold mb-4">{t('studio.result')}</h2>
+            <div
+              className="relative w-full flex items-center justify-center bg-cream-100 rounded-lg"
+              style={{ aspectRatio: `${resultAspect.width} / ${resultAspect.height}`, height: 400 * (resultAspect.height / resultAspect.width) }}
+            >
+              {isGenerating ? (
+                <div className="absolute inset-0 bg-cream-200 rounded-lg flex items-center justify-center">
+                  <LoadingSpinner />
+                </div>
+              ) : result ? (
+                <div className="relative w-full h-full">
+                  <img
+                    src={result}
+                    alt="Generated result"
+                    className="w-full h-full object-contain rounded-lg"
+                  />
+                </div>
+              ) : (
+                <div className="absolute inset-0 bg-cream-200 rounded-lg flex items-center justify-center">
+                  <p className="text-gray-500">{t('studio.clickGenerate')}</p>
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
+
+        {/* Grid for selectors */}
+        <div className={`grid ${result ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-8 mt-8`}>
+          {/* Hintergrundauswahl-Kachel */}
+          <Card>
+            <h2 className="text-xl font-semibold mb-4">{t('studio.backgroundTitle')}</h2>
+            <div className="flex flex-col gap-2">
+              {backgroundOptions.map((option) => (
+                <Button
+                  key={option.value}
+                  type="button"
+                  variant={selectedBackground === option.value ? 'primary' : 'secondary'}
+                  className={`flex items-center w-full justify-start text-left !rounded-lg ${selectedBackground === option.value ? '' : 'bg-white border border-cream-300'} ${selectedBackground === option.value ? '' : 'hover:bg-cream-100'}`}
+                  onClick={() => setSelectedBackground(option.value)}
+                >
+                  {option.icon}
+                  {option.label}
+                </Button>
+              ))}
+            </div>
+          </Card>
+
+          {/* Pose-Auswahl-Kachel */}
+          <Card>
+            <h2 className="text-xl font-semibold mb-4">{t('studio.poseTitle')}</h2>
+            <div className="flex flex-col gap-2">
+              {poseOptions.map((option) => (
+                <Button
+                  key={option.value}
+                  type="button"
+                  variant={selectedPose === option.value ? 'primary' : 'secondary'}
+                  className={`flex items-center w-full justify-start text-left !rounded-lg ${selectedPose === option.value ? '' : 'bg-white border border-cream-300'} ${selectedPose === option.value ? '' : 'hover:bg-cream-100'}`}
+                  onClick={() => setSelectedPose(option.value)}
+                >
+                  {option.icon}
+                  {option.label}
+                </Button>
+              ))}
+            </div>
+          </Card>
+
+          {/* Bildqualität-Kachel */}
+          <Card>
+            <h2 className="text-xl font-semibold mb-4">{t('studio.qualityTitle')}</h2>
+            <p className="mb-4 text-sm text-gray-600">{t('studio.qualityDescription')}</p>
+            <div className="flex flex-col gap-2">
+              {qualityOptions.map((option) => (
+                <Button
+                  key={option.value}
+                  type="button"
+                  variant={imageQuality === option.value ? 'primary' : 'secondary'}
+                  className={`flex items-center w-full justify-start text-left !rounded-lg ${imageQuality === option.value ? '' : 'bg-white border border-cream-300'} ${imageQuality === option.value ? '' : 'hover:bg-cream-100'}`}
+                  onClick={() => setImageQuality(option.value)}
+                >
+                  {option.label}
+                </Button>
+              ))}
+            </div>
+          </Card>
+
+          {/* Bild speichern Kachel (conditional) */}
+          {result && (
             <Card>
-              <h2 className="text-xl font-semibold mb-4">{t('studio.backgroundTitle')}</h2>
-              <div className="flex flex-col gap-2">
-                {backgroundOptions.map((option) => (
-                  <Button
-                    key={option.value}
-                    type="button"
-                    variant={selectedBackground === option.value ? 'primary' : 'secondary'}
-                    className={`flex items-center w-full justify-start text-left !rounded-lg ${selectedBackground === option.value ? '' : 'bg-white border border-cream-300'} ${selectedBackground === option.value ? '' : 'hover:bg-cream-100'}`}
-                    onClick={() => setSelectedBackground(option.value)}
-                  >
-                    {option.icon}
-                    {option.label}
-                  </Button>
-                ))}
+              <h3 className="text-lg font-semibold mb-2">{t('studio.saveTitle')}</h3>
+              <p className="mb-2 text-sm">
+                {t('studio.saveDescription1')}
+                <b>{t('studio.saveDescriptionBold')}</b>
+                {t('studio.saveDescription2')}
+              </p>
+              <div className="mb-4">
+                <label className="block mb-1 text-sm">{t('studio.saveToAlbumLabel')}</label>
+                <select
+                  className="w-full border rounded px-2 py-1"
+                  value={selectedAlbumId}
+                  onChange={e => setSelectedAlbumId(e.target.value)}
+                  disabled={saveDisabled}
+                >
+                  <option value="">{t('studio.selectAlbum')}</option>
+                  {albums.filter(a => a.id !== 'generated').map(album => (
+                    <option key={album.id} value={album.id}>{album.name}</option>
+                  ))}
+                </select>
               </div>
-            </Card>
-          </div>
-          {/* Column 2: Kleidungsstück + Pose */}
-          <div className="flex flex-col gap-6">
-            {/* Clothing Item */}
-            <Card className="md:self-start">
-              <h2 className="text-xl font-semibold mb-4">{t('studio.clothingItem')}</h2>
-              <div
-                className="relative w-full flex items-center justify-center bg-cream-100 rounded-lg"
-                style={{ aspectRatio: `${resultAspect.width} / ${resultAspect.height}`, height: 400 * (resultAspect.height / resultAspect.width) }}
-              >
-                {isExtractingCloth ? (
-                  <div className="w-full h-full bg-cream-200 rounded-lg animate-pulse"></div>
-                ) : extractError ? (
-                  <div className="w-full h-full bg-cream-200 rounded-lg flex items-center justify-center">
-                    <p className="text-red-500">{extractError}</p>
+              <div className="flex flex-col gap-2 justify-end mt-4">
+                <Button
+                  variant="primary"
+                  onClick={handleSave}
+                  disabled={saveDisabled}
+                  className="w-full bg-lavender hover:bg-lavender-dark text-white px-4 py-2 rounded shadow-lg"
+                  style={{ boxShadow: '0 4px 24px 0 rgba(80, 80, 180, 0.10)' }}
+                >
+                  {saveDisabled ? t('studio.saveButtonSaved') : t('studio.saveButton')}
+                </Button>
+                {saveSuccess && (
+                  <div className="mt-3 bg-green-100 text-green-800 px-4 py-2 rounded-lg text-center font-semibold transition-all animate-fade-in">
+                    {t('studio.saveButtonSaved')}
                   </div>
-                ) : (
-                  extractedClothImage && (
-                    <img
-                      src={extractedClothImage}
-                      alt="Clothing"
-                      className="w-full h-full object-contain rounded-lg block"
-                    />
-                  )
                 )}
               </div>
             </Card>
-            {/* Pose-Auswahl-Kachel */}
-            <Card>
-              <h2 className="text-xl font-semibold mb-4">{t('studio.poseTitle')}</h2>
-              <div className="flex flex-col gap-2">
-                {poseOptions.map((option) => (
-                  <Button
-                    key={option.value}
-                    type="button"
-                    variant={selectedPose === option.value ? 'primary' : 'secondary'}
-                    className={`flex items-center w-full justify-start text-left !rounded-lg ${selectedPose === option.value ? '' : 'bg-white border border-cream-300'} ${selectedPose === option.value ? '' : 'hover:bg-cream-100'}`}
-                    onClick={() => setSelectedPose(option.value)}
-                  >
-                    {option.icon}
-                    {option.label}
-                  </Button>
-                ))}
-              </div>
-            </Card>
-          </div>
-          {/* Column 3: Ergebnis + Speichern */}
-          <div className="flex flex-col gap-6">
-            <Card>
-              <h2 className="text-xl font-semibold mb-4">{t('studio.result')}</h2>
-              <div
-                className="relative w-full flex items-center justify-center bg-cream-100 rounded-lg"
-                style={{ aspectRatio: `${resultAspect.width} / ${resultAspect.height}`, height: 400 * (resultAspect.height / resultAspect.width) }}
-              >
-                {isGenerating ? (
-                  <div className="absolute inset-0 bg-cream-200 rounded-lg flex items-center justify-center">
-                    <LoadingSpinner />
-                  </div>
-                ) : result ? (
-                  <div className="relative w-full h-full">
-                    <img
-                      src={result}
-                      alt="Generated result"
-                      className="w-full h-full object-contain rounded-lg"
-                    />
-                  </div>
-                ) : (
-                  <div className="absolute inset-0 bg-cream-200 rounded-lg flex items-center justify-center">
-                    <p className="text-gray-500">{t('studio.clickGenerate')}</p>
-                  </div>
-                )}
-              </div>
-            </Card>
-            {result && (
-              <Card>
-                <h3 className="text-lg font-semibold mb-2">{t('studio.saveTitle')}</h3>
-                <p className="mb-2">{t('studio.saveInfo1')} <b>{t('albums.generated')}</b> {t('studio.saveInfo2')}</p>
-                <div className="mb-4">
-                  <label className="block mb-1">{t('studio.saveInfo3')}</label>
-                  <select
-                    className="w-full border rounded px-2 py-1"
-                    value={selectedAlbumId}
-                    onChange={e => setSelectedAlbumId(e.target.value)}
-                    disabled={saveDisabled}
-                  >
-                    <option value="">{t('studio.saveInfo4')}</option>
-                    {albums.filter(a => a.id !== 'generated').map(album => (
-                      <option key={album.id} value={album.id}>{album.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex flex-col gap-2 justify-end mt-4">
-                  <Button
-                    variant="primary"
-                    onClick={handleSave}
-                    disabled={saveDisabled}
-                    className="w-full max-w-xs bg-lavender hover:bg-lavender-dark text-white px-4 py-2 rounded shadow-lg"
-                    style={{ boxShadow: '0 4px 24px 0 rgba(80, 80, 180, 0.10)' }}
-                  >
-                    {saveDisabled ? t('studio.savedToCloset') : t('studio.saveToCloset')}
-                  </Button>
-                  {saveSuccess && (
-                    <div className="mt-3 bg-green-100 text-green-800 px-4 py-2 rounded-lg text-center font-semibold transition-all animate-fade-in">
-                      {t('studio.savedToCloset')}
-                    </div>
-                  )}
-                </div>
-              </Card>
-            )}
-          </div>
+          )}
+        </div>
+        {/* Benutzerdefinierte Anweisungen über dem Button */}
+        <div className="flex w-full justify-center mt-8 mb-6">
+          <Card className="max-w-2xl w-full">
+            <h2 className="text-xl font-semibold mb-4">Benutzerdefinierte Anweisungen</h2>
+            <textarea
+              className="w-full border rounded p-2 h-24"
+              placeholder="Fügen Sie spezifische Anweisungen für die KI hinzu..."
+              value={customPrompt}
+              onChange={(e) => setCustomPrompt(e.target.value)}
+            />
+          </Card>
         </div>
         {/* Anprobe generieren Button unter allen Kacheln */}
-        <div className="flex w-full justify-center mt-8">
+        <div className="flex w-full justify-center mt-4">
           <Button
             onClick={generateTryOn}
             disabled={isGenerating}
