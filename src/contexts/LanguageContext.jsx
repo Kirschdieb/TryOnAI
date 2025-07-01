@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useCloset } from '../store/useCloset';
 
@@ -13,8 +14,32 @@ export const useLanguage = () => {
 
 // Translation object
 const translations = {
-  de: {    // Navigation
+  de: {
+    // Dashboard Page
+    'dashboard.title': 'Dashboard',
+    'dashboard.stats.generated': 'Generierte Bilder',
+    'dashboard.stats.albums': 'Alben insgesamt',
+    'dashboard.stats.lastImage': 'Letztes Bild',
+    'dashboard.imagesPerAlbum': 'Bilder pro Album',
+    'dashboard.profile.complete': 'Profil ausgefüllt',
+    'dashboard.profile.title': 'Profil',
+    'dashboard.profile.name': 'Name',
+    'dashboard.profile.email': 'E-Mail',
+    'dashboard.profile.phone': 'Telefon',
+    'dashboard.profile.height': 'Größe',
+    'dashboard.recent': 'Letzte Aktivitäten',
+    'dashboard.noRecent': 'Keine generierten Bilder vorhanden.',
+    'dashboard.quick': 'Schnellzugriffe',
+    'dashboard.quick.studio': 'Neue Anprobe starten',
+    'dashboard.quick.closet': 'Kleiderschrank öffnen',
+    'dashboard.quick.profile': 'Profil bearbeiten',
+    'dashboard.tips': 'Hinweise & Tipps',
+    'dashboard.tips.1': 'Für bessere Ergebnisse lade ein klares, gut ausgeleuchtetes Foto hoch.',
+    'dashboard.tips.2': 'Deine Daten werden lokal gespeichert und nicht an Dritte weitergegeben.',
+    'dashboard.tips.3': 'Teste verschiedene Outfits im Try-On Studio!',
+    // Navigation
     'nav.tryOn': 'Try On',
+    'nav.dashboard': 'Dashboard',
     'nav.closet': 'Kleiderschrank',
     'nav.profile': 'Profil',
     'nav.about': 'About',
@@ -196,8 +221,31 @@ const translations = {
     'studio.saveInfo3': 'Optional: Zusätzlich in Album speichern',
     'studio.saveInfo4': 'Kein weiteres Album',
   },
-  en: {    // Navigation
+  en: {
+    // Dashboard Page
+    'dashboard.title': 'Dashboard',
+    'dashboard.stats.generated': 'Generated Images',
+    'dashboard.stats.albums': 'Total Albums',
+    'dashboard.stats.lastImage': 'Last Image',
+    'dashboard.imagesPerAlbum': 'Images per Album',
+    'dashboard.profile.complete': 'Profile Complete',
+    'dashboard.profile.title': 'Profile',
+    'dashboard.profile.name': 'Name',
+    'dashboard.profile.email': 'Email',
+    'dashboard.profile.phone': 'Phone',
+    'dashboard.profile.height': 'Height',
+    'dashboard.recent': 'Recent Activity',
+    'dashboard.noRecent': 'No generated images available.',
+    'dashboard.quick': 'Quick Access',
+    'dashboard.quick.studio': 'Start New Try-On',
+    'dashboard.quick.closet': 'Open Closet',
+    'dashboard.quick.profile': 'Edit Profile',
+    'dashboard.tips': 'Hints & Tips',
+    'dashboard.tips.1': 'For best results, upload a clear, well-lit photo.',
+    'dashboard.tips.2': 'Your data is stored locally and not shared with third parties.',
+    'dashboard.tips.3': 'Try different outfits in the Try-On Studio!',
     'nav.tryOn': 'Try On',
+    'nav.dashboard': 'Dashboard',
     'nav.closet': 'Closet',
     'nav.profile': 'Profile',
     'nav.about': 'About',

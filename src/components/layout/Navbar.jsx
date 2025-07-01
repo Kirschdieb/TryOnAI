@@ -21,6 +21,9 @@ export default function Navbar() {
             <Link to="/try-on" className="text-gray-600 hover:text-lavender">
               {t('nav.tryOn')}
             </Link>
+            <Link to="/dashboard" className="text-gray-600 hover:text-lavender">
+              {t('nav.dashboard')}
+            </Link>
             <Link to="/closet" className="text-gray-600 hover:text-lavender">
               {t('nav.closet')}
             </Link>

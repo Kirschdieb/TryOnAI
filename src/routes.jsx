@@ -8,6 +8,8 @@ import ProfilePage from './components/pages/Profile.jsx';
 import About from './components/pages/About.jsx';
 import Browse from './components/pages/Browse.jsx';
 
+import Dashboard from './components/pages/Dashboard.jsx';
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -20,6 +22,7 @@ const router = createBrowserRouter([
       { path: '/profile', element: <ProfilePage /> },
       { path: '/about', element: <About /> },
       { path: '/browse', element: <Browse /> },
+      { path: '/dashboard', element: <Dashboard /> },
     ],
   },
 ]);
