@@ -18,6 +18,9 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
+            <Link to="/" className="text-gray-600 hover:text-lavender">
+              {t('nav.home')}
+            </Link>
             <Link to="/try-on" className="text-gray-600 hover:text-lavender">
               {t('nav.tryOn')}
             </Link>
