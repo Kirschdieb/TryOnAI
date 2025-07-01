@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCloset } from '../../store/useCloset';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { FaUpload, FaTrash, FaPlus, FaCheck } from 'react-icons/fa';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import { BeachIcon, RainIcon, SnowIcon, OriginalIcon, StandingIcon, SittingIcon, HandsInPocketsIcon, ArmsCrossedIcon } from '../ui/BackgroundIcon';
@@ -72,8 +73,13 @@ const Studio = () => {
   }, [userPhoto]);
 
   // Redirect if no photos
+  useEffect(() => {
+    if (!userPhoto || !clothPhoto) {
+      navigate('/');
+    }
+  }, [userPhoto, clothPhoto, navigate]);
+
   if (!userPhoto || !clothPhoto) {
-    navigate('/');
     return null;
   }
 
@@ -372,9 +378,9 @@ const Studio = () => {
             <Card>
               <h3 className="text-lg font-semibold mb-2">{t('studio.saveTitle')}</h3>
               <p className="mb-2 text-sm">
-                <Trans i18nKey="studio.saveDescription">
-                  Das Bild wird automatisch im Album <b>Generierte Bilder</b> gespeichert. Sie können es zusätzlich in einem weiteren Album speichern.
-                </Trans>
+                {t('studio.saveDescription1')}
+                <b>{t('studio.saveDescriptionBold')}</b>
+                {t('studio.saveDescription2')}
               </p>
               <div className="mb-4">
                 <label className="block mb-1 text-sm">{t('studio.saveToAlbumLabel')}</label>
