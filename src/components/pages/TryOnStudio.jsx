@@ -85,8 +85,6 @@ const Studio = () => {
       if (loginStatus === 'true' && savedProfile && !currentProfileId) {
         try {
           const parsedProfile = JSON.parse(savedProfile);
-          console.log('Loading profile in TryOnStudio:', parsedProfile);
-          loadAlbumsFromProfile(parsedProfile);
         } catch (error) {
           console.error('Error loading profile in TryOnStudio:', error);
         }
@@ -177,9 +175,6 @@ const Studio = () => {
   const handleSave = () => {
     if (!result || saveDisabled) return;
     
-    console.log('handleSave called - saving image'); // Debug log
-    console.log('Current albums:', albums); // Debug log
-    console.log('Selected album ID:', selectedAlbumId); // Debug log
     setSaveDisabled(true);
     
     const imageObj = {
@@ -190,18 +185,14 @@ const Studio = () => {
       timestamp: new Date().toISOString(),
     };
     
-    console.log('Image object to save:', imageObj); // Debug log
-    
     // Speichere im State (temporär für die Sitzung)
     addGeneratedImage(imageObj);
     
     // Zusätzlich in gewähltes Album speichern
     if (selectedAlbumId && selectedAlbumId !== 'generated') {
-      console.log('Also saving to album:', selectedAlbumId); // Debug log
       addImageToAlbum(selectedAlbumId, { ...imageObj, id: Date.now().toString() + Math.random().toString(36).substr(2, 5) });
     }
     
-    console.log('Image saved successfully (in session)'); // Debug log
     setSaveSuccess(true);
     
     // Bestätigung für 3 Sekunden anzeigen
@@ -271,11 +262,9 @@ const Studio = () => {
       if (userPhoto instanceof File) {
         // Compress the file before upload
         userPhotoBlob = await compressImage(userPhoto);
-        console.log('[TryOnStudio] Compressed File userPhoto for API submission');
       } else if (typeof userPhoto === 'string' && userPhoto.startsWith('data:')) {
         // Compress base64 image
         userPhotoBlob = await compressImage(userPhoto);
-        console.log('[TryOnStudio] Compressed base64 userPhoto for API submission');
       } else {
         alert('Invalid user photo format. Please try uploading again.');
         setIsGenerating(false);
@@ -284,9 +273,6 @@ const Studio = () => {
       
       formData.append('userPhoto', userPhotoBlob, 'user-photo.jpg');
       const clothImageSource = extractedClothImage || clothPhoto;
-      console.log('[TryOnStudio] clothPhoto:', typeof clothPhoto, clothPhoto?.substring(0, 50) + '...');
-      console.log('[TryOnStudio] extractedClothImage:', typeof extractedClothImage, extractedClothImage?.substring(0, 50) + '...');
-      console.log('[TryOnStudio] clothImageSource:', typeof clothImageSource, clothImageSource?.substring(0, 50) + '...');
       
       if (clothImageSource) {
         formData.append('clothImageUrl', clothImageSource);

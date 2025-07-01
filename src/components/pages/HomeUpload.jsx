@@ -75,7 +75,6 @@ export default function HomeUpload() {
       let userPhotoData = userPhotoFile;
       if (userPhotoFile instanceof File) {
         userPhotoData = await convertFileToBase64(userPhotoFile);
-        console.log('[HomeUpload] User photo converted to base64 for studio');
       }
       
       setUserPhoto(userPhotoData); // Pass base64 data to the store for /studio
@@ -117,7 +116,6 @@ export default function HomeUpload() {
           const base64 = await convertFileToBase64(clothPhotoFile);
           setLocalClothPhotoUrl(base64);
           setHomeClothPhotoUrl(base64);
-          console.log('[HomeUpload] Cloth photo converted to base64 for persistent storage');
         } catch (error) {
           console.error('[HomeUpload] Error converting cloth photo to base64:', error);
           alert('Error processing image. Please try again.');

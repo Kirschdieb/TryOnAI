@@ -33,13 +33,10 @@ export default function ProfilePage() {
     const savedProfile = localStorage.getItem('userProfile');
     const loginStatus = localStorage.getItem('isLoggedIn');
     
-    console.log('[Profile] Checking login status:', { loginStatus, hasProfile: !!savedProfile });
-    
     if (loginStatus === 'true' && savedProfile) {
       setIsLoggedIn(true);
       try {
         const parsedProfile = JSON.parse(savedProfile);
-        console.log('[Profile] Loaded profile:', parsedProfile.name, 'ID:', parsedProfile.id);
         
         // Ensure profile has an ID
         if (!parsedProfile.id) {

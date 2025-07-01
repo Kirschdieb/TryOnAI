@@ -170,7 +170,6 @@ app.post('/api/tryon', upload.single('userPhoto'), handleMulterError, async (req
     // Handle cloth image: either download from URL or save base64 data
     if (clothImageUrl.startsWith('data:')) {
       // Handle base64 data URL
-      console.log('[/api/tryon] Processing base64 cloth image');
       const base64Data = clothImageUrl.split(',')[1];
       const mimeType = clothImageUrl.split(';')[0].split(':')[1];
       const extension = mimeType === 'image/jpeg' ? '.jpg' : 
@@ -182,10 +181,8 @@ app.post('/api/tryon', upload.single('userPhoto'), handleMulterError, async (req
       
       const buffer = Buffer.from(base64Data, 'base64');
       await fsp.writeFile(clothPhotoDownloadedPath, buffer);
-      console.log(`[/api/tryon] Base64 cloth image saved to: ${clothPhotoDownloadedPath}`);
     } else {
       // Handle HTTP/HTTPS URL - download it
-      console.log('[/api/tryon] Downloading cloth image from URL');
       clothPhotoDownloadedPath = await downloadImageAsTempFile(clothImageUrl, 'cloth-image');
     }
 
