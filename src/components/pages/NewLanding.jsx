@@ -1,34 +1,67 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 import Button from '../ui/Button';
+import { useEffect, useRef, useState } from 'react';
+
 
 export default function Landing() {
   const { t } = useLanguage();
-  return (
-    <div className="relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
-        <div className="absolute left-1/2 top-0 -translate-x-1/2">
-          <div className="h-[848px] w-[848px] rounded-full border border-slate-200 opacity-50 [mask-image:linear-gradient(to_bottom,white,transparent)]" />
-        </div>
-      </div>
+  const heroRef = useRef(null);
+  const [isHeroOnPurple, setIsHeroOnPurple] = useState(true);
+  const featuresRef = useRef(null);
+  const [isFeaturesOnPurple, setIsFeaturesOnPurple] = useState(false);
 
-      {/* Hero Section */}
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+  useEffect(() => {
+    const handleScroll = () => {
+      if (heroRef.current) {
+        const rect = heroRef.current.getBoundingClientRect();
+        setIsHeroOnPurple(rect.bottom > 120);
+      }
+      if (featuresRef.current) {
+        const rect = featuresRef.current.getBoundingClientRect();
+        // Wenn die Mitte der Section noch im lila Bereich ist (z.B. top < 400)
+        setIsFeaturesOnPurple(rect.top < 400);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <div className="relative overflow-hidden min-h-screen">
+      {/* Custom Purple Gradient Background - now full width */}
+      <div
+        className="fixed -top-24 left-1/2 -translate-x-1/2 w-screen h-[70vh] -z-20 rotate-[-6deg] rounded-bl-[120px]"
+        style={{
+          background: 'linear-gradient(100deg, #7f3ffb 0%, #e14eca 100%)',
+          boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
+          minWidth: '100vw',
+        }}
+        aria-hidden="true"
+      />
+      {/* Optional: Soft shadow for depth */}
+      <div className="fixed -top-24 left-1/2 -translate-x-1/2 w-screen h-[80vh] -z-30 rotate-[-6deg] rounded-bl-[120px] opacity-30 blur-2xl" style={{background: 'linear-gradient(100deg, #7f3ffb 0%, #e14eca 100%)', minWidth: '100vw'}} />
+
+      {/* Hero Section - dynamic text color */}
+      <div className="mx-auto max-w-6xl px-0 sm:px-0" ref={heroRef}>
         <div className="pb-12 pt-32 md:pb-20 md:pt-40">
           <div className="text-center">
-            <div className="mb-6 inline-flex rounded-full bg-cream-100 px-3 py-1 text-sm text-gray-700">
+            <div className={`mb-6 inline-flex rounded-full px-3 py-1 text-sm font-semibold shadow transition-colors duration-300 ${isHeroOnPurple ? 'bg-white/80 text-purple-700' : 'bg-purple-100 text-purple-700'}`}>
               {t('landing.experience')}
             </div>
-            <h1 className="mb-8 text-5xl md:text-6xl font-bold bg-gradient-to-r from-lavender to-purple-600 bg-clip-text text-transparent">
+            <h1 className={`mb-8 text-5xl md:text-6xl font-bold drop-shadow-lg transition-colors duration-300 ${isHeroOnPurple ? 'text-white' : 'text-purple-700'}`}>
               {t('landing.title')}
             </h1>
-            <p className="text-xl text-gray-600 mb-8 mx-auto max-w-3xl">
+            <p className={`text-xl mb-8 mx-auto max-w-3xl drop-shadow transition-colors duration-300 ${isHeroOnPurple ? 'text-purple-100' : 'text-gray-700'}`}>
               {t('landing.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
               <Link to="/try-on">
-                <Button variant="primary" className="w-full sm:w-auto text-lg px-8 py-3 group">
+                <Button 
+                  variant="primary"
+                  className={`w-full sm:w-auto text-lg px-8 py-3 h-[52px] group border-2 border-white bg-white !text-purple-700 hover:bg-purple-100`}
+                >
                   {t('landing.tryNow')}
                   <span className="tracking-normal ml-2 transition-transform group-hover:translate-x-0.5">
                     →
@@ -36,7 +69,7 @@ export default function Landing() {
                 </Button>
               </Link>
               <Link to="/closet">
-                <Button variant="outline" className="w-full sm:w-auto text-lg px-8 py-3">
+                <Button variant="outline" className={`w-full sm:w-auto text-lg px-8 py-3 h-[52px] border-white transition-colors duration-300 ${isHeroOnPurple ? 'text-white hover:bg-white/10' : 'text-purple-700 border-purple-700 hover:bg-purple-100'}`}>
                   {t('landing.viewCloset')}
                 </Button>
               </Link>
@@ -46,44 +79,41 @@ export default function Landing() {
       </div>
 
       {/* Features Section */}
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6" ref={featuresRef}>
         <div className="relative py-12">
           <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
             <div className="py-12 md:py-20">
-              <h2 className="text-3xl font-bold text-center mb-12">{t('landing.howItWorks')}</h2>
-              <div className="mx-auto grid max-w-sm items-start gap-8 md:max-w-none md:grid-cols-3 lg:gap-16">                {/* Upload Photo */}
+              <h2 className={`text-3xl font-bold text-center mb-12 transition-colors duration-300 ${isFeaturesOnPurple ? 'text-white' : 'text-black'}`}>{t('landing.howItWorks')}</h2>
+              <div className="mx-auto grid max-w-sm items-start gap-8 md:max-w-none md:grid-cols-3 lg:gap-16">
+                {/* Upload Photo */}
                 <Link to="/profile" className="relative flex flex-col items-center group hover:transform hover:scale-105 transition-transform">
                   <div className="mb-4 h-16 w-16 bg-lavender rounded-full flex items-center justify-center group-hover:bg-purple-600 transition-colors">
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold mb-2">{t('landing.uploadPhoto')}</h3>
-                  <p className="text-gray-600 text-center">
-                    {t('landing.uploadPhotoDesc')}
-                  </p>
-                </Link>                {/* Choose Clothing */}
+                  <h3 className={`text-xl font-bold mb-2 transition-colors duration-300 ${isFeaturesOnPurple ? 'text-white' : 'text-black'}`}>{t('landing.uploadPhoto')}</h3>
+                  <p className={`text-center transition-colors duration-300 ${isFeaturesOnPurple ? 'text-purple-100' : 'text-gray-700'}`}>{t('landing.uploadPhotoDesc')}</p>
+                </Link>
+                {/* Choose Clothing */}
                 <Link to="/browse" className="relative flex flex-col items-center group hover:transform hover:scale-105 transition-transform">
                   <div className="mb-4 h-16 w-16 bg-lavender rounded-full flex items-center justify-center group-hover:bg-purple-600 transition-colors">
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold mb-2">{t('landing.chooseClothing')}</h3>
-                  <p className="text-gray-600 text-center">
-                    {t('landing.chooseClothingDesc')}
-                  </p>
-                </Link>{/* About Us */}
+                  <h3 className={`text-xl font-bold mb-2 transition-colors duration-300 ${isFeaturesOnPurple ? 'text-white' : 'text-black'}`}>{t('landing.chooseClothing')}</h3>
+                  <p className={`text-center transition-colors duration-300 ${isFeaturesOnPurple ? 'text-purple-100' : 'text-gray-700'}`}>{t('landing.chooseClothingDesc')}</p>
+                </Link>
+                {/* About Us */}
                 <Link to="/about" className="relative flex flex-col items-center group hover:transform hover:scale-105 transition-transform">
                   <div className="mb-4 h-16 w-16 bg-lavender rounded-full flex items-center justify-center group-hover:bg-purple-600 transition-colors">
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold mb-2">{t('landing.aboutUs')}</h3>
-                  <p className="text-gray-600 text-center">
-                    {t('landing.aboutUsDesc')}
-                  </p>
+                  <h3 className={`text-xl font-bold mb-2 transition-colors duration-300 ${isFeaturesOnPurple ? 'text-white' : 'text-black'}`}>{t('landing.aboutUs')}</h3>
+                  <p className={`text-center transition-colors duration-300 ${isFeaturesOnPurple ? 'text-purple-100' : 'text-gray-700'}`}>{t('landing.aboutUsDesc')}</p>
                 </Link>
               </div>
             </div>

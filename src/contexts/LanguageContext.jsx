@@ -14,6 +14,7 @@ export const useLanguage = () => {
 // Translation object
 const translations = {
   de: {    // Navigation
+    'nav.home': 'Startseite',
     'nav.tryOn': 'Try On',
     'nav.closet': 'Kleiderschrank',
     'nav.profile': 'Profil',
@@ -197,6 +198,7 @@ const translations = {
     'studio.saveInfo4': 'Kein weiteres Album',
   },
   en: {    // Navigation
+    'nav.home': 'Homepage',
     'nav.tryOn': 'Try On',
     'nav.closet': 'Closet',
     'nav.profile': 'Profile',
