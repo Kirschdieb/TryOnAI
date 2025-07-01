@@ -35,7 +35,15 @@ const storage = multer.diskStorage({
     cb(null, `${file.fieldname}-${uuidv4()}${path.extname(file.originalname)}`);
   }
 });
-const upload = multer({ storage: storage });
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB file size limit
+    fieldSize: 10 * 1024 * 1024, // 10MB field size limit (for base64 data)
+    fields: 10, // Maximum number of non-file fields
+    files: 5 // Maximum number of file fields
+  }
+});
 
 // Check if API Key is loaded
 if (!process.env.OPENAI_API_KEY) {
@@ -112,15 +120,32 @@ app.post('/api/tryon', upload.single('userPhoto'), async (req, res) => { // 'use
   }
   userPhotoUploadedPath = req.file.path; // Path to the uploaded user photo by multer
 
-  if (!clothImageUrl || typeof clothImageUrl !== 'string' || !clothImageUrl.startsWith('http')) {
-     // For now, we expect clothImageUrl to be an HTTP/S URL from Zalando extraction or direct input
+  if (!clothImageUrl || typeof clothImageUrl !== 'string' || 
+      (!clothImageUrl.startsWith('http') && !clothImageUrl.startsWith('data:'))) {
+     // Accept both HTTP/S URLs and base64 data URLs
     if (userPhotoUploadedPath) await fsp.unlink(userPhotoUploadedPath).catch(err => console.error('Failed to delete temp user photo on cloth error:', err));
-    return res.status(400).json({ message: 'clothImageUrl must be a valid HTTP/S URL string.' });
+    return res.status(400).json({ message: 'clothImageUrl must be a valid HTTP/S URL string or base64 data URL.' });
   }
 
   try {
-    // clothImageUrl is a URL, so we need to download it.
-    clothPhotoDownloadedPath = await downloadImageAsTempFile(clothImageUrl, 'cloth-image');
+    // Handle cloth image: either download from URL or save base64 data
+    if (clothImageUrl.startsWith('data:')) {
+      // Handle base64 data URL
+      const base64Data = clothImageUrl.split(',')[1];
+      const mimeType = clothImageUrl.split(';')[0].split(':')[1];
+      const extension = mimeType === 'image/jpeg' ? '.jpg' : 
+                       mimeType === 'image/png' ? '.png' : 
+                       mimeType === 'image/webp' ? '.webp' : '.jpg';
+      
+      const uniqueFilename = `cloth-image-${uuidv4()}${extension}`;
+      clothPhotoDownloadedPath = path.join(TEMP_DIR, uniqueFilename);
+      
+      const buffer = Buffer.from(base64Data, 'base64');
+      await fsp.writeFile(clothPhotoDownloadedPath, buffer);
+    } else {
+      // Handle HTTP/HTTPS URL - download it
+      clothPhotoDownloadedPath = await downloadImageAsTempFile(clothImageUrl, 'cloth-image');
+    }
 
     const promptText = `Put the clothing item from the reference image onto the person in the main image. Make it photorealistic, keep pose and background unchanged. ${customPrompt || ''}`;
 

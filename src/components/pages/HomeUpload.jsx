@@ -59,8 +59,20 @@ export default function HomeUpload() {
   const [isExtracting, setIsExtracting] = useState(false);
   const [extractError, setExtractError] = useState(null);
 
-  const handleTryOn = () => {
-    setUserPhoto(userPhotoFile); // Pass the File object to the store for /studio
+  const handleTryOn = async () => {
+    // Convert File to base64 for storage to avoid blob URL issues
+    let userPhotoToStore = userPhotoFile;
+    if (userPhotoFile && userPhotoFile instanceof File) {
+      try {
+        userPhotoToStore = await convertFileToBase64(userPhotoFile);
+      } catch (error) {
+        console.error('Error converting user photo to base64 for storage:', error);
+        // Fallback to File object if conversion fails
+        userPhotoToStore = userPhotoFile;
+      }
+    }
+    
+    setUserPhoto(userPhotoToStore); // Store base64 or File object to the store for /studio
     // Use local state (synced with store) for cloth photo decision
     setClothPhoto(localClothPhotoUrl || localZalandoUrl); // Set cloth photo for /studio
 
@@ -71,25 +83,50 @@ export default function HomeUpload() {
     navigate('/studio');
   };
 
-  // Effect to create and revoke blob URL for preview
+  // Utility function to convert file to base64
+  const convertFileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  };
+
+  // Effect to create base64 preview for user photo
   useEffect(() => {
-    if (userPhotoFile) {
-      const previewUrl = URL.createObjectURL(userPhotoFile);
-      setUserPhotoPreviewUrl(previewUrl);
-      return () => URL.revokeObjectURL(previewUrl); // Cleanup
-    } else {
-      setUserPhotoPreviewUrl(null);
-    }
+    const convertUserPhoto = async () => {
+      if (userPhotoFile) {
+        try {
+          const base64 = await convertFileToBase64(userPhotoFile);
+          setUserPhotoPreviewUrl(base64);
+        } catch (error) {
+          console.error('Error converting user photo to base64:', error);
+          setUserPhotoPreviewUrl(null);
+        }
+      } else {
+        setUserPhotoPreviewUrl(null);
+      }
+    };
+    convertUserPhoto();
   }, [userPhotoFile]);
 
-  // Effect to create and revoke blob URL for cloth photo file preview
+  // Effect to create base64 for cloth photo file
   useEffect(() => {
-    if (clothPhotoFile) {
-      const previewUrl = URL.createObjectURL(clothPhotoFile);
-      setLocalClothPhotoUrl(previewUrl);
-      setHomeClothPhotoUrl(previewUrl);
-      return () => URL.revokeObjectURL(previewUrl);
-    }
+    const convertClothPhoto = async () => {
+      if (clothPhotoFile) {
+        try {
+          const base64 = await convertFileToBase64(clothPhotoFile);
+          setLocalClothPhotoUrl(base64);
+          setHomeClothPhotoUrl(base64);
+        } catch (error) {
+          console.error('Error converting cloth photo to base64:', error);
+          setLocalClothPhotoUrl(null);
+          setHomeClothPhotoUrl(null);
+        }
+      }
+    };
+    convertClothPhoto();
   }, [clothPhotoFile, setHomeClothPhotoUrl]);
 
   const isValid = (userPhotoFile && (localClothPhotoUrl || localZalandoUrl.startsWith('https://www.zalando.')));

@@ -59,17 +59,34 @@ const Studio = () => {
     { value: 'winter', label: t('studio.background.winter'), icon: <SnowIcon /> },
   ];
 
-  // Effect to create and revoke blob URL for userPhoto preview if it's a File object
+  // Utility function to convert file to base64
+  const convertFileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  };
+
+  // Effect to create base64 preview for userPhoto if it's a File object
   useEffect(() => {
-    if (userPhoto instanceof File) {
-      const previewUrl = URL.createObjectURL(userPhoto);
-      setUserPhotoPreviewUrl(previewUrl);
-      return () => URL.revokeObjectURL(previewUrl); // Cleanup
-    } else if (typeof userPhoto === 'string') {
-      setUserPhotoPreviewUrl(userPhoto); // It might be a URL string in some cases (though current flow is File)
-    } else {
-      setUserPhotoPreviewUrl(null);
-    }
+    const convertUserPhoto = async () => {
+      if (userPhoto instanceof File) {
+        try {
+          const base64 = await convertFileToBase64(userPhoto);
+          setUserPhotoPreviewUrl(base64);
+        } catch (error) {
+          console.error('Error converting user photo to base64:', error);
+          setUserPhotoPreviewUrl(null);
+        }
+      } else if (typeof userPhoto === 'string') {
+        setUserPhotoPreviewUrl(userPhoto); // It might be a URL string or base64
+      } else {
+        setUserPhotoPreviewUrl(null);
+      }
+    };
+    convertUserPhoto();
   }, [userPhoto]);
 
   // Redirect if no photos
@@ -205,7 +222,21 @@ const Studio = () => {
       }
       formData.append('customPrompt', fullPrompt.trim());
       formData.append('imageQuality', imageQuality);
-      formData.append('userPhoto', userPhoto); // userPhoto is a File object
+      
+      // Handle userPhoto - convert base64 to blob if needed
+      if (userPhoto instanceof File) {
+        formData.append('userPhoto', userPhoto);
+      } else if (typeof userPhoto === 'string' && userPhoto.startsWith('data:')) {
+        // Convert base64 to blob for FormData
+        const response = await fetch(userPhoto);
+        const blob = await response.blob();
+        formData.append('userPhoto', blob, 'user-photo.jpg');
+      } else {
+        alert('Invalid user photo format. Please try uploading again.');
+        setIsGenerating(false);
+        return;
+      }
+      
       const clothImageSource = extractedClothImage || clothPhoto;
       if (clothImageSource) {
         formData.append('clothImageUrl', clothImageSource);
