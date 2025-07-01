@@ -102,8 +102,8 @@ async function downloadImageAsTempFile(imageUrl, baseName) {
 app.post('/api/tryon', upload.single('userPhoto'), async (req, res) => { // 'userPhoto' is the field name from FormData
   console.log('--- /api/tryon request received ---');
   console.log('req.file (userPhoto):', req.file);
-  console.log('req.body (customPrompt, clothImageUrl):', req.body);
-  const { customPrompt, clothImageUrl } = req.body; // clothImageUrl is a string (URL)
+  console.log('req.body (customPrompt, clothImageUrl, imageQuality):', req.body);
+  const { customPrompt, clothImageUrl, imageQuality } = req.body; // clothImageUrl is a string (URL)
   let userPhotoUploadedPath = null;
   let clothPhotoDownloadedPath = null;
 
@@ -137,10 +137,16 @@ app.post('/api/tryon', upload.single('userPhoto'), async (req, res) => { // 'use
     const clothPhotoFile = await toFile(fs.createReadStream(clothPhotoDownloadedPath), path.basename(clothPhotoDownloadedPath), { type: clothMimeType });
 
     const openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    // Convert the imageQuality value to match the expected API parameter values
+    // Valid values for quality are 'low', 'medium', 'high', or 'hd' (equivalent to 'high')
+    const apiQuality = imageQuality || 'medium';
+    console.log(`Using image quality: ${apiQuality}`);
+    
     const response = await openaiClient.images.edit({
       model: 'gpt-image-1', // As per user, this model works
       image: [userPhotoFile, clothPhotoFile], // As per user, this structure works
       prompt: promptText,
+      quality: apiQuality, // Add the quality parameter
     });
 
     let imageUrlToClient;
