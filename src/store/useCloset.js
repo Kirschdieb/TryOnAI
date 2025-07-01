@@ -1,16 +1,7 @@
+// Simplified Closet Store - Focus on Essential Album & Profile Functionality
+import { create } from 'zustand';
 
-// Hilfsfunktion: Stellt sicher, dass das "Generierte Bilder"-Album immer existiert und an erster Stelle steht
-// Muss außerhalb des Store-Objekts stehen!
-function ensureGeneratedAlbum(albums) {
-  let generated = albums.find(a => a.id === 'generated');
-  if (!generated) {
-    generated = { id: 'generated', name: 'Generierte Bilder', images: [] };
-  }
-  const rest = albums.filter(a => a.id !== 'generated');
-  return [generated, ...rest];
-}
-
-// Funktion zum Erstellen der Standard-Alben basierend auf der Sprache
+// Default albums function
 function getDefaultAlbums(language = 'de') {
   const albumTranslations = {
     de: {
@@ -49,70 +40,152 @@ function getDefaultAlbums(language = 'de') {
   ];
 }
 
-import { create } from 'zustand';
+// Utility function to ensure generated album exists and is first
+function ensureGeneratedAlbum(albums) {
+  let generated = albums.find(a => a.id === 'generated');
+  if (!generated) {
+    generated = { id: 'generated', name: 'Generierte Bilder', images: [] };
+  }
+  const rest = albums.filter(a => a.id !== 'generated');
+  return [generated, ...rest];
+}
 
 export const useCloset = create((set, get) => ({
+  // Core state
   userPhoto: null,
-  clothPhoto: null, // Photo used in the studio
-  albums: getDefaultAlbums('de'), // Standardmäßig deutsche Alben
-  homeZalandoUrl: '', // Zalando URL from HomeUpload page
-  homeClothPhotoUrl: null, // Cloth photo URL from HomeUpload page (extracted or uploaded)
+  clothPhoto: null,
+  albums: getDefaultAlbums('de'),
+  homeZalandoUrl: '',
+  homeClothPhotoUrl: null,
+  
+  // Profile integration state
+  currentProfileId: null,
+  isAlbumDataLoaded: false,
 
+  // Basic setters
   setUserPhoto: (p) => set({ userPhoto: p }),
   setClothPhoto: (p) => set({ clothPhoto: p }),
-
-
-
-
-addAlbum: (name) => set((state) => ({
-  albums: ensureGeneratedAlbum([
-    ...state.albums,
-    { id: Date.now().toString() + Math.random().toString(36).substr(2, 5), name, images: [] }
-  ])
-})),
-renameAlbum: (albumId, newName) => set((state) => {
-  if (albumId === 'generated') return {};
-  return {
-    albums: ensureGeneratedAlbum(state.albums.map(a => a.id === albumId ? { ...a, name: newName } : a))
-  };
-}),
-deleteAlbum: (albumId) => set((state) => {
-  if (albumId === 'generated') return {};
-  return {
-    albums: ensureGeneratedAlbum(state.albums.filter(a => a.id !== albumId))
-  };
-}),
-addImageToAlbum: (albumId, image) => set((state) => ({
-  albums: ensureGeneratedAlbum(state.albums.map(a => a.id === albumId ? { ...a, images: [...a.images, image] } : a))
-})),
-removeImageFromAlbum: (albumId, imageId) => set((state) => ({
-  albums: ensureGeneratedAlbum(state.albums.map(a => a.id === albumId ? { ...a, images: a.images.filter(img => img.id !== imageId) } : a))
-})),
-addGeneratedImage: (image) => set((state) => ({
-  albums: ensureGeneratedAlbum(state.albums.map(a => a.id === 'generated' ? { ...a, images: [{...image, id: Date.now().toString() + Math.random().toString(36).substr(2, 5)}, ...a.images] } : a))
-})),
-
-// Funktion zum Aktualisieren der Album-Namen basierend auf der Sprache
-updateAlbumLanguage: (language) => set((state) => {
-  const defaultAlbums = getDefaultAlbums(language);
-  const updatedAlbums = state.albums.map(album => {
-    const defaultAlbum = defaultAlbums.find(da => da.id === album.id);
-    if (defaultAlbum && ['generated', 'sommer', 'herbst', 'winter', 'fruehling', 'formal', 'casual', 'sport'].includes(album.id)) {
-      return { ...album, name: defaultAlbum.name };
-    }
-    return album;
-  });
-  return { albums: ensureGeneratedAlbum(updatedAlbums) };
-}),
-
   setHomeZalandoUrl: (url) => set({ homeZalandoUrl: url }),
   setHomeClothPhotoUrl: (url) => set({ homeClothPhotoUrl: url }),
 
+  // ESSENTIAL: Load albums from profile (simplified)
+  loadAlbumsFromProfile: (profileData) => {
+    const profileAlbums = profileData.albums || [];
+    const defaultAlbums = getDefaultAlbums('de');
+    
+    // Merge: default albums first, then add any custom albums
+    const mergedAlbums = [
+      ...defaultAlbums.map(defaultAlbum => {
+        const existingAlbum = profileAlbums.find(a => a.id === defaultAlbum.id);
+        return existingAlbum || defaultAlbum; // Keep existing if found, otherwise use default
+      }),
+      ...profileAlbums.filter(album => !defaultAlbums.some(da => da.id === album.id)) // Add custom albums
+    ];
+    
+    set({ 
+      albums: ensureGeneratedAlbum(mergedAlbums), 
+      currentProfileId: profileData.id || 'default',
+      isAlbumDataLoaded: true 
+    });
+  },
+
+  // ESSENTIAL: Save albums to profile (simplified)
+  saveAlbumsToProfile: () => {
+    const { albums, currentProfileId, isAlbumDataLoaded } = get();
+    
+    if (!isAlbumDataLoaded || !currentProfileId) {
+      return;
+    }
+    
+    try {
+      const savedProfile = localStorage.getItem('userProfile');
+      if (savedProfile) {
+        const profile = JSON.parse(savedProfile);
+        const updatedProfile = { 
+          ...profile, 
+          albums,
+          lastModified: new Date().toISOString()
+        };
+        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+      }
+    } catch (error) {
+      console.error('Failed to save albums to profile:', error);
+    }
+  },
+
+  // Album management with auto-save
+  addAlbum: (name) => {
+    set((state) => ({
+      albums: [
+        ...state.albums,
+        { 
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 5), 
+          name, 
+          images: [],
+          createdAt: new Date().toISOString()
+        }
+      ]
+    }));
+    // Auto-save after state update
+    setTimeout(() => get().saveAlbumsToProfile(), 0);
+  },
+
+  renameAlbum: (albumId, newName) => {
+    if (albumId === 'generated') return; // Cannot rename generated album
+    
+    set((state) => ({
+      albums: state.albums.map(a => a.id === albumId ? { ...a, name: newName } : a)
+    }));
+    setTimeout(() => get().saveAlbumsToProfile(), 0);
+  },
+
+  deleteAlbum: (albumId) => {
+    if (albumId === 'generated') return; // Cannot delete generated album
+    
+    set((state) => ({
+      albums: state.albums.filter(a => a.id !== albumId)
+    }));
+    setTimeout(() => get().saveAlbumsToProfile(), 0);
+  },
+
+  addImageToAlbum: (albumId, image) => {
+    // Create simple image object with just URL and basic metadata
+    const imageToAdd = {
+      id: image.id || Date.now().toString() + Math.random().toString(36).substr(2, 5),
+      url: image.url || image,
+      createdAt: new Date().toISOString(),
+      metadata: image.metadata || {}
+    };
+
+    set((state) => ({
+      albums: state.albums.map(a => 
+        a.id === albumId 
+          ? { ...a, images: [...a.images, imageToAdd] }
+          : a
+      )
+    }));
+    setTimeout(() => get().saveAlbumsToProfile(), 0);
+  },
+
+  removeImageFromAlbum: (albumId, imageId) => {
+    set((state) => ({
+      albums: state.albums.map(a => 
+        a.id === albumId 
+          ? { ...a, images: a.images.filter(img => img.id !== imageId) }
+          : a
+      )
+    }));
+    setTimeout(() => get().saveAlbumsToProfile(), 0);
+  },
+
+  // Reset function
   reset: () => set({
     userPhoto: null,
     clothPhoto: null,
     albums: getDefaultAlbums('de'),
     homeZalandoUrl: '',
     homeClothPhotoUrl: null,
+    currentProfileId: null,
+    isAlbumDataLoaded: false,
   }),
 }));

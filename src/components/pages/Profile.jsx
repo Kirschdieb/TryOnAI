@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useCloset } from '../../store/useCloset';
 
 export default function ProfilePage() {
   const { t } = useLanguage();
+  const { loadAlbumsFromProfile, saveAlbumsToProfile, albums } = useCloset();
   
   const [showModal, setShowModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -16,7 +18,8 @@ export default function ProfilePage() {
     size: "",
     imageUrl: "",
     tryonImageFrontUrl: "",
-    tryonImageBackUrl: ""
+    tryonImageBackUrl: "",
+    albums: []
   });
 
   // Check if user is logged in on component mount
@@ -28,13 +31,31 @@ export default function ProfilePage() {
       setIsLoggedIn(true);
       try {
         const parsedProfile = JSON.parse(savedProfile);
+        
+        // Ensure profile has an ID
+        if (!parsedProfile.id) {
+          parsedProfile.id = Date.now().toString();
+        }
+        
         // Ensure we only use base64 image URLs
-        setProfile({
+        const profileWithDefaults = {
           ...parsedProfile,
           imageUrl: parsedProfile.imageUrl || "",
           tryonImageFrontUrl: parsedProfile.tryonImageFrontUrl || "",
-          tryonImageBackUrl: parsedProfile.tryonImageBackUrl || ""
-        });
+          tryonImageBackUrl: parsedProfile.tryonImageBackUrl || "",
+          albums: parsedProfile.albums || []
+        };
+        
+        setProfile(profileWithDefaults);
+        
+        // Load user's albums into closet store (this will merge with defaults)
+        loadAlbumsFromProfile(profileWithDefaults);
+        
+        // After loading, save the merged albums back to localStorage
+        setTimeout(() => {
+          saveAlbumsToProfile();
+        }, 100);
+        
       } catch (error) {
         console.error('Error parsing saved profile:', error);
         handleLogout(); // Reset if corrupted
@@ -42,7 +63,7 @@ export default function ProfilePage() {
     } else {
       setShowModal(true);
     }
-  }, []);
+  }, [loadAlbumsFromProfile, saveAlbumsToProfile]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -137,7 +158,9 @@ export default function ProfilePage() {
             size: importedProfile.size || "",
             imageUrl: (importedProfile.imageUrl && isValidBase64Image(importedProfile.imageUrl)) ? importedProfile.imageUrl : "",
             tryonImageFrontUrl: (importedProfile.tryonImageFrontUrl && isValidBase64Image(importedProfile.tryonImageFrontUrl)) ? importedProfile.tryonImageFrontUrl : "",
-            tryonImageBackUrl: (importedProfile.tryonImageBackUrl && isValidBase64Image(importedProfile.tryonImageBackUrl)) ? importedProfile.tryonImageBackUrl : ""
+            tryonImageBackUrl: (importedProfile.tryonImageBackUrl && isValidBase64Image(importedProfile.tryonImageBackUrl)) ? importedProfile.tryonImageBackUrl : "",
+            albums: importedProfile.albums || [],
+            id: importedProfile.id || Date.now().toString()
           };
           
           setProfile(cleanProfile);
@@ -145,6 +168,15 @@ export default function ProfilePage() {
           localStorage.setItem('isLoggedIn', 'true');
           setIsLoggedIn(true);
           setShowModal(false);
+          
+          // Load imported albums into store (this will merge with defaults)
+          loadAlbumsFromProfile(cleanProfile);
+          
+          // Save the merged albums (with defaults) back to localStorage
+          setTimeout(() => {
+            saveAlbumsToProfile();
+          }, 100);
+          
           alert(t('profile.importSuccess'));
         } catch (error) {
           alert(t('profile.importError'));
@@ -164,13 +196,23 @@ export default function ProfilePage() {
       size: "",
       imageUrl: "",
       tryonImageFrontUrl: "",
-      tryonImageBackUrl: ""
+      tryonImageBackUrl: "",
+      albums: [],
+      id: Date.now().toString()
     };
     setProfile(newProfile);
     localStorage.setItem('userProfile', JSON.stringify(newProfile));
     localStorage.setItem('isLoggedIn', 'true');
     setIsLoggedIn(true);
     setShowModal(false);
+    
+    // Load default albums into store (this will add all default albums)
+    loadAlbumsFromProfile(newProfile);
+    
+    // Save the merged albums (with defaults) back to localStorage
+    setTimeout(() => {
+      saveAlbumsToProfile();
+    }, 100);
   };
 
   const handleLogout = () => {
@@ -186,16 +228,20 @@ export default function ProfilePage() {
       size: "",
       imageUrl: "",
       tryonImageFrontUrl: "",
-      tryonImageBackUrl: ""
+      tryonImageBackUrl: "",
+      albums: []
     });
     setShowModal(true);
   };
 
   const handleExportProfile = () => {
     try {
-      // Only export base64 images
+      // Get current album references from localStorage (not loaded URLs)
+      const savedProfile = localStorage.getItem('userProfile');
+      const profileData = savedProfile ? JSON.parse(savedProfile) : profile;
+      
       const exportData = {
-        ...profile,
+        ...profileData,
         exportDate: new Date().toISOString()
       };
       
@@ -215,22 +261,121 @@ export default function ProfilePage() {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
+  // Function to save profile to assets folder as default
+  const handleSaveProfileToAssets = () => {
     try {
-      // Save profile to localStorage
+      // Get current profile from localStorage (should have latest albums)
+      const savedProfile = localStorage.getItem('userProfile');
+      const profileData = savedProfile ? JSON.parse(savedProfile) : profile;
+      
+      const exportData = {
+        ...profileData,
+        exportDate: new Date().toISOString()
+      };
+      
+      const dataStr = JSON.stringify(exportData, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      
+      // Default save to assets folder with user name
+      const exportFileDefaultName = `profile_${profile.name || 'user'}_${new Date().toISOString().split('T')[0]}.json`;
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+      
+      // Clear instructions for Windows file path
+      const projectAssetsPath = 'c:\\Users\\Geiler Stecher\\Documents\\unikram\\python\\DPI_Projekt\\TryOnAI\\src\\assets\\';
+      const downloadPath = `%USERPROFILE%\\Downloads\\${exportFileDefaultName}`;
+      
+      const instructions = `✅ Profile downloaded successfully!
+
+📁 TO MOVE TO PROJECT ASSETS:
+
+1. Open File Explorer
+2. Go to your Downloads folder
+3. Find: ${exportFileDefaultName}
+4. Cut the file (Ctrl+X)
+5. Navigate to: ${projectAssetsPath}
+6. Paste the file (Ctrl+V)
+
+🎯 The profile is now ready for use in your project!`;
+      
+      alert(instructions);
+    } catch (error) {
+      alert('Error saving profile: ' + error.message);
+    }
+  };
+
+  // Alternative: Copy profile data to clipboard for easy pasting into assets
+  const handleCopyProfileToClipboard = () => {
+    try {
+      // Get current profile from localStorage (should have latest albums)
+      const savedProfile = localStorage.getItem('userProfile');
+      const profileData = savedProfile ? JSON.parse(savedProfile) : profile;
+      
+      const exportData = {
+        ...profileData,
+        exportDate: new Date().toISOString()
+      };
+      
+      const dataStr = JSON.stringify(exportData, null, 2);
+      
+      // Copy to clipboard
+      navigator.clipboard.writeText(dataStr).then(() => {
+        const filename = `profile_${profile.name || 'user'}_${new Date().toISOString().split('T')[0]}.json`;
+        const projectAssetsPath = 'c:\\Users\\Geiler Stecher\\Documents\\unikram\\python\\DPI_Projekt\\TryOnAI\\src\\assets\\';
+        
+        const instructions = `✅ Profile copied to clipboard!
+
+📋 TO CREATE FILE IN PROJECT ASSETS:
+
+1. Open VS Code or File Explorer
+2. Navigate to: ${projectAssetsPath}
+3. Create new file: ${filename}
+4. Paste the content (Ctrl+V)
+5. Save the file
+
+🎯 The profile is now ready for use in your project!`;
+        
+        alert(instructions);
+      }).catch(() => {
+        // Fallback to download if clipboard fails
+        alert('Clipboard access failed. Switching to download method...');
+        handleSaveProfileToAssets();
+      });
+    } catch (error) {
+      alert('Error copying profile: ' + error.message);
+    }
+  };
+
+  const handleExportWithInstructions = () => {
+    try {
+      // Auto-save current albums to profile first
+      saveAlbumsToProfile();
+      
+      // Update profile in localStorage
       localStorage.setItem('userProfile', JSON.stringify(profile));
       
-      // Export profile as JSON
-      handleExportProfile();
+      // Then export
+      handleSaveProfileToAssets();
     } catch (error) {
-      if (error.name === 'QuotaExceededError') {
-        alert('Storage full! Profile will only be exported as file, not saved locally.');
-        handleExportProfile();
-      } else {
-        alert('Error saving profile: ' + error.message);
-      }
+      alert('Error exporting profile: ' + error.message);
+    }
+  };
+
+  const handleCopyWithInstructions = () => {
+    try {
+      // Auto-save current albums to profile first
+      saveAlbumsToProfile();
+      
+      // Update profile in localStorage
+      localStorage.setItem('userProfile', JSON.stringify(profile));
+      
+      // Then copy to clipboard
+      handleCopyProfileToClipboard();
+    } catch (error) {
+      alert('Error copying profile: ' + error.message);
     }
   };
 
@@ -320,7 +465,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Profile Form */}
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <div className="space-y-8">
         <div>
           <h3 className="font-semibold text-lg mb-2 border-b border-gray-200 pb-1">{t('profile.profileInfo')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -474,16 +619,82 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-        
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded transition"
-          >
-            {t('profile.saveProfile')}
-          </button>
+
+        {/* Album Statistics Section */}
+        <div>
+          <h3 className="font-semibold text-lg mb-2 border-b border-gray-200 pb-1">{t('profile.albumOverview') || 'Album Overview'}</h3>
+          <AlbumStatistics />
         </div>
-      </form>
+        
+        <div className="flex flex-col gap-4">
+          {/* Save & Export Options */}
+          <div>
+            <h3 className="text-lg font-semibold mb-3 text-center">Save Profile</h3>
+            <p className="text-sm text-gray-600 mb-4 text-center">
+              Choose how to save your profile. Both options will automatically save all changes and albums.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              {/* Download Option */}
+              <button
+                type="button"
+                onClick={handleExportWithInstructions}
+                className="flex-1 sm:flex-none bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded transition flex items-center justify-center gap-2"
+              >
+                <span>📥</span>
+                Save & Download
+              </button>
+              
+              {/* Clipboard Option */}
+              <button
+                type="button"
+                onClick={handleCopyWithInstructions}
+                className="flex-1 sm:flex-none bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-6 rounded transition flex items-center justify-center gap-2"
+              >
+                <span>📋</span>
+                Save & Copy
+              </button>
+            </div>
+            
+            <div className="mt-3 text-xs text-gray-500 text-center">
+              <p><strong>Save & Download:</strong> Downloads profile file to move to assets folder</p>
+              <p><strong>Save & Copy:</strong> Copies profile JSON to create new file in assets folder</p>
+            </div>
+          </div>
+        </div>
+    </div>
     </div>
   );
 }
+
+// Simple Album Statistics Component (Essential functionality only)
+const AlbumStatistics = () => {
+  const { albums } = useCloset();
+
+  const totalImages = albums.reduce((sum, album) => sum + album.images.length, 0);
+  const customAlbums = albums.filter(a => !['generated', 'sommer', 'herbst', 'winter', 'fruehling', 'formal', 'casual', 'sport'].includes(a.id));
+
+  return (
+    <div className="bg-gray-50 rounded-lg p-4 mt-4">
+      <h4 className="font-semibold mb-2">Your Albums</h4>
+      <div className="grid grid-cols-2 gap-4 text-sm">
+        <div>
+          <span className="text-gray-600">Total Albums:</span>
+          <span className="ml-2 font-medium">{albums.length}</span>
+        </div>
+        <div>
+          <span className="text-gray-600">Total Images:</span>
+          <span className="ml-2 font-medium">{totalImages}</span>
+        </div>
+        <div>
+          <span className="text-gray-600">Custom Albums:</span>
+          <span className="ml-2 font-medium">{customAlbums.length}</span>
+        </div>
+        <div>
+          <span className="text-gray-600">Generated Images:</span>
+          <span className="ml-2 font-medium">{albums.find(a => a.id === 'generated')?.images.length || 0}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
