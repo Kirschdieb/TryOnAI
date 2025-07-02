@@ -11,7 +11,7 @@ export default function Browse() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('alle');
   const navigate = useNavigate();
-  const { setHomeZalandoUrl, setHomeClothPhotoUrl } = useCloset();
+  const { setHomeZalandoUrl, setHomeClothPhotoUrl, setSelectedClothingItem } = useCloset();
   // Fetch products from server
   useEffect(() => {
     const fetchProducts = async () => {
@@ -52,6 +52,14 @@ export default function Browse() {
     // Set Zalando URL in store for HomeUpload
     setHomeZalandoUrl(item.url);
     setHomeClothPhotoUrl(null); // Reset any previous cloth photo
+    // Store the selected clothing item with product information
+    setSelectedClothingItem({
+      name: item.name,
+      image: item.image,
+      link: item.url,
+      price: item.price,
+      category: item.category
+    });
     navigate('/try-on');
   };
 
