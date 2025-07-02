@@ -15,6 +15,8 @@ export default function Landing() {
   const [isFaqOnPurple, setIsFaqOnPurple] = useState(false);
   const testimonialsRef = useRef(null);
   const [isTestimonialsOnPurple, setIsTestimonialsOnPurple] = useState(false);
+  const ctaRef = useRef(null);
+  const [isCtaOnPurple, setIsCtaOnPurple] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,6 +36,10 @@ export default function Landing() {
       if (testimonialsRef.current) {
         const rect = testimonialsRef.current.getBoundingClientRect();
         setIsTestimonialsOnPurple(rect.top < window.innerHeight / 2);
+      }
+      if (ctaRef.current) {
+        const rect = ctaRef.current.getBoundingClientRect();
+        setIsCtaOnPurple(rect.top < window.innerHeight / 2);
       }
     };
     window.addEventListener('scroll', handleScroll);
@@ -98,22 +104,25 @@ export default function Landing() {
             <div className="py-12 md:py-20">
               <h2 className={`text-3xl font-bold text-center mb-12 transition-colors duration-300 ${isFeaturesOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.howItWorks')}</h2>
               <div className="mx-auto grid max-w-sm items-start gap-8 md:max-w-none md:grid-cols-3 lg:gap-16">
-                {/* Upload Photo - Interactive Flip Card */}
+                {/* 1. Upload Photo - Interactive Flip Card */}
                 <div className="relative h-64 w-full [perspective:1000px] group">
                   <div className="relative h-full w-full transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                     {/* Front Side */}
-                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-center justify-center p-6 border ${!isFeaturesOnPurple ? 'bg-gradient-to-br from-purple-500 to-pink-500 border-purple-300' : 'bg-white border-gray-100'}`}>
-                      <h3 className={`text-2xl font-bold transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.uploadPhoto')}</h3>
+                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex flex-col items-center justify-center p-6 border-2 ${!isFeaturesOnPurple ? 'bg-gradient-to-r from-purple-500 to-purple-600 border-purple-600' : 'bg-white border-purple-500'}`}>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-3 transition-colors duration-300 ${!isFeaturesOnPurple ? 'bg-white/20 text-white' : 'bg-purple-100 text-purple-600'}`}>
+                        <span className="text-lg font-bold">1</span>
+                      </div>
+                      <h3 className={`text-xl font-semibold transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.uploadPhoto')}</h3>
                     </div>
                     {/* Back Side */}
-                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-xl shadow-lg flex flex-col items-center justify-center p-6 transition-all duration-300 ${!isFeaturesOnPurple ? 'bg-gradient-to-br from-purple-500 to-pink-500 text-white' : 'bg-white text-purple-700 border border-gray-100'}`}>
+                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-xl shadow-md flex flex-col items-center justify-center p-6 transition-all duration-300 border-2 ${!isFeaturesOnPurple ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white border-purple-600' : 'bg-white text-purple-700 border-purple-500'}`}>
                       <div className="mb-4">
-                        <svg className={`w-12 h-12 transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white opacity-80' : 'text-purple-500 opacity-80'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className={`w-12 h-12 transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white opacity-80' : 'text-purple-500 opacity-70'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                       </div>
-                      <h4 className="text-lg font-bold mb-2">{t('landing.uploadPhoto')}</h4>
-                      <p className={`text-sm text-center mb-4 transition-colors duration-300 ${!isFeaturesOnPurple ? 'opacity-90' : 'opacity-80'}`}>{t('landing.uploadPhotoDesc')}</p>
+                      <h4 className="text-lg font-semibold mb-2">{t('landing.uploadPhoto')}</h4>
+                      <p className={`text-sm text-center mb-4 transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white/90 opacity-90' : 'text-purple-600 opacity-70'}`}>{t('landing.uploadPhotoDesc')}</p>
                       <Link to="/profile" className={`px-4 py-2 rounded-lg transition-colors duration-300 ${!isFeaturesOnPurple ? 'bg-white text-purple-600 hover:bg-gray-100' : 'bg-purple-600 text-white hover:bg-purple-700'}`}>
                         {t('landing.getStarted')} →
                       </Link>
@@ -121,46 +130,52 @@ export default function Landing() {
                   </div>
                 </div>
 
-                {/* Choose Clothing - Interactive Flip Card */}
+                {/* 2. Choose Clothing - Interactive Flip Card */}
                 <div className="relative h-64 w-full [perspective:1000px] group">
                   <div className="relative h-full w-full transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                     {/* Front Side */}
-                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-center justify-center p-6 border ${!isFeaturesOnPurple ? 'bg-gradient-to-br from-blue-500 to-purple-500 border-blue-300' : 'bg-white border-gray-100'}`}>
-                      <h3 className={`text-2xl font-bold transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.chooseClothing')}</h3>
+                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex flex-col items-center justify-center p-6 border-2 ${!isFeaturesOnPurple ? 'bg-gradient-to-r from-purple-500 to-purple-600 border-purple-600' : 'bg-white border-purple-500'}`}>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-3 transition-colors duration-300 ${!isFeaturesOnPurple ? 'bg-white/20 text-white' : 'bg-purple-100 text-purple-600'}`}>
+                        <span className="text-lg font-bold">2</span>
+                      </div>
+                      <h3 className={`text-xl font-semibold transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.chooseClothing')}</h3>
                     </div>
                     {/* Back Side */}
-                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-xl shadow-lg flex flex-col items-center justify-center p-6 transition-all duration-300 ${!isFeaturesOnPurple ? 'bg-gradient-to-br from-blue-500 to-purple-500 text-white' : 'bg-white text-purple-700 border border-gray-100'}`}>
+                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-xl shadow-md flex flex-col items-center justify-center p-6 transition-all duration-300 border-2 ${!isFeaturesOnPurple ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white border-purple-600' : 'bg-white text-purple-700 border-purple-500'}`}>
                       <div className="mb-4">
-                        <svg className={`w-12 h-12 transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white opacity-80' : 'text-purple-500 opacity-80'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className={`w-12 h-12 transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white opacity-80' : 'text-purple-500 opacity-70'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                         </svg>
                       </div>
-                      <h4 className="text-lg font-bold mb-2">{t('landing.chooseClothing')}</h4>
-                      <p className={`text-sm text-center mb-4 transition-colors duration-300 ${!isFeaturesOnPurple ? 'opacity-90' : 'opacity-80'}`}>{t('landing.chooseClothingDesc')}</p>
-                      <Link to="/browse" className={`px-4 py-2 rounded-lg transition-colors duration-300 ${!isFeaturesOnPurple ? 'bg-white text-blue-600 hover:bg-gray-100' : 'bg-purple-600 text-white hover:bg-purple-700'}`}>
+                      <h4 className="text-lg font-semibold mb-2">{t('landing.chooseClothing')}</h4>
+                      <p className={`text-sm text-center mb-4 transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white/90 opacity-90' : 'text-purple-600 opacity-70'}`}>{t('landing.chooseClothingDesc')}</p>
+                      <Link to="/browse" className={`px-4 py-2 rounded-lg transition-colors duration-300 ${!isFeaturesOnPurple ? 'bg-white text-purple-600 hover:bg-gray-100' : 'bg-purple-600 text-white hover:bg-purple-700'}`}>
                         {t('browse.tryNow')} →
                       </Link>
                     </div>
                   </div>
                 </div>
 
-                {/* AI Magic - Interactive Flip Card */}
+                {/* 3. AI Magic - Interactive Flip Card */}
                 <div className="relative h-64 w-full [perspective:1000px] group">
                   <div className="relative h-full w-full transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                     {/* Front Side */}
-                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-center justify-center p-6 border ${!isFeaturesOnPurple ? 'bg-gradient-to-br from-green-500 to-blue-500 border-green-300' : 'bg-white border-gray-100'}`}>
-                      <h3 className={`text-2xl font-bold transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.aiMagic')}</h3>
+                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex flex-col items-center justify-center p-6 border-2 ${!isFeaturesOnPurple ? 'bg-gradient-to-r from-purple-500 to-purple-600 border-purple-600' : 'bg-white border-purple-500'}`}>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-3 transition-colors duration-300 ${!isFeaturesOnPurple ? 'bg-white/20 text-white' : 'bg-purple-100 text-purple-600'}`}>
+                        <span className="text-lg font-bold">3</span>
+                      </div>
+                      <h3 className={`text-xl font-semibold transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.aiMagic')}</h3>
                     </div>
                     {/* Back Side */}
-                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-xl shadow-lg flex flex-col items-center justify-center p-6 transition-all duration-300 ${!isFeaturesOnPurple ? 'bg-gradient-to-br from-green-500 to-blue-500 text-white' : 'bg-white text-purple-700 border border-gray-100'}`}>
+                    <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] [transform:rotateY(180deg)] rounded-xl shadow-md flex flex-col items-center justify-center p-6 transition-all duration-300 border-2 ${!isFeaturesOnPurple ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white border-purple-600' : 'bg-white text-purple-700 border-purple-500'}`}>
                       <div className="mb-4">
-                        <svg className={`w-12 h-12 transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white opacity-80' : 'text-purple-500 opacity-80'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className={`w-12 h-12 transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white opacity-80' : 'text-purple-500 opacity-70'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                         </svg>
                       </div>
-                      <h4 className="text-lg font-bold mb-2">{t('landing.aiMagic')}</h4>
-                      <p className={`text-sm text-center mb-4 transition-colors duration-300 ${!isFeaturesOnPurple ? 'opacity-90' : 'opacity-80'}`}>{t('landing.aiMagicDesc')}</p>
-                      <Link to="/try-on" className={`px-4 py-2 rounded-lg transition-colors duration-300 ${!isFeaturesOnPurple ? 'bg-white text-green-600 hover:bg-gray-100' : 'bg-purple-600 text-white hover:bg-purple-700'}`}>
+                      <h4 className="text-lg font-semibold mb-2">{t('landing.aiMagic')}</h4>
+                      <p className={`text-sm text-center mb-4 transition-colors duration-300 ${!isFeaturesOnPurple ? 'text-white/90 opacity-90' : 'text-purple-600 opacity-70'}`}>{t('landing.aiMagicDesc')}</p>
+                      <Link to="/try-on" className={`px-4 py-2 rounded-lg transition-colors duration-300 ${!isFeaturesOnPurple ? 'bg-white text-purple-600 hover:bg-gray-100' : 'bg-purple-600 text-white hover:bg-purple-700'}`}>
                         {t('landing.tryNow')} →
                       </Link>
                     </div>
@@ -190,15 +205,15 @@ export default function Landing() {
       </div>
 
       {/* Call to Action */}
-      <div className="mx-auto max-w-6xl px-4 pb-16">
-        <div className="relative bg-gradient-to-r from-lavender to-purple-600 rounded-2xl px-8 py-10 md:py-16 md:px-12">
+      <div className="mx-auto max-w-6xl px-4 pb-16" ref={ctaRef}>
+        <div className={`relative rounded-2xl px-8 py-10 md:py-16 md:px-12 transition-all duration-300 ${!isCtaOnPurple ? 'bg-gradient-to-r from-purple-500 to-purple-600' : 'bg-white border-2 border-purple-500'}`}>
           <div className="relative flex flex-col items-center">
-            <h2 className="h2 mb-4 text-center text-3xl font-bold text-white">{t('landing.readyTransform')}</h2>
-            <p className="mb-6 text-center text-lg text-purple-200">
+            <h2 className={`h2 mb-4 text-center text-3xl font-bold transition-colors duration-300 ${!isCtaOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.readyTransform')}</h2>
+            <p className={`mb-6 text-center text-lg transition-colors duration-300 ${!isCtaOnPurple ? 'text-purple-200' : 'text-purple-600'}`}>
               {t('landing.joinThousands')}
             </p>
             <Link to="/try-on">
-              <Button variant="secondary" className="w-full sm:w-auto text-lg px-8 py-3 bg-white text-purple-600 hover:bg-gray-100">
+              <Button variant="secondary" className={`w-full sm:w-auto text-lg px-8 py-3 transition-colors duration-300 ${!isCtaOnPurple ? 'bg-white text-purple-600 hover:bg-gray-100' : 'bg-purple-600 text-white hover:bg-purple-700'}`}>
                 {t('landing.getStarted')}
               </Button>
             </Link>
