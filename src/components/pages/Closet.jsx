@@ -156,7 +156,7 @@ export default function Closet() {
                 return (
                   <Card
                     key={album.id}
-                    className="cursor-pointer transition-all duration-300 hover:shadow-xl group relative overflow-hidden"
+                    className="cursor-pointer transition-all duration-300 hover:shadow-xl group relative overflow-hidden border-2 border-purple-200 hover:border-purple-500"
                     onClick={() => openAlbum(album.id)}
                   >
                     {/* Album Preview Image */}
@@ -415,8 +415,16 @@ export default function Closet() {
 
         {/* Zalando Browse Box - nur in Album-Übersicht anzeigen */}
         {viewMode === 'albums' && (
-          <div className="flex justify-center mt-12">
-            <Card className="max-w-xl w-full text-center">
+          <>
+            {/* Decorative Separator */}
+            <div className="flex items-center justify-center my-16">
+              <div className="h-px w-16 bg-gradient-to-r from-purple-500 to-pink-500"></div>
+              <div className="mx-4 w-3 h-3 rounded-full bg-purple-500"></div>
+              <div className="h-px w-16 bg-gradient-to-r from-pink-500 to-purple-500"></div>
+            </div>
+            
+            <div className="flex justify-center">
+              <Card className="max-w-xl w-full text-center">
               <div className="mb-4">
                 <div className="w-16 h-16 mx-auto mb-4 text-purple-500">
                   <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -438,7 +446,9 @@ export default function Closet() {
                   {t('closet.browseClothes') || 'Kleidung entdecken'}
                 </Button>
               </Link>
-            </Card>          </div>
+            </Card>
+            </div>
+          </>
         )}
 
         {/* Bild Detail Modal - nur im Album-Inhalt sichtbar */}
