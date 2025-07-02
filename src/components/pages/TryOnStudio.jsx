@@ -274,8 +274,42 @@ const Studio = () => {
   };
 
   return (
-    <>
-      <div className="max-w-7xl mx-auto">
+    <div className="relative overflow-hidden min-h-screen">
+      {/* Decorative curved elements - small and corner-only */}
+      
+      {/* Top left curved element */}
+      <div
+        className="fixed top-0 left-0 w-80 h-80 -translate-x-20 -translate-y-20 -z-10"
+        style={{
+          background: 'linear-gradient(135deg, #7f3ffb 0%, #e14eca 100%)',
+          borderRadius: '0 0 100% 0',
+          transform: 'translate(-25%, -25%)',
+        }}
+        aria-hidden="true"
+      />
+      
+      {/* Bottom right curved element */}
+      <div
+        className="fixed bottom-0 right-0 w-96 h-96 translate-x-24 translate-y-24 -z-10"
+        style={{
+          background: 'linear-gradient(315deg, #7f3ffb 0%, #e14eca 100%)',
+          borderRadius: '100% 0 0 0',
+          transform: 'translate(25%, 25%)',
+        }}
+        aria-hidden="true"
+      />
+
+      <div className="max-w-7xl mx-auto relative z-10 px-4 py-8">
+        {/* Page Title */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-purple-700 mb-4">
+            {t('studio.title')}
+          </h1>
+          <p className="text-xl text-purple-600 max-w-3xl mx-auto">
+            {t('studio.subtitle')}
+          </p>
+        </div>
+        
         <div className="grid md:grid-cols-3 gap-8">
           {/* Column 1: Dein Foto */}
           <Card>
@@ -476,7 +510,7 @@ const Studio = () => {
           </Button>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

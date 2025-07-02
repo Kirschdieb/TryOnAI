@@ -49,14 +49,6 @@ const translations = {
     'landing.faq.a2': 'Wir unterstützen JPG, PNG und GIF.',
     'landing.faq.q3': 'Ist meine Privatsphäre sicher?',
     'landing.faq.a3': 'Ja, alle Bilder werden verschlüsselt und nur temporär verarbeitet.',
-    // Testimonials
-    'landing.testimonials.title': 'Was unsere Nutzer sagen',
-    'landing.testimonials.u1.name': 'Max Mustermann',
-    'landing.testimonials.u1.quote': 'TryOnAI hat mein Online-Shopping revolutioniert – so kann ich Kleidung endlich sorgenfrei kaufen!',
-    'landing.testimonials.u2.name': 'Lisa Beispiel',
-    'landing.testimonials.u2.quote': 'Die virtuelle Anprobe ist unglaublich realistisch und einfach zu bedienen.',
-    'landing.testimonials.u3.name': 'John Doe',
-    'landing.testimonials.u3.quote': 'Schnell, präzise und macht Spaß – absolute Empfehlung!',
     
     // Home/Try-On Page
     'home.title': 'KI-gestützte Anprobe',
@@ -67,8 +59,8 @@ const translations = {
     'home.generateButton': 'Anprobe generieren',
     'home.clipboardPrompt': 'Möchtest du diesen Link für die Anprobe verwenden?',
     'home.virtualTryOn': 'Virtuelle Anprobe',
-    'home.uploadYourPhoto': 'Lade dein Foto hoch',
-    'home.chooseClothing': 'Wähle Kleidung',
+    'home.uploadYourPhoto': '1. Lade dein Foto hoch',
+    'home.chooseClothing': '2. Wähle Kleidung',
     'home.pasteZalandoUrl': 'Zalando URL einfügen',
     'home.zalandoPlaceholder': 'https://www.zalando.de/...',
     'home.extracting': 'Extrahiere...',
@@ -147,6 +139,23 @@ const translations = {
     'profile.importError': 'Fehler beim Importieren des Profils',
     
     // Try-On Studio
+    'studio.title': 'Try-On Studio',
+    'studio.subtitle': 'Erstelle deine perfekte virtuelle Anprobe mit KI-Power',
+    'studio.poseTitle': 'Pose wählen',
+    'studio.backgroundTitle': 'Hintergrund wählen',
+    'studio.qualityTitle': 'Bildqualität',
+    'studio.qualityDescription': 'Wähle die gewünschte Qualität (höhere Qualität = längere Generierungszeit)',
+    'studio.qualityLow': 'Niedrig (schnell)',
+    'studio.qualityMedium': 'Mittel (empfohlen)',
+    'studio.qualityHigh': 'Hoch (langsam)',
+    'studio.saveTitle': 'Bild speichern',
+    'studio.saveDescription1': 'Das Bild wird automatisch in ',
+    'studio.saveDescriptionBold': '"Generierte Bilder"',
+    'studio.saveDescription2': ' gespeichert. Optional kannst du es zusätzlich in einem anderen Album speichern.',
+    'studio.saveToAlbumLabel': 'Zusätzlich speichern in:',
+    'studio.selectAlbum': 'Album wählen...',
+    'studio.saveButton': 'Speichern',
+    'studio.saveButtonSaved': 'Gespeichert ✓',
     'studio.generating': 'Generiere...',
     'studio.tryAgain': 'Erneut versuchen',
     'studio.saveToCloset': 'In Kleiderschrank speichern',
@@ -260,14 +269,6 @@ const translations = {
     'landing.faq.a2': 'We support JPG, PNG, and GIF.',
     'landing.faq.q3': 'Is my privacy protected?',
     'landing.faq.a3': 'Yes, all images are encrypted and processed temporarily only.',
-    // Testimonials
-    'landing.testimonials.title': 'Testimonials',
-    'landing.testimonials.u1.name': 'Max Mustermann',
-    'landing.testimonials.u1.quote': 'TryOnAI has revolutionized my online shopping – now I can buy clothes worry-free!',
-    'landing.testimonials.u2.name': 'Lisa Example',
-    'landing.testimonials.u2.quote': 'The virtual try-on is incredibly realistic and easy to use.',
-    'landing.testimonials.u3.name': 'John Doe',
-    'landing.testimonials.u3.quote': 'Fast, accurate and fun – highly recommend!',
     
     // Home/Try-On Page
     'home.title': 'AI-Powered Try-On',
@@ -358,6 +359,8 @@ const translations = {
     'profile.importError': 'Error importing profile',
     
     // Try-On Studio
+    'studio.title': 'Try-On Studio',
+    'studio.subtitle': 'Create your perfect virtual try-on with AI power',
     'studio.generating': 'Generating...',
     'studio.tryAgain': 'Try Again',
     'studio.saveToCloset': 'Save to Closet',
