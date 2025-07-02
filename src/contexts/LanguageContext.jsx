@@ -126,6 +126,7 @@ const translations = {
     
     // Profile Page
     'profile.title': 'Profil',
+    'profile.subtitle': 'Verwalte dein Profil und deine persönlichen Daten',
     'profile.upload': 'Foto hochladen',
     'profile.confirmSingle': 'Sind Sie sicher, dass Sie kein Bild der Rückseite hochladen wollen?',
     'profile.requirements': 'Voraussetzungen',
@@ -133,6 +134,7 @@ const translations = {
     'profile.bodyMeasurements': 'Körpermaße',
     'profile.tryOnPhoto': 'Dein TryOn Foto',
     'profile.profileImage': 'Profilbild',
+    'profile.noImage': 'Kein Bild',
     'profile.saveProfile': 'Profil speichern',
     'profile.profileSaved': 'Profil gespeichert!',
     'profile.email': 'E-Mail',
@@ -376,6 +378,7 @@ const translations = {
     
     // Profile Page
     'profile.title': 'Profile',
+    'profile.subtitle': 'Manage your profile and personal data',
     'profile.upload': 'Upload Photo',
     'profile.confirmSingle': 'Are you sure you don\'t want to upload a back view image?',
     'profile.requirements': 'Requirements',
@@ -383,6 +386,7 @@ const translations = {
     'profile.bodyMeasurements': 'Body Measurements',
     'profile.tryOnPhoto': 'Your TryOn Photo',
     'profile.profileImage': 'Profile Image',
+    'profile.noImage': 'No Image',
     'profile.saveProfile': 'Save Profile',
     'profile.profileSaved': 'Profile saved!',
     'profile.email': 'Email',
