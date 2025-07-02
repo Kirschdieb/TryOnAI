@@ -41,6 +41,9 @@ const translations = {
     'landing.readyTransform': 'Bereit, dein Shopping-Erlebnis zu transformieren?',
     'landing.joinThousands': 'Schließe dich Tausenden von Nutzern an, die ihr Online-Shopping mit TryOnAI revolutioniert haben.',
     'landing.getStarted': 'Jetzt loslegen',
+    // Demo Section
+    'landing.demoTitle': 'Erlebe TryOnAI in Aktion',
+    'landing.demoDescription': 'Sieh dir an, wie einfach es ist, Kleidung virtuell anzuprobieren. Von der Fotoauswahl bis zum fertigen Ergebnis - alles in wenigen Sekunden.',
     // FAQ Section
     'landing.faq.title': 'Häufig gestellte Fragen',
     'landing.faq.q1': 'Wie funktioniert TryOnAI?',
@@ -284,6 +287,9 @@ const translations = {
     'landing.readyTransform': 'Ready to transform your shopping experience?',
     'landing.joinThousands': 'Join thousands of users who have revolutionized their online shopping with TryOnAI.',
     'landing.getStarted': 'Get Started Now',
+    // Demo Section
+    'landing.demoTitle': 'Experience TryOnAI in Action',
+    'landing.demoDescription': 'See how easy it is to try on clothes virtually. From photo selection to final result - everything in just seconds.',
     // FAQ Section
     'landing.faq.title': 'Frequently Asked Questions',
     'landing.faq.q1': 'How does TryOnAI work?',

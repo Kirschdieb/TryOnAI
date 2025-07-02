@@ -15,6 +15,8 @@ export default function Landing() {
   const [isFaqOnPurple, setIsFaqOnPurple] = useState(false);
   const testimonialsRef = useRef(null);
   const [isTestimonialsOnPurple, setIsTestimonialsOnPurple] = useState(false);
+  const demoRef = useRef(null);
+  const [isDemoOnPurple, setIsDemoOnPurple] = useState(false);
   const ctaRef = useRef(null);
   const [isCtaOnPurple, setIsCtaOnPurple] = useState(false);
 
@@ -36,6 +38,10 @@ export default function Landing() {
       if (testimonialsRef.current) {
         const rect = testimonialsRef.current.getBoundingClientRect();
         setIsTestimonialsOnPurple(rect.top < window.innerHeight / 2);
+      }
+      if (demoRef.current) {
+        const rect = demoRef.current.getBoundingClientRect();
+        setIsDemoOnPurple(rect.top < window.innerHeight / 2);
       }
       if (ctaRef.current) {
         const rect = ctaRef.current.getBoundingClientRect();
@@ -95,6 +101,58 @@ export default function Landing() {
             </div>
           </div>
         </div>
+      </div>      {/* Animated chevron arrow pointing down */}
+      <div className="flex justify-center py-1 -mt-12 -mb-9">
+        <div className="relative">
+          <div className="arrow-container">
+            <span className="chevron chevron-1"></span>
+            <span className="chevron chevron-2"></span>
+            <span className="chevron chevron-3"></span>
+          </div>
+        </div>
+        
+        {/* CSS for animated chevron arrow */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            .arrow-container {
+              position: relative;
+              cursor: pointer;
+            }
+            
+            .chevron {
+              display: block;
+              width: 2rem;
+              height: 2rem;
+              border-bottom: 4px solid white;
+              border-right: 4px solid white;
+              transform: rotate(45deg);
+              margin: -8px auto;
+              animation: chevronAnimate 2s infinite;
+            }
+            
+            .chevron-2 {
+              animation-delay: -0.2s;
+            }
+            
+            .chevron-3 {
+              animation-delay: -0.4s;
+            }
+            
+            @keyframes chevronAnimate {
+              0% {
+                opacity: 0;
+                transform: rotate(45deg) translate(-20px, -20px);
+              }
+              50% {
+                opacity: 1;
+              }
+              100% {
+                opacity: 0;
+                transform: rotate(45deg) translate(20px, 20px);
+              }
+            }
+          `
+        }} />
       </div>
 
       {/* Features Section */}
@@ -188,19 +246,31 @@ export default function Landing() {
       </div>
 
       {/* Demo Animation Section */}
-      <div className="px-4 sm:px-6 lg:px-8 pb-16">
-        <div className="relative aspect-video rounded-2xl bg-gray-900 px-5 py-3 shadow-xl max-w-7xl mx-auto">
-          <div className="flex h-full items-center justify-center rounded-xl overflow-hidden">
-            <img 
-              src="/src/assets/Präsentation1.gif" 
-              alt="TryOnAI Demo - Experience our AI technology in action" 
-              className="w-full h-full object-cover rounded-xl"
-            />
+      <div className="px-4 sm:px-6 lg:px-8 pb-16" ref={demoRef}>
+        <div className="max-w-7xl mx-auto">
+          {/* Überschrift */}
+          <div className="text-center mb-12">
+            <h2 className={`text-3xl font-bold mb-4 transition-colors duration-300 ${isDemoOnPurple ? 'text-white' : 'text-purple-700'}`}>
+              {t('landing.demoTitle') || 'Erlebe TryOnAI in Aktion'}
+            </h2>
+            <p className={`text-lg max-w-3xl mx-auto transition-colors duration-300 ${isDemoOnPurple ? 'text-purple-200' : 'text-gray-600'}`}>
+              {t('landing.demoDescription') || 'Sieh dir an, wie einfach es ist, Kleidung virtuell anzuprobieren. Von der Fotoauswahl bis zum fertigen Ergebnis - alles in wenigen Sekunden.'}
+            </p>
           </div>
-          {/* Border animation effect */}
-          <div className="pointer-events-none absolute -inset-px">
-            <div className="absolute inset-0 border-y border-transparent [background:linear-gradient(to_right,transparent,theme(colors.purple.300/.8),transparent)_1] animate-pulse"></div>
-            <div className="absolute inset-0 border-x border-transparent [background:linear-gradient(to_bottom,transparent,theme(colors.purple.300/.8),transparent)_1] animate-pulse"></div>
+          
+          {/* Demo Video Container */}
+          <div className="relative rounded-2xl overflow-hidden border-2 border-purple-500 bg-white p-4 shadow-lg">
+            <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-900">
+              <img 
+                src="/src/assets/Präsentation1.gif" 
+                alt="TryOnAI Demo - Experience our AI technology in action" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+            {/* Decorative border animation effect */}
+            <div className="pointer-events-none absolute inset-0 rounded-2xl">
+              <div className="absolute inset-0 border-2 border-transparent bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 rounded-2xl opacity-20 animate-pulse"></div>
+            </div>
           </div>
         </div>
       </div>
