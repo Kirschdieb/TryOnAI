@@ -75,9 +75,9 @@ export default function Closet() {
               <span>{language === 'de' ? 'Generierte Bilder' : 'Generated Pictures'}</span>
             ) : renamingAlbumId === album.id ? (
               <form onSubmit={e => { e.preventDefault(); renameAlbum(album.id, renameValue); setRenamingAlbumId(null); }} className="flex gap-2">
-                <input value={renameValue} onChange={e => setRenameValue(e.target.value)} className="border rounded px-2 py-1" autoFocus />
-                <Button type="submit" variant="primary" className="px-2 py-1">OK</Button>
-                <Button type="button" variant="outline" className="px-2 py-1" onClick={() => setRenamingAlbumId(null)}>Abbrechen</Button>
+                <input value={renameValue} onChange={e => setRenameValue(e.target.value)} className="border rounded px-2 py-1 text-black" autoFocus />
+                <Button type="submit" variant="primary" className="px-2 py-1 hover:underline hover:bg-purple-700 transition-colors">OK</Button>
+                <Button type="button" variant="primary" className="px-2 py-1 hover:underline hover:bg-purple-700 transition-colors" onClick={() => setRenamingAlbumId(null)}>Abbrechen</Button>
               </form>
             ) : (
               <span onDoubleClick={() => { setRenamingAlbumId(album.id); setRenameValue(album.name); }}>{album.name}</span>
