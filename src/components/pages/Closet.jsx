@@ -187,7 +187,7 @@ export default function Closet() {
             {t('closet.title') || 'Kleiderschrank'}
           </h1>
           <p className="text-xl text-purple-600 max-w-3xl mx-auto">
-            Verwalte deine Try-On Bilder und erstelle personalisierte Kollektionen
+            {t('closet.subtitle')}
           </p>
         </div>
 
@@ -196,7 +196,7 @@ export default function Closet() {
           /* Album Grid Ansicht */
           <div className={`mb-12 transition-all duration-300 ${animationClass}`}>
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-semibold text-gray-800">Deine Alben</h2>
+              <h2 className="text-2xl font-semibold text-gray-800">{t('closet.yourAlbums')}</h2>
               
               {/* Neues Album erstellen */}
               <form onSubmit={e => { e.preventDefault(); if (newAlbumName.trim()) { addAlbum(newAlbumName.trim()); setNewAlbumName(''); } }} className="flex gap-3">
@@ -316,7 +316,7 @@ export default function Closet() {
                             }
                           </h3>
                           <p className="text-gray-500 text-sm">
-                            {album.images.length} {album.images.length === 1 ? 'Bild' : 'Bilder'}
+                            {album.images.length} {album.images.length === 1 ? t('closet.image') : t('closet.images')}
                           </p>
                         </>
                       )}

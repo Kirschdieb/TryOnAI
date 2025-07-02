@@ -92,8 +92,10 @@ const translations = {
     'browse.title': 'Kleidung durchsuchen',
     'browse.subtitle': 'Entdecke unsere beliebten Herrenprodukte und finde das perfekte Outfit zum virtuellen Anprobieren',
     'browse.categories.all': 'Alle',
-    'browse.categories.shirts': 'Hemden',
-    'browse.categories.pants': 'Hosen',
+    'browse.categories.dresses': 'Kleider',
+    'browse.categories.tops': 'Oberteile',
+    'browse.categories.bottoms': 'Hosen',
+    'browse.categories.outerwear': 'Außenbekleidung',
     'browse.categories.tshirts': 'Shirts',
     'browse.categories.jackets': 'Jacken',
     'browse.tryNow': 'Jetzt anprobieren',
@@ -104,6 +106,10 @@ const translations = {
     
     // Closet Page
     'closet.title': 'Mein Kleiderschrank',
+    'closet.subtitle': 'Verwalte deine Anprobe-Bilder und erstelle persönliche Kollektionen',
+    'closet.yourAlbums': 'Deine Alben',
+    'closet.image': 'Bild',
+    'closet.images': 'Bilder',
     'closet.empty': 'Dein Kleiderschrank ist leer',
     'closet.emptySubtitle': 'Beginne damit, Outfits zu erstellen!',
     'closet.albumEmpty': 'Dieses Album ist noch leer',
@@ -342,11 +348,13 @@ const translations = {
     'home.generationFailed': 'Generation failed',
     
     // Browse Page
-    'browse.title': 'Browse Clothing',
-    'browse.subtitle': 'Discover our popular men\'s products and find the perfect outfit for virtual try-on',
+    'browse.title': 'Browse Items',
+    'browse.subtitle': 'Discover and try on our latest fashion',
     'browse.categories.all': 'All',
-    'browse.categories.shirts': 'Shirts',
-    'browse.categories.pants': 'Pants',
+    'browse.categories.dresses': 'Dresses',
+    'browse.categories.tops': 'Tops',
+    'browse.categories.bottoms': 'Bottoms',
+    'browse.categories.outerwear': 'Outerwear',
     'browse.categories.tshirts': 'T-Shirts',
     'browse.categories.jackets': 'Jackets',
     'browse.tryNow': 'Try Now',
@@ -357,6 +365,10 @@ const translations = {
     
     // Closet Page
     'closet.title': 'My Closet',
+    'closet.subtitle': 'Manage your try-on images and create personalized collections',
+    'closet.yourAlbums': 'Your Albums',
+    'closet.image': 'image',
+    'closet.images': 'images',
     'closet.empty': 'Your closet is empty',
     'closet.emptySubtitle': 'Start creating outfits!',
     'closet.albumEmpty': 'This album is still empty',
