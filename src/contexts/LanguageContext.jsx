@@ -50,6 +50,15 @@ const translations = {
     'landing.faq.q3': 'Ist meine Privatsphäre sicher?',
     'landing.faq.a3': 'Ja, alle Bilder werden verschlüsselt und nur temporär verarbeitet.',
     
+    // Testimonials Section
+    'landing.testimonials.title': 'Was unsere Nutzer sagen',
+    'landing.testimonials.u1.name': 'Marcus Weber',
+    'landing.testimonials.u1.quote': 'TryOnAI hat mein Online-Shopping revolutioniert! Ich kann endlich sehen, wie Kleidung an mir aussieht, bevor ich kaufe.',
+    'landing.testimonials.u2.name': 'Lisa Schmidt',
+    'landing.testimonials.u2.quote': 'Unglaublich realistisch! Die KI-Technologie ist beeindruckend und spart mir so viel Zeit beim Einkaufen.',
+    'landing.testimonials.u3.name': 'Anna Müller',
+    'landing.testimonials.u3.quote': 'Perfekt für Online-Shopping! Nie wieder Fehlkäufe dank der virtuellen Anprobe.',
+    
     // Home/Try-On Page
     'home.title': 'KI-gestützte Anprobe',
     'home.subtitle': 'Lade dein Foto hoch und probiere Kleidung virtuell an',
@@ -269,6 +278,15 @@ const translations = {
     'landing.faq.a2': 'We support JPG, PNG, and GIF.',
     'landing.faq.q3': 'Is my privacy protected?',
     'landing.faq.a3': 'Yes, all images are encrypted and processed temporarily only.',
+    
+    // Testimonials Section
+    'landing.testimonials.title': 'What our users say',
+    'landing.testimonials.u1.name': 'Marcus Weber',
+    'landing.testimonials.u1.quote': 'TryOnAI has revolutionized my online shopping! I can finally see how clothes look on me before buying.',
+    'landing.testimonials.u2.name': 'Lisa Schmidt',
+    'landing.testimonials.u2.quote': 'Incredibly realistic! The AI technology is impressive and saves me so much time shopping.',
+    'landing.testimonials.u3.name': 'Anna Müller',
+    'landing.testimonials.u3.quote': 'Perfect for online shopping! No more wrong purchases thanks to virtual try-on.',
     
     // Home/Try-On Page
     'home.title': 'AI-Powered Try-On',

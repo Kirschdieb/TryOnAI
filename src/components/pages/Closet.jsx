@@ -116,7 +116,7 @@ export default function Closet() {
                 {album.id === 'generated' ? (
                   <span className="font-medium">{language === 'de' ? 'Generierte Bilder' : 'Generated Pictures'}</span>
                 ) : renamingAlbumId === album.id ? (
-                  <form onSubmit={e => { e.preventDefault(); renameAlbum(album.id, renameValue); setRenamingAlbumId(null); }} className="flex gap-2">
+                  <form onSubmit={e => { e.preventDefault(); renameAlbum(album.id, renameValue); setRenamingAlbumId(null); }} className="flex gap-2" onClick={e => e.stopPropagation()}>
                     <input 
                       value={renameValue} 
                       onChange={e => setRenameValue(e.target.value)} 
@@ -127,38 +127,36 @@ export default function Closet() {
                     <Button type="button" variant="outline" className="px-3 py-1 text-sm" onClick={() => setRenamingAlbumId(null)}>✕</Button>
                   </form>
                 ) : (
-                  <div className="flex items-center gap-2">
-                    <span 
-                      className="font-medium"
-                      onDoubleClick={() => { setRenamingAlbumId(album.id); setRenameValue(album.name); }}
-                    >
-                      {album.name}
-                    </span>
-                    {album.id !== 'generated' && (
-                      <div className="flex gap-1">
-                        <button 
-                          onClick={e => { e.stopPropagation(); setRenamingAlbumId(album.id); setRenameValue(album.name); }} 
-                          className="text-gray-400 hover:text-purple-600 transition-colors duration-200"
-                          title="Umbenennen"
-                        >
-                          ✏️
-                        </button>
-                        {albums.length > 1 && (
-                          <button 
-                            onClick={e => { e.stopPropagation(); deleteAlbum(album.id); if (selectedAlbumId === album.id) setSelectedAlbumId(albums[0]?.id || null); }} 
-                            className="text-gray-400 hover:text-red-600 transition-colors duration-200"
-                            title="Löschen"
-                          >
-                            🗑️
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                  <span className="font-medium">{album.name}</span>
                 )}
               </div>
             ))}
           </div>
+          
+          {/* Album Aktionen - nur wenn ein Album ausgewählt ist und es nicht das "Generierte Bilder" Album ist */}
+          {selectedAlbum && selectedAlbum.id !== 'generated' && (
+            <div className="flex justify-center gap-4 mb-6">
+              <Button
+                onClick={() => { setRenamingAlbumId(selectedAlbum.id); setRenameValue(selectedAlbum.name); }}
+                className="px-6 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl font-medium transition-all duration-200 flex items-center gap-2"
+              >
+                ✏️ Bearbeiten
+              </Button>
+              {albums.length > 1 && (
+                <Button
+                  onClick={() => { 
+                    if (window.confirm(`Album "${selectedAlbum.name}" wirklich löschen?`)) {
+                      deleteAlbum(selectedAlbum.id); 
+                      setSelectedAlbumId(albums[0]?.id || null); 
+                    }
+                  }}
+                  className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl font-medium transition-all duration-200 flex items-center gap-2"
+                >
+                  🗑️ Löschen
+                </Button>
+              )}
+            </div>
+          )}
           
           {/* Neues Album erstellen */}
           <div className="flex justify-center">
