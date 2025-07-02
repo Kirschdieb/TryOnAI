@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCloset } from '../../store/useCloset';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -56,7 +56,8 @@ export default function Closet() {
     deleteAlbum,
     addImageToAlbum,
     removeImageFromAlbum,
-    deleteImageFromAllAlbums
+    deleteImageFromAllAlbums,
+    initializeSampleImages
   } = useCloset();
   const [selectedAlbumId, setSelectedAlbumId] = useState(null);
   const [newAlbumName, setNewAlbumName] = useState('');
@@ -67,6 +68,11 @@ export default function Closet() {
 
   // Album Auswahl: Standardmäßig erstes Album auswählen
   const selectedAlbum = albums.find(a => a.id === selectedAlbumId) || albums[0];
+
+  // Initialisiere Beispielbilder beim ersten Laden
+  useEffect(() => {
+    initializeSampleImages();
+  }, [initializeSampleImages]);
 
   // Funktion zum Öffnen eines Albums
   const openAlbum = (albumId) => {
@@ -154,7 +160,7 @@ export default function Closet() {
                     onClick={() => openAlbum(album.id)}
                   >
                     {/* Album Preview Image */}
-                    <div className="relative aspect-square bg-gray-100 overflow-hidden">
+                    <div className="relative aspect-square bg-gray-100 overflow-hidden rounded-2xl">
                       {firstImage ? (
                         <img
                           src={firstImage.image}
@@ -275,7 +281,7 @@ export default function Closet() {
                     {/* Album Cover als klickbares Element */}
                     {selectedAlbum.images[0] && (
                       <div 
-                        className="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200 flex-shrink-0"
+                        className="w-20 h-20 bg-gray-100 rounded-2xl overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200 flex-shrink-0"
                         onClick={backToAlbums}
                         title="Zurück zu allen Alben"
                       >
@@ -393,7 +399,7 @@ export default function Closet() {
                         <img
                           src={img.image}
                           alt={img.customPrompt || 'Try-On'}
-                          className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                          className="absolute inset-0 w-full h-full object-cover rounded-2xl"
                         />
                       </div>
                       <p className="mt-2 text-sm text-gray-500 text-center">
