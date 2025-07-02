@@ -5,66 +5,126 @@ export default function About() {
   const { t } = useLanguage();
   
   return (
-    <div className="max-w-4xl mx-auto px-4">
-      <h1 className="text-4xl font-bold text-center mb-12">{t('about.title')}</h1>
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Decorative curved elements - consistent with other pages */}
+      
+      {/* Top right curved element */}
+      <div
+        className="fixed top-0 right-0 w-72 h-72 translate-x-18 -translate-y-18 -z-10"
+        style={{
+          background: 'linear-gradient(225deg, #7f3ffb 0%, #e14eca 100%)',
+          borderRadius: '0 0 0 100%',
+          transform: 'translate(25%, -25%)',
+        }}
+        aria-hidden="true"
+      />
+      
+      {/* Bottom left curved element */}
+      <div
+        className="fixed bottom-0 left-0 w-88 h-88 -translate-x-22 translate-y-22 -z-10"
+        style={{
+          background: 'linear-gradient(45deg, #7f3ffb 0%, #e14eca 100%)',
+          borderRadius: '0 100% 0 0',
+          transform: 'translate(-25%, 25%)',
+        }}
+        aria-hidden="true"
+      />
 
-      <div className="space-y-8">
-        <Card>
-          <h2 className="text-2xl font-semibold mb-4">{t('about.mission')}</h2>
-          <p className="text-gray-600 leading-relaxed">
-            {t('about.missionText')}
+      <div className="max-w-6xl mx-auto px-4 py-8 relative z-10">
+        {/* Page Title */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-purple-700 mb-4">
+            {t('about.title')}
+          </h1>
+          <p className="text-xl text-purple-600 max-w-3xl mx-auto">
+            {t('about.subtitle') || 'Erfahre mehr über unsere Vision und Technologie'}
           </p>
-        </Card>
+        </div>
 
-        <Card>
-          <h2 className="text-2xl font-semibold mb-4">{t('about.howItWorks')}</h2>
-          <div className="space-y-4">
-            <div className="flex items-start gap-4">
-              <div className="w-8 h-8 bg-lavender rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-semibold">1</span>
+        {/* Content Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          
+          {/* Mission Card */}
+          <Card className="p-8 col-span-1 lg:col-span-2">
+            <h2 className="text-3xl font-semibold mb-6 text-gray-800 text-center">
+              {t('about.mission')}
+            </h2>
+            <p className="text-gray-600 leading-relaxed text-lg text-center max-w-4xl mx-auto">
+              {t('about.missionText')}
+            </p>
+          </Card>
+
+          {/* How It Works Card */}
+          <Card className="p-8">
+            <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+              {t('about.howItWorks')}
+            </h2>
+            <div className="space-y-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <span className="text-white font-bold text-lg">1</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2 text-lg text-gray-800">{t('about.step1Title')}</h3>
+                  <p className="text-gray-600">{t('about.step1Text')}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold mb-1">{t('about.step1Title')}</h3>
-                <p className="text-gray-600">{t('about.step1Text')}</p>
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <span className="text-white font-bold text-lg">2</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2 text-lg text-gray-800">{t('about.step2Title')}</h3>
+                  <p className="text-gray-600">{t('about.step2Text')}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <span className="text-white font-bold text-lg">3</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2 text-lg text-gray-800">{t('about.step3Title')}</h3>
+                  <p className="text-gray-600">{t('about.step3Text')}</p>
+                </div>
               </div>
             </div>
-            <div className="flex items-start gap-4">
-              <div className="w-8 h-8 bg-lavender rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-semibold">2</span>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">{t('about.step2Title')}</h3>
-                <p className="text-gray-600">{t('about.step2Text')}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <div className="w-8 h-8 bg-lavender rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-semibold">3</span>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-1">{t('about.step3Title')}</h3>
-                <p className="text-gray-600">{t('about.step3Text')}</p>
-              </div>
-            </div>
-          </div>
-        </Card>
+          </Card>
 
-        <Card>
-          <h2 className="text-2xl font-semibold mb-4">{t('about.technology')}</h2>
-          <p className="text-gray-600 leading-relaxed mb-4">
-            {t('about.technologyText')}
-          </p>
-          <ul className="list-disc list-inside space-y-2 text-gray-600">
-            <li>{t('about.tech1')}</li>
-            <li>{t('about.tech2')}</li>
-            <li>{t('about.tech3')}</li>
-            <li>{t('about.tech4')}</li>
-          </ul>
-        </Card>
+          {/* Technology Card */}
+          <Card className="p-8">
+            <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+              {t('about.technology')}
+            </h2>
+            <p className="text-gray-600 leading-relaxed mb-6">
+              {t('about.technologyText')}
+            </p>
+            <ul className="space-y-3">
+              <li className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full"></div>
+                <span className="text-gray-600">{t('about.tech1')}</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full"></div>
+                <span className="text-gray-600">{t('about.tech2')}</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full"></div>
+                <span className="text-gray-600">{t('about.tech3')}</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full"></div>
+                <span className="text-gray-600">{t('about.tech4')}</span>
+              </li>
+            </ul>
+          </Card>
+        </div>
 
-        <Card>
-          <h2 className="text-2xl font-semibold mb-4">{t('about.privacy')}</h2>
-          <p className="text-gray-600 leading-relaxed">
+        {/* Privacy Card - Full Width */}
+        <Card className="p-8">
+          <h2 className="text-2xl font-semibold mb-6 text-gray-800 text-center">
+            {t('about.privacy')}
+          </h2>
+          <p className="text-gray-600 leading-relaxed text-center max-w-4xl mx-auto">
             {t('about.privacyText')}
           </p>
         </Card>

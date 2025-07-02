@@ -212,6 +212,7 @@ const translations = {
     
     // About Page
     'about.title': 'Über TryOnAI',
+    'about.subtitle': 'Erfahre mehr über unsere Vision und Technologie',
     'about.mission': 'Unsere Mission',
     'about.missionText': 'TryOnAI möchte das Online-Shopping revolutionieren, indem es ein nahtloses virtuelles Anprobe-Erlebnis bietet. Unsere Plattform kombiniert modernste KI-Technologie mit einer intuitiven Benutzeroberfläche, um Ihnen zu helfen, zu visualisieren, wie Kleidung an Ihnen aussehen wird, bevor Sie einen Kauf tätigen.',
     'about.howItWorks': 'Wie es funktioniert',
@@ -449,6 +450,7 @@ const translations = {
     
     // About Page
     'about.title': 'About TryOnAI',
+    'about.subtitle': 'Learn more about our vision and technology',
     'about.mission': 'Our Mission',
     'about.missionText': 'TryOnAI aims to revolutionize online shopping by providing a seamless virtual try-on experience. Our platform combines cutting-edge AI technology with an intuitive interface to help you visualize how clothes will look on you before making a purchase.',
     'about.howItWorks': 'How It Works',
