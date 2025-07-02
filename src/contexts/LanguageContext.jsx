@@ -49,6 +49,8 @@ const translations = {
     'landing.faq.a2': 'Wir unterstützen JPG, PNG und GIF.',
     'landing.faq.q3': 'Ist meine Privatsphäre sicher?',
     'landing.faq.a3': 'Ja, alle Bilder werden verschlüsselt und nur temporär verarbeitet.',
+    'landing.questionNotFound': 'Ihre Frage nicht gefunden?',
+    'landing.goToFAQSection': '→ Hier geht\'s zum FAQ Bereich',
     // Testimonials
     'landing.testimonials.title': 'Was unsere Nutzer sagen',
     'landing.testimonials.u1.name': 'Max Mustermann',
@@ -260,6 +262,8 @@ const translations = {
     'landing.faq.a2': 'We support JPG, PNG, and GIF.',
     'landing.faq.q3': 'Is my privacy protected?',
     'landing.faq.a3': 'Yes, all images are encrypted and processed temporarily only.',
+    'landing.questionNotFound': 'Question not found?',
+    'landing.goToFAQSection': '→ Go to FAQ Section',
     // Testimonials
     'landing.testimonials.title': 'Testimonials',
     'landing.testimonials.u1.name': 'Max Mustermann',

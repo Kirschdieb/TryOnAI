@@ -41,6 +41,10 @@ export default function FAQ() {
   const faqData = {
     de: [
       {
+        question: "Wie funktioniert TryOnAI?",
+        answer: "Lade einfach ein Foto hoch, wähle Kleidung aus und erlebe die Vorschau in Echtzeit. Unsere KI analysiert Ihr Foto und das gewählte Kleidungsstück und generiert ein realistisches Bild."
+      },
+      {
         question: "Was ist TryOnAI?",
         answer: [
           "TryOnAI ist eine innovative Web-Anwendung, die Künstliche Intelligenz nutzt, um virtuelle Anproben von Kleidungsstücken zu ermöglichen.",
@@ -56,12 +60,31 @@ export default function FAQ() {
         ]
       },
       {
+        question: "Welche Dateiformate werden unterstützt?",
+        answer: "Wir unterstützen JPG, PNG und WebP. Die maximale Dateigröße beträgt 10MB und die empfohlene Auflösung ist mindestens 512x512 Pixel."
+      },
+      {
         question: "Welche Arten von Bildern kann ich hochladen?",
         answer: [
           "Am besten funktionieren Fotos von vorne, mit guter Beleuchtung und deutlich sichtbarer Kleidung.",
           "Unterstützte Formate: JPG, PNG, WebP",
           "Maximale Dateigröße: 10MB",
           "Empfohlene Auflösung: mindestens 512x512 Pixel"
+        ]
+      },
+      {
+        question: "Ist meine Privatsphäre sicher?",
+        answer: "Ja, alle Bilder werden verschlüsselt und nur temporär verarbeitet. Es gibt keine permanente Speicherung auf unseren Servern."
+      },
+      {
+        question: "Was passiert mit meinen hochgeladenen Fotos?",
+        answer: [
+          "Ihre Privatsphäre ist uns wichtig:",
+          "• Fotos werden nur temporär für die KI-Verarbeitung gespeichert",
+          "• Keine permanente Speicherung auf unseren Servern",
+          "• Automatische Löschung nach der Verarbeitung",
+          "• Lokale Speicherung in Ihrem Browser (Kleiderschrank-Feature)",
+          "Weitere Details finden Sie in unserer Datenschutzerklärung."
         ]
       },
       {
@@ -150,6 +173,10 @@ export default function FAQ() {
     ],
     en: [
       {
+        question: "How does TryOnAI work?",
+        answer: "Simply upload a photo, choose clothing, and see a real-time preview. Our AI analyzes your photo and the selected clothing item to generate a realistic image."
+      },
+      {
         question: "What is TryOnAI?",
         answer: [
           "TryOnAI is an innovative web application that uses artificial intelligence to enable virtual try-ons of clothing items.",
@@ -165,12 +192,31 @@ export default function FAQ() {
         ]
       },
       {
+        question: "Which file formats are supported?",
+        answer: "We support JPG, PNG, and WebP. The maximum file size is 10MB and the recommended resolution is at least 512x512 pixels."
+      },
+      {
         question: "What types of images can I upload?",
         answer: [
           "Front-facing photos work best, with good lighting and clearly visible clothing.",
           "Supported formats: JPG, PNG, WebP",
           "Maximum file size: 10MB",
           "Recommended resolution: at least 512x512 pixels"
+        ]
+      },
+      {
+        question: "Is my privacy protected?",
+        answer: "Yes, all images are encrypted and processed temporarily only. There is no permanent storage on our servers."
+      },
+      {
+        question: "What happens to my uploaded photos?",
+        answer: [
+          "Your privacy is important to us:",
+          "• Photos are only temporarily stored for AI processing",
+          "• No permanent storage on our servers",
+          "• Automatic deletion after processing",
+          "• Local storage in your browser (wardrobe feature)",
+          "More details can be found in our privacy policy."
         ]
       },
       {
@@ -193,6 +239,14 @@ export default function FAQ() {
         ]
       },
       {
+        question: "Is TryOnAI free?",
+        answer: [
+          "Yes, TryOnAI is a free university project for educational purposes.",
+          "There are no hidden costs or premium features.",
+          "Usage is within the scope of the academic project."
+        ]
+      },
+      {
         question: "How accurate are the generated images?",
         answer: [
           "Accuracy depends on various factors:",
@@ -200,6 +254,60 @@ export default function FAQ() {
           "• Lighting and pose",
           "• Type of clothing item",
           "As this is a university project, the algorithms are still in development and improvement."
+        ]
+      },
+      {
+        question: "Which browsers are supported?",
+        answer: [
+          "TryOnAI works in all modern browsers:",
+          "• Chrome (recommended)",
+          "• Firefox",
+          "• Safari",
+          "• Edge",
+          "For the best experience, we recommend using the latest version of your browser."
+        ]
+      },
+      {
+        question: "Can I use the generated images commercially?",
+        answer: [
+          "No, the generated images are intended for private, non-commercial use only.",
+          "This is a university project for educational purposes.",
+          "For commercial use, please contact our team."
+        ]
+      },
+      {
+        question: "What about the wardrobe feature?",
+        answer: [
+          "The virtual wardrobe allows you to:",
+          "• Save generated try-on images",
+          "• Create and organize albums",
+          "• Collect your favorite outfits",
+          "Data is stored locally in your browser."
+        ]
+      },
+      {
+        question: "Is there a mobile app?",
+        answer: [
+          "Currently, TryOnAI is available as a web application.",
+          "However, you can use it on any smartphone or tablet through your browser.",
+          "A native app is planned for the future but not yet available."
+        ]
+      },
+      {
+        question: "How can I provide feedback?",
+        answer: [
+          "Your feedback is very valuable for our university project!",
+          "• Use our contact form",
+          "• Send an email to feedback@tryonai.de",
+          "• Share your experiences and suggestions with us"
+        ]
+      },
+      {
+        question: "Who developed TryOnAI?",
+        answer: [
+          "TryOnAI was developed by students as part of the 'Digital Product Development & Innovation' program.",
+          "It is an academic project supervised by university professors.",
+          "More information can be found on our 'About' page."
         ]
       }
     ]
