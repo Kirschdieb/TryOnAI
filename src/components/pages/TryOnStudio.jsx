@@ -312,7 +312,7 @@ const Studio = () => {
         
         <div className="grid md:grid-cols-3 gap-8">
           {/* Column 1: Dein Foto */}
-          <Card>
+          <Card className="rounded-2xl shadow-lg border border-purple-100 bg-white">
             <h2 className="text-xl font-semibold mb-4">{t('studio.yourPhoto')}</h2>
             <div
               className="relative w-full flex items-center justify-center bg-cream-100 rounded-lg"
@@ -327,7 +327,7 @@ const Studio = () => {
           </Card>
 
           {/* Column 2: Kleidungsstück */}
-          <Card>
+          <Card className="rounded-2xl shadow-lg border border-purple-100 bg-white">
             <h2 className="text-xl font-semibold mb-4">{t('studio.clothingItem')}</h2>
             <div
               className="relative w-full flex items-center justify-center bg-cream-100 rounded-lg"
@@ -352,7 +352,7 @@ const Studio = () => {
           </Card>
 
           {/* Column 3: Ergebnis */}
-          <Card>
+          <Card className="rounded-2xl shadow-lg border border-purple-100 bg-white">
             <h2 className="text-xl font-semibold mb-4">{t('studio.result')}</h2>
             <div
               className="relative w-full flex items-center justify-center bg-cream-100 rounded-lg"
@@ -382,7 +382,7 @@ const Studio = () => {
         {/* Grid for selectors */}
         <div className={`grid ${result ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-8 mt-8`}>
           {/* Hintergrundauswahl-Kachel */}
-          <Card>
+          <Card className="rounded-2xl shadow-lg border border-purple-100 bg-white">
             <h2 className="text-xl font-semibold mb-4">{t('studio.backgroundTitle')}</h2>
             <div className="flex flex-col gap-2">
               {backgroundOptions.map((option) => (
@@ -390,18 +390,18 @@ const Studio = () => {
                   key={option.value}
                   type="button"
                   variant={selectedBackground === option.value ? 'primary' : 'secondary'}
-                  className={`flex items-center w-full justify-start text-left !rounded-lg ${selectedBackground === option.value ? '' : 'bg-white border border-cream-300'} ${selectedBackground === option.value ? '' : 'hover:bg-cream-100'}`}
+                  className={`flex items-center w-full justify-start text-left rounded-2xl px-4 py-2 font-medium transition-all duration-200 ${selectedBackground === option.value ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg' : 'bg-white border border-purple-200 text-purple-700 hover:bg-purple-50'} `}
                   onClick={() => setSelectedBackground(option.value)}
                 >
                   {option.icon}
-                  {option.label}
+                  <span className="ml-2">{option.label}</span>
                 </Button>
               ))}
             </div>
           </Card>
 
           {/* Pose-Auswahl-Kachel */}
-          <Card>
+          <Card className="rounded-2xl shadow-lg border border-purple-100 bg-white">
             <h2 className="text-xl font-semibold mb-4">{t('studio.poseTitle')}</h2>
             <div className="flex flex-col gap-2">
               {poseOptions.map((option) => (
@@ -409,18 +409,18 @@ const Studio = () => {
                   key={option.value}
                   type="button"
                   variant={selectedPose === option.value ? 'primary' : 'secondary'}
-                  className={`flex items-center w-full justify-start text-left !rounded-lg ${selectedPose === option.value ? '' : 'bg-white border border-cream-300'} ${selectedPose === option.value ? '' : 'hover:bg-cream-100'}`}
+                  className={`flex items-center w-full justify-start text-left rounded-2xl px-4 py-2 font-medium transition-all duration-200 ${selectedPose === option.value ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg' : 'bg-white border border-purple-200 text-purple-700 hover:bg-purple-50'} `}
                   onClick={() => setSelectedPose(option.value)}
                 >
                   {option.icon}
-                  {option.label}
+                  <span className="ml-2">{option.label}</span>
                 </Button>
               ))}
             </div>
           </Card>
 
           {/* Bildqualität-Kachel */}
-          <Card>
+          <Card className="rounded-2xl shadow-lg border border-purple-100 bg-white">
             <h2 className="text-xl font-semibold mb-4">{t('studio.qualityTitle')}</h2>
             <p className="mb-4 text-sm text-gray-600">{t('studio.qualityDescription')}</p>
             <div className="flex flex-col gap-2">
@@ -429,7 +429,7 @@ const Studio = () => {
                   key={option.value}
                   type="button"
                   variant={imageQuality === option.value ? 'primary' : 'secondary'}
-                  className={`flex items-center w-full justify-start text-left !rounded-lg ${imageQuality === option.value ? '' : 'bg-white border border-cream-300'} ${imageQuality === option.value ? '' : 'hover:bg-cream-100'}`}
+                  className={`flex items-center w-full justify-start text-left rounded-2xl px-4 py-2 font-medium transition-all duration-200 ${imageQuality === option.value ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg' : 'bg-white border border-purple-200 text-purple-700 hover:bg-purple-50'} `}
                   onClick={() => setImageQuality(option.value)}
                 >
                   {option.label}
@@ -440,7 +440,7 @@ const Studio = () => {
 
           {/* Bild speichern Kachel (conditional) */}
           {result && (
-            <Card>
+            <Card className="rounded-2xl shadow-lg border border-purple-100 bg-white">
               <h3 className="text-lg font-semibold mb-2">{t('studio.saveTitle')}</h3>
               <p className="mb-2 text-sm">
                 {t('studio.saveDescription1')}
@@ -466,7 +466,7 @@ const Studio = () => {
                   variant="primary"
                   onClick={handleSave}
                   disabled={saveDisabled}
-                  className="w-full bg-lavender hover:bg-lavender-dark text-white px-4 py-2 rounded shadow-lg"
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 rounded-2xl font-semibold shadow-lg transition-all duration-200"
                   style={{ boxShadow: '0 4px 24px 0 rgba(80, 80, 180, 0.10)' }}
                 >
                   {saveDisabled ? t('studio.saveButtonSaved') : t('studio.saveButton')}
@@ -482,10 +482,10 @@ const Studio = () => {
         </div>
         {/* Benutzerdefinierte Anweisungen über dem Button */}
         <div className="flex w-full justify-center mt-8 mb-6">
-          <Card className="max-w-2xl w-full">
+          <Card className="max-w-2xl w-full rounded-2xl shadow-lg border border-purple-100 bg-white">
             <h2 className="text-xl font-semibold mb-4">Benutzerdefinierte Anweisungen</h2>
             <textarea
-              className="w-full border rounded p-2 h-24"
+              className="w-full border-2 border-purple-200 rounded-2xl p-3 h-24 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
               placeholder="Fügen Sie spezifische Anweisungen für die KI hinzu..."
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value)}
@@ -497,7 +497,7 @@ const Studio = () => {
           <Button
             onClick={generateTryOn}
             disabled={isGenerating}
-            className="w-full max-w-2xl text-lg py-4"
+            className="w-full max-w-2xl text-lg py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-2xl font-semibold shadow-lg transition-all duration-200"
           >
             {isGenerating ? (
               <span className="flex items-center justify-center">
