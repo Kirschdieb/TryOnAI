@@ -63,7 +63,7 @@ export default function Landing() {
       <div className="fixed -top-24 left-1/2 -translate-x-1/2 w-screen h-[80vh] -z-30 rotate-[-6deg] rounded-bl-[120px] opacity-30 blur-2xl" style={{background: 'linear-gradient(100deg, #7f3ffb 0%, #e14eca 100%)', minWidth: '100vw'}} />
 
       {/* Hero Section - dynamic text color */}
-      <div className="mx-auto max-w-6xl px-0 sm:px-0" ref={heroRef}>
+      <div className="mx-auto px-4 sm:px-6 lg:px-8" ref={heroRef}>
         <div className="pb-12 pt-32 md:pb-20 md:pt-40">
           <div className="text-center">
             <div className={`mb-6 inline-flex rounded-full px-3 py-1 text-sm font-semibold shadow transition-colors duration-300 ${isHeroOnPurple ? 'bg-white/80 text-purple-700' : 'bg-purple-100 text-purple-700'}`}>
@@ -72,7 +72,7 @@ export default function Landing() {
             <h1 className={`mb-8 text-5xl md:text-6xl font-bold drop-shadow-lg transition-colors duration-300 ${isHeroOnPurple ? 'text-white' : 'text-purple-700'}`}>
               {t('landing.title')}
             </h1>
-            <p className={`text-xl mb-8 mx-auto max-w-3xl drop-shadow transition-colors duration-300 ${isHeroOnPurple ? 'text-purple-100' : 'text-gray-700'}`}>
+            <p className={`text-xl mb-8 mx-auto max-w-4xl drop-shadow transition-colors duration-300 ${isHeroOnPurple ? 'text-purple-100' : 'text-gray-700'}`}>
               {t('landing.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
@@ -98,12 +98,12 @@ export default function Landing() {
       </div>
 
       {/* Features Section */}
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6" ref={featuresRef}>
+      <div className="px-4 py-16 sm:px-6 lg:px-8" ref={featuresRef}>
         <div className="relative py-12">
-          <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="relative px-4 sm:px-6 lg:px-8">
             <div className="py-12 md:py-20">
               <h2 className={`text-3xl font-bold text-center mb-12 transition-colors duration-300 ${isFeaturesOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.howItWorks')}</h2>
-              <div className="mx-auto grid max-w-sm items-start gap-8 md:max-w-none md:grid-cols-3 lg:gap-16">
+              <div className="mx-auto grid max-w-7xl items-start gap-8 md:grid-cols-3 lg:gap-16">{/* Vergrößert von max-w-sm zu max-w-7xl */}
                 {/* 1. Upload Photo - Interactive Flip Card */}
                 <div className="relative h-64 w-full [perspective:1000px] group">
                   <div className="relative h-full w-full transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
@@ -188,7 +188,8 @@ export default function Landing() {
       </div>
 
       {/* Demo Animation Section */}
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 pb-16">        <div className="relative aspect-video rounded-2xl bg-gray-900 px-5 py-3 shadow-xl">
+      <div className="px-4 sm:px-6 lg:px-8 pb-16">
+        <div className="relative aspect-video rounded-2xl bg-gray-900 px-5 py-3 shadow-xl max-w-7xl mx-auto">
           <div className="flex h-full items-center justify-center rounded-xl overflow-hidden">
             <img 
               src="/src/assets/Präsentation1.gif" 
@@ -205,8 +206,8 @@ export default function Landing() {
       </div>
 
       {/* Call to Action */}
-      <div className="mx-auto max-w-6xl px-4 pb-16" ref={ctaRef}>
-        <div className={`relative rounded-2xl px-8 py-10 md:py-16 md:px-12 transition-all duration-300 ${!isCtaOnPurple ? 'bg-gradient-to-r from-purple-500 to-purple-600' : 'bg-white border-2 border-purple-500'}`}>
+      <div className="px-4 pb-16 sm:px-6 lg:px-8" ref={ctaRef}>
+        <div className={`relative rounded-2xl px-8 py-10 md:py-16 md:px-12 transition-all duration-300 max-w-7xl mx-auto ${!isCtaOnPurple ? 'bg-gradient-to-r from-purple-500 to-purple-600' : 'bg-white border-2 border-purple-500'}`}>
           <div className="relative flex flex-col items-center">
             <h2 className={`h2 mb-4 text-center text-3xl font-bold transition-colors duration-300 ${!isCtaOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.readyTransform')}</h2>
             <p className={`mb-6 text-center text-lg transition-colors duration-300 ${!isCtaOnPurple ? 'text-purple-200' : 'text-purple-600'}`}>
@@ -222,36 +223,39 @@ export default function Landing() {
       </div>
 
       {/* FAQ Section */}
-      <div ref={faqRef} className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <h2 className={`text-3xl font-bold text-center mb-8 transition-colors duration-300 ${isFaqOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.faq.title')}</h2>
-        <div className="space-y-4">
-          {[
-            { qKey: 'landing.faq.q1', aKey: 'landing.faq.a1' },
-            { qKey: 'landing.faq.q2', aKey: 'landing.faq.a2' },
-            { qKey: 'landing.faq.q3', aKey: 'landing.faq.a3' },
-          ].map((item, index) => (
-            <div key={index} className="bg-white shadow rounded-lg overflow-hidden">
-              <button
-                onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                className="w-full flex justify-between items-center py-4 px-6 text-left hover:bg-gray-100 focus:outline-none focus:ring transition-colors duration-200"
-              >
-                <span className="text-lg font-semibold">{t(item.qKey)}</span>
-                <span className="text-2xl">{openFaq === index ? '−' : '+'}</span>
-              </button>
-              <div className={`overflow-hidden transition-all duration-300 ${openFaq === index ? 'max-h-40' : 'max-h-0'}`}> 
-                <div className="px-6 pb-4 text-gray-700">
-                  {t(item.aKey)}
+      <div ref={faqRef} className="px-4 py-16 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <h2 className={`text-3xl font-bold text-center mb-8 transition-colors duration-300 ${isFaqOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.faq.title')}</h2>
+          <div className="space-y-4">
+            {[
+              { qKey: 'landing.faq.q1', aKey: 'landing.faq.a1' },
+              { qKey: 'landing.faq.q2', aKey: 'landing.faq.a2' },
+              { qKey: 'landing.faq.q3', aKey: 'landing.faq.a3' },
+            ].map((item, index) => (
+              <div key={index} className="bg-white shadow rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                  className="w-full flex justify-between items-center py-4 px-6 text-left hover:bg-gray-100 focus:outline-none focus:ring transition-colors duration-200"
+                >
+                  <span className="text-lg font-semibold">{t(item.qKey)}</span>
+                  <span className="text-2xl">{openFaq === index ? '−' : '+'}</span>
+                </button>
+                <div className={`overflow-hidden transition-all duration-300 ${openFaq === index ? 'max-h-40' : 'max-h-0'}`}> 
+                  <div className="px-6 pb-4 text-gray-700">
+                    {t(item.aKey)}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Testimonials Section */}
-      <div ref={testimonialsRef} className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <h2 className={`text-3xl font-bold text-center mb-8 transition-colors duration-300 ${isTestimonialsOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.testimonials.title')}</h2>
-        <div className="grid gap-8 md:grid-cols-3">
+      <div ref={testimonialsRef} className="px-4 py-16 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <h2 className={`text-3xl font-bold text-center mb-8 transition-colors duration-300 ${isTestimonialsOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.testimonials.title')}</h2>
+          <div className="grid gap-8 md:grid-cols-3">
           {[ 
             { img: 'https://randomuser.me/api/portraits/men/5.jpg', nameKey: 'landing.testimonials.u1.name', quoteKey: 'landing.testimonials.u1.quote' },
             { img: 'https://i.pravatar.cc/150?img=10', nameKey: 'landing.testimonials.u2.name', quoteKey: 'landing.testimonials.u2.quote' },
@@ -261,8 +265,8 @@ export default function Landing() {
               <img src={item.img} alt={t(item.nameKey)} className="w-16 h-16 rounded-full mb-4 object-cover" />
               <h3 className="font-semibold mb-2">{t(item.nameKey)}</h3>
               <p className="text-gray-600 text-center">“{t(item.quoteKey)}”</p>
-            </div>
-          ))}
+            </div>            ))}
+          </div>
         </div>
       </div>
     </div>

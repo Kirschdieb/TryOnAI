@@ -9,35 +9,38 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 bg-cream-100 shadow-sm z-50">
-      <div className="container mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="font-bold text-xl text-lavender">
+          <Link to="/" className="font-bold text-xl text-lavender flex-shrink-0">
             TryOnAI
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-600 hover:text-lavender">
+          {/* Desktop Navigation - Zentriert */}
+          <div className="hidden md:flex items-center justify-center space-x-8 flex-1">
+            <Link to="/" className="text-gray-600 hover:text-lavender font-medium transition-colors">
               {t('nav.home')}
             </Link>
-            <Link to="/try-on" className="text-gray-600 hover:text-lavender">
+            <Link to="/try-on" className="text-gray-600 hover:text-lavender font-medium transition-colors">
               {t('nav.tryOn')}
             </Link>
-            <Link to="/closet" className="text-gray-600 hover:text-lavender">
+            <Link to="/closet" className="text-gray-600 hover:text-lavender font-medium transition-colors">
               {t('nav.closet')}
             </Link>
-            <Link to="/profile" className="text-gray-600 hover:text-lavender">
+            <Link to="/profile" className="text-gray-600 hover:text-lavender font-medium transition-colors">
               {t('nav.profile')}
             </Link>
-            <Link to="/about" className="text-gray-600 hover:text-lavender">
+            <Link to="/about" className="text-gray-600 hover:text-lavender font-medium transition-colors">
               {t('nav.about')}
             </Link>
-            
+          </div>
+          
+          {/* Right Actions */}
+          <div className="hidden md:flex items-center space-x-4 flex-shrink-0">
             {/* Language Switcher */}
             <button
               onClick={toggleLanguage}
-              className="px-3 py-1 text-sm border border-lavender text-lavender hover:bg-lavender hover:text-white rounded-md transition-colors duration-200"
+              className="px-3 py-1.5 text-sm border border-lavender text-lavender hover:bg-lavender hover:text-white rounded-lg transition-all duration-200 font-medium"
             >
               {language === 'de' ? 'EN' : 'DE'}
             </button>
