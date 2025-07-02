@@ -10,6 +10,11 @@ export default function Landing() {
   const [isHeroOnPurple, setIsHeroOnPurple] = useState(true);
   const featuresRef = useRef(null);
   const [isFeaturesOnPurple, setIsFeaturesOnPurple] = useState(false);
+  const [openFaq, setOpenFaq] = useState(null); // State to manage open FAQ item
+  const faqRef = useRef(null);
+  const [isFaqOnPurple, setIsFaqOnPurple] = useState(false);
+  const testimonialsRef = useRef(null);
+  const [isTestimonialsOnPurple, setIsTestimonialsOnPurple] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,8 +24,16 @@ export default function Landing() {
       }
       if (featuresRef.current) {
         const rect = featuresRef.current.getBoundingClientRect();
-        // Wenn die Mitte der Section noch im lila Bereich ist (z.B. top < 400)
         setIsFeaturesOnPurple(rect.top < 400);
+      }
+      if (faqRef.current) {
+        const rect = faqRef.current.getBoundingClientRect();
+        // Wenn Section-Überschrift über die Mitte des Bildschirms scrollt
+        setIsFaqOnPurple(rect.top < window.innerHeight / 2);
+      }
+      if (testimonialsRef.current) {
+        const rect = testimonialsRef.current.getBoundingClientRect();
+        setIsTestimonialsOnPurple(rect.top < window.innerHeight / 2);
       }
     };
     window.addEventListener('scroll', handleScroll);
@@ -83,7 +96,7 @@ export default function Landing() {
         <div className="relative py-12">
           <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
             <div className="py-12 md:py-20">
-              <h2 className={`text-3xl font-bold text-center mb-12 transition-colors duration-300 ${isFeaturesOnPurple ? 'text-white' : 'text-black'}`}>{t('landing.howItWorks')}</h2>
+              <h2 className={`text-3xl font-bold text-center mb-12 transition-colors duration-300 ${isFeaturesOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.howItWorks')}</h2>
               <div className="mx-auto grid max-w-sm items-start gap-8 md:max-w-none md:grid-cols-3 lg:gap-16">
                 {/* Upload Photo - Interactive Flip Card */}
                 <div className="relative h-64 w-full [perspective:1000px] group">
@@ -190,6 +203,51 @@ export default function Landing() {
               </Button>
             </Link>
           </div>
+        </div>
+      </div>
+
+      {/* FAQ Section */}
+      <div ref={faqRef} className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <h2 className={`text-3xl font-bold text-center mb-8 transition-colors duration-300 ${isFaqOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.faq.title')}</h2>
+        <div className="space-y-4">
+          {[
+            { qKey: 'landing.faq.q1', aKey: 'landing.faq.a1' },
+            { qKey: 'landing.faq.q2', aKey: 'landing.faq.a2' },
+            { qKey: 'landing.faq.q3', aKey: 'landing.faq.a3' },
+          ].map((item, index) => (
+            <div key={index} className="bg-white shadow rounded-lg overflow-hidden">
+              <button
+                onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                className="w-full flex justify-between items-center py-4 px-6 text-left hover:bg-gray-100 focus:outline-none focus:ring transition-colors duration-200"
+              >
+                <span className="text-lg font-semibold">{t(item.qKey)}</span>
+                <span className="text-2xl">{openFaq === index ? '−' : '+'}</span>
+              </button>
+              <div className={`overflow-hidden transition-all duration-300 ${openFaq === index ? 'max-h-40' : 'max-h-0'}`}> 
+                <div className="px-6 pb-4 text-gray-700">
+                  {t(item.aKey)}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Testimonials Section */}
+      <div ref={testimonialsRef} className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <h2 className={`text-3xl font-bold text-center mb-8 transition-colors duration-300 ${isTestimonialsOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.testimonials.title')}</h2>
+        <div className="grid gap-8 md:grid-cols-3">
+          {[ 
+            { img: 'https://randomuser.me/api/portraits/men/5.jpg', nameKey: 'landing.testimonials.u1.name', quoteKey: 'landing.testimonials.u1.quote' },
+            { img: 'https://i.pravatar.cc/150?img=10', nameKey: 'landing.testimonials.u2.name', quoteKey: 'landing.testimonials.u2.quote' },
+            { img: 'https://i.pravatar.cc/150?img=15', nameKey: 'landing.testimonials.u3.name', quoteKey: 'landing.testimonials.u3.quote' },
+          ].map((item, idx) => (
+            <div key={idx} className="flex flex-col items-center bg-white p-6 rounded-lg shadow">
+              <img src={item.img} alt={t(item.nameKey)} className="w-16 h-16 rounded-full mb-4 object-cover" />
+              <h3 className="font-semibold mb-2">{t(item.nameKey)}</h3>
+              <p className="text-gray-600 text-center">“{t(item.quoteKey)}”</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>
