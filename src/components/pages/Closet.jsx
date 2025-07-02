@@ -65,6 +65,8 @@ export default function Closet() {
   const [renameValue, setRenameValue] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
   const [viewMode, setViewMode] = useState('albums'); // 'albums' oder 'album-content'
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [animationClass, setAnimationClass] = useState('');
 
   // Album Auswahl: Standardmäßig erstes Album auswählen
   const selectedAlbum = albums.find(a => a.id === selectedAlbumId) || albums[0];
@@ -74,20 +76,86 @@ export default function Closet() {
     initializeSampleImages();
   }, [initializeSampleImages]);
 
-  // Funktion zum Öffnen eines Albums
+  // Funktion zum Öffnen eines Albums mit Animation
   const openAlbum = (albumId) => {
-    setSelectedAlbumId(albumId);
-    setViewMode('album-content');
+    setIsTransitioning(true);
+    setAnimationClass('animate-fade-out');
+    
+    setTimeout(() => {
+      setSelectedAlbumId(albumId);
+      setViewMode('album-content');
+      setAnimationClass('animate-fade-in');
+      setIsTransitioning(false);
+    }, 300);
   };
 
-  // Funktion zum Zurückkehren zur Album-Übersicht
+  // Funktion zum Zurückkehren zur Album-Übersicht mit Animation
   const backToAlbums = () => {
-    setViewMode('albums');
-    setSelectedAlbumId(null);
+    setIsTransitioning(true);
+    setAnimationClass('animate-slide-out-right');
+    
+    setTimeout(() => {
+      setViewMode('albums');
+      setSelectedAlbumId(null);
+      setAnimationClass('animate-slide-in-left');
+      setIsTransitioning(false);
+    }, 300);
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <>
+      {/* CSS Animations for Album Transitions */}
+      <style jsx>{`
+        .animate-fade-out {
+          opacity: 0;
+          transform: scale(0.95);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .animate-fade-in {
+          opacity: 1;
+          transform: scale(1);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          animation: fadeInScale 0.3s ease-out;
+        }
+        
+        .animate-slide-out-right {
+          opacity: 0;
+          transform: translateX(20px);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .animate-slide-in-left {
+          opacity: 1;
+          transform: translateX(0);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          animation: slideInLeft 0.3s ease-out;
+        }
+        
+        @keyframes fadeInScale {
+          0% {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        
+        @keyframes slideInLeft {
+          0% {
+            opacity: 0;
+            transform: translateX(-20px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+      `}</style>
+      
+      <div className="relative min-h-screen overflow-hidden">
       {/* Decorative curved elements - different positions for variety */}
       
       {/* Top right curved element */}
@@ -126,7 +194,7 @@ export default function Closet() {
         {/* Album Verwaltung oder Album-Inhalt */}
         {viewMode === 'albums' ? (
           /* Album Grid Ansicht */
-          <div className="mb-12">
+          <div className={`mb-12 transition-all duration-300 ${animationClass}`}>
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-2xl font-semibold text-gray-800">Deine Alben</h2>
               
@@ -261,7 +329,7 @@ export default function Closet() {
         ) : (
           /* Album-Inhalt Ansicht */
           selectedAlbum && (
-            <div className="mb-12">
+            <div className={`mb-12 transition-all duration-300 ${animationClass}`}>
               {/* Zurück-Navigation und Album-Header */}
               <div className="mb-8">
                 {/* Zurück-Button */}
@@ -607,6 +675,7 @@ export default function Closet() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
