@@ -216,12 +216,43 @@ export default function HomeUpload() {
         <Card>
           <h2 className="text-xl font-semibold mb-4">{t('home.chooseClothing')}</h2>
           
-          {/* Zalando URL Input */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          {/* Single clothing image box - FIRST */}
+          <div className="relative aspect-[3/4] mb-6">
+            <DropZone
+              onFileSelect={(file) => {
+                setClothPhotoFile(file);
+                // Zalando URL zurücksetzen wenn File hochgeladen wird
+                setLocalZalandoUrl('');
+                setHomeZalandoUrl('');
+              }}
+              className="w-full h-full"
+            />
+            {localClothPhotoUrl && (
+              <div className="absolute inset-0 pointer-events-none rounded-2xl overflow-hidden">
+                <img
+                  src={localClothPhotoUrl}
+                  alt="Clothing preview"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-white px-4 text-sm font-medium text-gray-500 uppercase tracking-wider">{t('home.or')}</span>
+            </div>
+          </div>
+
+          {/* Zalando URL Input - AFTER ODER */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-3">
               {t('home.pasteZalandoUrl')}
             </label>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <input
                 type="url"
                 value={localZalandoUrl}
@@ -232,13 +263,14 @@ export default function HomeUpload() {
                 }}
                 pattern="https://www.zalando."
                 placeholder={t('home.zalandoPlaceholder')}
-                className="w-full p-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender"
+                className="flex-1 p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
               />
               <Button
                 type="button"
                 variant="outline"
                 onClick={handlePasteFromClipboard}
                 title="Aus Zwischenablage einfügen"
+                className="px-4 py-3 border-gray-200 hover:border-purple-300 hover:bg-purple-50"
               >
                 📋
               </Button>
@@ -246,54 +278,21 @@ export default function HomeUpload() {
             <Button
               onClick={extractZalandoImage}
               disabled={!localZalandoUrl || isExtracting}
-              className="mt-2"
+              className="mt-3 w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 rounded-xl transition-all duration-200"
             >
               {isExtracting ? t('home.extracting') : t('home.extractImage')}
             </Button>
-            {extractError && <p className="text-sm text-red-600 mt-1">{extractError}</p>}
-          </div>
-
-          <div className="relative">
-            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2">
-              <div className="border-t border-cream-300"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="bg-cream-100 px-2 text-sm text-gray-500">{t('home.or')}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Direct Upload */}
-          <div className="mt-6">
-            <div className="relative aspect-[3/4] mb-4">
-              <DropZone
-                onFileSelect={(file) => {
-                  setClothPhotoFile(file);
-                  // Zalando URL zurücksetzen wenn File hochgeladen wird
-                  setLocalZalandoUrl('');
-                  setHomeZalandoUrl('');
-                }}
-                className="w-full h-full"
-              />
-              {localClothPhotoUrl && ( // Use localClothPhotoUrl for condition
-                <div className="absolute inset-0 pointer-events-none">
-                  <img
-                    src={localClothPhotoUrl} // Use localClothPhotoUrl for src
-                    alt="Preview"
-                    className="w-full h-full object-cover rounded-lg"
-                  />
-                </div>
-              )}
-            </div>
+            {extractError && <p className="text-sm text-red-500 mt-2 font-medium">{extractError}</p>}
           </div>
         </Card>
       </div>
 
       {/* Try On Button */}
-      <div className="mt-8 text-center">
+      <div className="mt-12 text-center">
         <Button
           onClick={handleTryOn}
           disabled={!isValid}
-          className="w-full md:w-auto"
+          className="w-full md:w-auto px-8 py-4 text-lg font-semibold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {t('home.tryOn')}
         </Button>
