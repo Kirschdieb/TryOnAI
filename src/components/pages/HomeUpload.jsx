@@ -155,118 +155,129 @@ export default function HomeUpload() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-4xl font-bold text-center mb-8">
-        {t('home.virtualTryOn')}
-      </h1>
-      
-      <div className="grid md:grid-cols-2 gap-8">
-        {/* User Photo Upload */}
-        <Card>
-          <h2 className="text-xl font-semibold mb-4">{t('home.uploadYourPhoto')}</h2>
-          <div className="relative aspect-[3/4] mb-4">
-            <DropZone
-              onFileSelect={setUserPhotoFile} // setUserPhotoFile will receive the File object
-              className="w-full h-full"
-            />
-            {userPhotoPreviewUrl && (
-              <div className="absolute inset-0 pointer-events-none">
-                <img
-                  src={userPhotoPreviewUrl} // Use the blob URL for preview
-                  alt="Preview"
-                  className="w-full h-full object-cover rounded-lg"
-                />
-              </div>
-            )}
-          </div>
-        </Card>
-
-        {/* Clothing Upload */}
-        <Card>
-          <h2 className="text-xl font-semibold mb-4">{t('home.chooseClothing')}</h2>
-          
-          {/* Zalando URL Input */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('home.pasteZalandoUrl')}
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="url"
-                value={localZalandoUrl}
-                onChange={(e) => {
-                  const newUrl = e.target.value;
-                  setLocalZalandoUrl(newUrl);
-                  setHomeZalandoUrl(newUrl);
-                }}
-                pattern="https://www.zalando."
-                placeholder={t('home.zalandoPlaceholder')}
-                className="w-full p-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handlePasteFromClipboard}
-                title="Aus Zwischenablage einfügen"
-              >
-                📋
-              </Button>
-            </div>
-            <Button
-              onClick={extractZalandoImage}
-              disabled={!localZalandoUrl || isExtracting}
-              className="mt-2"
-            >
-              {isExtracting ? t('home.extracting') : t('home.extractImage')}
-            </Button>
-            {extractError && <p className="text-sm text-red-600 mt-1">{extractError}</p>}
-          </div>
-
-          <div className="relative">
-            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2">
-              <div className="border-t border-cream-300"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="bg-cream-100 px-2 text-sm text-gray-500">{t('home.or')}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Direct Upload */}
-          <div className="mt-6">
+    <section className="relative overflow-hidden">
+      {/* Custom Purple Gradient Background */}
+      <div
+        className="fixed -top-24 left-1/2 -translate-x-1/2 w-screen h-1/2-screen -z-20 rotate-[-6deg] rounded-bl-[120px]"
+        style={{
+          background: 'linear-gradient(100deg, #7f3ffb 0%, #e14eca 100%)',
+          minWidth: '100vw',
+        }}
+        aria-hidden="true"
+      />
+      {/* Soft shadow for depth */}
+      <div
+        className="fixed -top-24 left-1/2 -translate-x-1/2 w-screen h-[60vh] -z-30 rotate-[-6deg] rounded-bl-[120px] opacity-30 blur-2xl"
+        style={{ background: 'linear-gradient(100deg, #7f3ffb 0%, #e14eca 100%)', minWidth: '100vw' }}
+      />
+      <div className="max-w-4xl mx-auto px-4">
+        <h1 className="text-4xl md:text-5xl font-bold text-center mb-12 text-white drop-shadow-lg">
+          {t('home.virtualTryOn')}
+        </h1>
+        <div className="grid md:grid-cols-2 gap-12">
+          {/* User Photo Upload */}
+          <Card className="relative hover:shadow-lg transition-shadow duration-200">
+            <span className="absolute -top-3 left-4 bg-purple-700 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">1</span>
+            <h2 className="text-xl font-semibold mb-4 mt-2 pl-12">{t('home.uploadYourPhoto')}</h2>
             <div className="relative aspect-[3/4] mb-4">
               <DropZone
-                onFileSelect={(file) => {
-                  setClothPhotoFile(file);
-                  // Zalando URL zurücksetzen wenn File hochgeladen wird
-                  setLocalZalandoUrl('');
-                  setHomeZalandoUrl('');
-                }}
-                className="w-full h-full"
+                onFileSelect={setUserPhotoFile} // setUserPhotoFile will receive the File object
+                className="w-full h-full rounded-lg border-2 border-dashed border-gray-300"
               />
-              {localClothPhotoUrl && ( // Use localClothPhotoUrl for condition
+              {userPhotoPreviewUrl && (
                 <div className="absolute inset-0 pointer-events-none">
                   <img
-                    src={localClothPhotoUrl} // Use localClothPhotoUrl for src
+                    src={userPhotoPreviewUrl} // Use the blob URL for preview
                     alt="Preview"
                     className="w-full h-full object-cover rounded-lg"
                   />
                 </div>
               )}
             </div>
-          </div>
-        </Card>
-      </div>
+          </Card>
 
-      {/* Try On Button */}
-      <div className="mt-8 text-center">
-        <Button
-          onClick={handleTryOn}
-          disabled={!isValid}
-          className="w-full md:w-auto"
-        >
-          {t('home.tryOn')}
-        </Button>
+          {/* Clothing Upload */}
+          <Card className="relative hover:shadow-lg transition-shadow duration-200">
+            <span className="absolute -top-3 left-4 bg-purple-700 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">2</span>
+            <h2 className="text-xl font-semibold mb-4 mt-2 pl-12">{t('home.chooseClothing')}</h2>
+            
+            {/* Zalando URL Input */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('home.pasteZalandoUrl')}
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  value={localZalandoUrl}
+                  onChange={(e) => {
+                    const newUrl = e.target.value;
+                    setLocalZalandoUrl(newUrl);
+                    setHomeZalandoUrl(newUrl);
+                  }}
+                  pattern="https://www.zalando."
+                  placeholder={t('home.zalandoPlaceholder')}
+                  className="w-full p-2 border border-cream-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handlePasteFromClipboard}
+                  title="Aus Zwischenablage einfügen"
+                >
+                  📋
+                </Button>
+              </div>
+              <Button
+                onClick={extractZalandoImage}
+                disabled={!localZalandoUrl || isExtracting}
+                className="mt-2"
+              >
+                {isExtracting ? t('home.extracting') : t('home.extractImage')}
+              </Button>
+              {extractError && <p className="text-sm text-red-600 mt-1">{extractError}</p>}
+            </div>
+
+            <div className="relative mt-6">
+              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2">
+                <div className="border-t border-gray-300"></div>
+              </div>
+            </div>
+
+            {/* Direct Upload */}
+            <div className="mt-6">
+              <div className="relative aspect-[3/4] mb-4">
+                <DropZone
+                  onFileSelect={(file) => {
+                    setClothPhotoFile(file);
+                  }}
+                  className="w-full h-full rounded-lg border-2 border-dashed border-gray-300"
+                />
+                {localClothPhotoUrl && ( // Use localClothPhotoUrl for condition
+                  <div className="absolute inset-0 pointer-events-none">
+                    <img
+                      src={localClothPhotoUrl} // Use localClothPhotoUrl for src
+                      alt="Preview"
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Try On Button */}
+        <div className="mt-8 text-center">
+          <Button
+            onClick={handleTryOn}
+            disabled={!isValid}
+            className="bg-purple-700 text-white hover:bg-purple-800 px-8 py-3 rounded-lg transition-colors duration-200 w-full md:w-auto"
+          >
+            {t('home.tryOn')}
+          </Button>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
