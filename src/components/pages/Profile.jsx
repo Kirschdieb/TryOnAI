@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLanguage } from '../../contexts/LanguageContext';
+import Card from '../ui/Card';
 
 export default function ProfilePage() {
   const { t } = useLanguage();
@@ -266,147 +267,198 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto py-10">
-      {/* Header with Logout */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">{t('profile.title')}</h1>
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition"
-        >
-          {t('profile.logout')}
-        </button>
-      </div>
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Decorative curved elements - consistent with Closet page */}
+      
+      {/* Top right curved element */}
+      <div
+        className="fixed top-0 right-0 w-72 h-72 translate-x-18 -translate-y-18 -z-10"
+        style={{
+          background: 'linear-gradient(225deg, #7f3ffb 0%, #e14eca 100%)',
+          borderRadius: '0 0 0 100%',
+          transform: 'translate(25%, -25%)',
+        }}
+        aria-hidden="true"
+      />
+      
+      {/* Bottom left curved element */}
+      <div
+        className="fixed bottom-0 left-0 w-88 h-88 -translate-x-22 translate-y-22 -z-10"
+        style={{
+          background: 'linear-gradient(45deg, #7f3ffb 0%, #e14eca 100%)',
+          borderRadius: '0 100% 0 0',
+          transform: 'translate(-25%, 25%)',
+        }}
+        aria-hidden="true"
+      />
 
-      {/* Profile Picture Section */}
-      <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-10">
-        <div className="flex flex-col items-center flex-1">
-          <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border-2 border-gray-300 mb-2">
-            {profile.imageUrl && isValidBase64Image(profile.imageUrl) ? (
-              <img 
-                src={profile.imageUrl} 
-                alt="Profilbild" 
-                className="object-cover w-full h-full"
-              />
-            ) : (
-              <span className="text-gray-400">{t('profile.profileImage')}</span>
-            )}
-          </div>
-          <div className="font-semibold text-lg mb-1">{profile.name || "Max Mustermann"}</div>
-          <div className="mt-2">
-            <button 
-              type="button" 
-              onClick={() => document.getElementById('profileImage').click()}
-              className="flex items-center gap-2 border-2 border-blue-500 text-blue-500 px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition"
-            >
-              <span className="text-xl">+</span> {t('profile.upload')}
-            </button>
-            <input
-              id="profileImage"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageChange}
-            />
-          </div>
+      <div className="max-w-6xl mx-auto px-4 py-8 relative z-10">
+        {/* Page Title */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-purple-700 mb-4">
+            {t('profile.title')}
+          </h1>
+          <p className="text-xl text-purple-600 max-w-3xl mx-auto">
+            {t('profile.subtitle') || 'Verwalte dein Profil und deine persönlichen Daten'}
+          </p>
         </div>
-        <div className="flex-1 flex flex-col items-center md:items-start">
-          <div className="text-gray-700 font-medium mb-2">{t('profile.requirements')}</div>
-          <ul className="text-gray-500 text-sm list-disc pl-5">
-            <li>{t('profile.req1')}</li>
-            <li>{t('profile.req2')}</li>
-          </ul>
-        </div>
-      </div>
 
-      {/* Profile Form */}
-      <form onSubmit={handleSubmit} className="space-y-8">
-        <div>
-          <h3 className="font-semibold text-lg mb-2 border-b border-gray-200 pb-1">{t('profile.profileInfo')}</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">{t('profile.name')}</label>
-              <input
-                type="text"
-                name="name"
-                value={profile.name}
-                onChange={handleChange}
-                className="w-full bg-gray-100 border-none rounded px-3 py-2"
-                placeholder={t('profile.placeholder')}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">{t('profile.email')}</label>
-              <input
-                type="email"
-                name="email"
-                value={profile.email}
-                onChange={handleChange}
-                className="w-full bg-gray-100 border-none rounded px-3 py-2"
-                placeholder={t('profile.placeholder')}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">{t('profile.phone')}</label>
-              <input
-                type="tel"
-                name="phone"
-                value={profile.phone}
-                onChange={handleChange}
-                className="w-full bg-gray-100 border-none rounded px-3 py-2"
-                placeholder={t('profile.placeholder')}
-              />
-            </div>
-          </div>
-          <div className="mt-4">
-            <label className="block text-sm font-medium mb-1">{t('profile.address')}</label>
-            <input
-              type="text"
-              name="address"
-              value={profile.address}
-              onChange={handleChange}
-              className="w-full bg-gray-100 border-none rounded px-3 py-2"
-              placeholder={t('profile.placeholder')}
-            />
-          </div>
+        {/* Header with Logout */}
+        <div className="flex justify-end items-center mb-8">
+          <button
+            onClick={handleLogout}
+            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg"
+          >
+            {t('profile.logout')}
+          </button>
         </div>
-        
-        <div>
-          <h3 className="font-semibold text-lg mb-2 border-b border-gray-200 pb-1">{t('profile.bodyMeasurements')}</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        {/* Profile Content in Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          
+          {/* Profile Picture Card */}
+          <Card className="p-8">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+              {t('profile.profileImage')}
+            </h2>
+            
+            <div className="flex flex-col items-center">
+              <div className="w-40 h-40 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center overflow-hidden border-4 border-purple-200 mb-4 shadow-lg">
+                {profile.imageUrl && isValidBase64Image(profile.imageUrl) ? (
+                  <img 
+                    src={profile.imageUrl} 
+                    alt="Profilbild" 
+                    className="object-cover w-full h-full"
+                  />
+                ) : (
+                  <span className="text-purple-400 text-lg font-medium">{t('profile.noImage') || 'Kein Bild'}</span>
+                )}
+              </div>
+              
+              <div className="font-semibold text-xl mb-4 text-gray-800">
+                {profile.name || "Max Mustermann"}
+              </div>
+              
+              <button 
+                type="button" 
+                onClick={() => document.getElementById('profileImage').click()}
+                className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-lg"
+              >
+                <span className="text-xl">+</span> {t('profile.upload')}
+              </button>
+              <input
+                id="profileImage"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageChange}
+              />
+            </div>
+          </Card>
+          
+          {/* Personal Information Card */}
+          <Card className="p-8">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+              {t('profile.profileInfo')}
+            </h2>
+            
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-700">{t('profile.name')}</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={profile.name}
+                    onChange={handleChange}
+                    className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                    placeholder={t('profile.placeholder')}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-700">{t('profile.email')}</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={profile.email}
+                    onChange={handleChange}
+                    className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                    placeholder={t('profile.placeholder')}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-700">{t('profile.phone')}</label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={profile.phone}
+                    onChange={handleChange}
+                    className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                    placeholder={t('profile.placeholder')}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-700">{t('profile.address')}</label>
+                  <input
+                    type="text"
+                    name="address"
+                    value={profile.address}
+                    onChange={handleChange}
+                    className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                    placeholder={t('profile.placeholder')}
+                  />
+                </div>
+              </div>
+            </form>
+          </Card>
+        </div>
+
+        {/* Body Measurements Card */}
+        <Card className="p-8 mb-8">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+            {t('profile.bodyMeasurements')}
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium mb-1">{t('profile.height')}</label>
+              <label className="block text-sm font-medium mb-2 text-gray-700">{t('profile.height')}</label>
               <input
                 type="text"
                 name="height"
                 value={profile.height}
                 onChange={handleChange}
-                className="w-full bg-gray-100 border-none rounded px-3 py-2"
+                className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                 placeholder={t('profile.placeholder')}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">{t('profile.circumference')}</label>
+              <label className="block text-sm font-medium mb-2 text-gray-700">{t('profile.circumference')}</label>
               <input
                 type="text"
                 name="size"
                 value={profile.size}
                 onChange={handleChange}
-                className="w-full bg-gray-100 border-none rounded px-3 py-2"
+                className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                 placeholder={t('profile.placeholder')}
               />
             </div>
           </div>
-        </div>
+        </Card>
         
-        {/* TryOn Photo Section */}
-        <div>
-          <h3 className="font-semibold text-lg mb-2 border-b border-gray-200 pb-1">{t('profile.tryOnPhoto')}</h3>
-          <div className="flex flex-col md:flex-row gap-8 items-center">
-            <div className="flex gap-4">
+        {/* TryOn Photos Card */}
+        <Card className="p-8 mb-8">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+            {t('profile.tryOnPhoto')}
+          </h2>
+          
+          <div className="flex flex-col lg:flex-row gap-8 items-start">
+            <div className="flex gap-6 justify-center lg:justify-start flex-wrap">
               {/* Front Photo */}
               <div className="flex flex-col items-center">
-                <div className="w-40 h-56 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                <div className="w-40 h-56 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl flex items-center justify-center overflow-hidden border-2 border-purple-200 shadow-lg">
                   {profile.tryonImageFrontUrl && isValidBase64Image(profile.tryonImageFrontUrl) ? (
                     <img 
                       src={profile.tryonImageFrontUrl} 
@@ -414,13 +466,13 @@ export default function ProfilePage() {
                       className="object-cover w-full h-full"
                     />
                   ) : (
-                    <span className="text-gray-400">{t('profile.tryOnFront')}</span>
+                    <span className="text-purple-400 text-center text-sm font-medium">{t('profile.tryOnFront')}</span>
                   )}
                 </div>
                 <button 
                   type="button" 
                   onClick={() => document.getElementById('tryonImageFront').click()}
-                  className="mt-2 flex items-center gap-1 border border-blue-500 text-blue-500 px-3 py-1 rounded text-sm font-medium hover:bg-blue-50 transition"
+                  className="mt-3 flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 shadow-md"
                 >
                   <span className="text-sm">+</span> {t('profile.front')}
                 </button>
@@ -435,7 +487,7 @@ export default function ProfilePage() {
               
               {/* Back Photo */}
               <div className="flex flex-col items-center">
-                <div className="w-40 h-56 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                <div className="w-40 h-56 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl flex items-center justify-center overflow-hidden border-2 border-purple-200 shadow-lg">
                   {profile.tryonImageBackUrl && isValidBase64Image(profile.tryonImageBackUrl) ? (
                     <img 
                       src={profile.tryonImageBackUrl} 
@@ -443,13 +495,13 @@ export default function ProfilePage() {
                       className="object-cover w-full h-full"
                     />
                   ) : (
-                    <span className="text-gray-400">{t('profile.tryOnBack')}</span>
+                    <span className="text-purple-400 text-center text-sm font-medium">{t('profile.tryOnBack')}</span>
                   )}
                 </div>
                 <button 
                   type="button" 
                   onClick={() => document.getElementById('tryonImageBack').click()}
-                  className="mt-2 flex items-center gap-1 border border-blue-500 text-blue-500 px-3 py-1 rounded text-sm font-medium hover:bg-blue-50 transition"
+                  className="mt-3 flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 shadow-md"
                 >
                   <span className="text-sm">+</span> {t('profile.back')}
                 </button>
@@ -463,9 +515,9 @@ export default function ProfilePage() {
               </div>
             </div>
             
-            <div className="flex flex-col items-center md:items-start">
-              <div className="text-gray-700 font-medium mb-2 mt-2">{t('profile.requirements')}</div>
-              <ul className="text-gray-500 text-sm list-disc pl-5">
+            <div className="flex-1">
+              <div className="text-gray-700 font-medium mb-4">{t('profile.requirements')}</div>
+              <ul className="text-gray-500 text-sm list-disc pl-5 space-y-2">
                 <li>{t('profile.req1')}</li>
                 <li>{t('profile.req2')}</li>
                 <li>{t('profile.req3')}</li>
@@ -473,17 +525,19 @@ export default function ProfilePage() {
               </ul>
             </div>
           </div>
-        </div>
-        
-        <div className="flex justify-end">
+        </Card>
+
+        {/* Save Button */}
+        <div className="flex justify-center">
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded transition"
+            onClick={handleSubmit}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-4 px-12 rounded-xl transition-all duration-200 shadow-lg text-lg"
           >
             {t('profile.saveProfile')}
           </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 }

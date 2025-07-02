@@ -5,198 +5,128 @@ export default function About() {
   const { t, language } = useLanguage();
   
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold text-center mb-8">
-        {language === 'de' ? 'Über TryOnAI' : 'About TryOnAI'}
-      </h1>
 
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-purple-100 to-blue-100 rounded-xl p-8 mb-12 text-center">
-        <h2 className="text-2xl font-semibold mb-4">
-          {language === 'de' 
-            ? 'Künstliche Intelligenz trifft auf Mode' 
-            : 'Artificial Intelligence meets Fashion'}
-        </h2>
-        <p className="text-lg text-gray-700">
-          {language === 'de' 
-            ? 'Ein innovatives Universitätsprojekt, das die Zukunft des Online-Shoppings erforscht'
-            : 'An innovative university project exploring the future of online shopping'}
-        </p>
-      </div>
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Decorative curved elements - consistent with other pages */}
+      
+      {/* Top right curved element */}
+      <div
+        className="fixed top-0 right-0 w-72 h-72 translate-x-18 -translate-y-18 -z-10"
+        style={{
+          background: 'linear-gradient(225deg, #7f3ffb 0%, #e14eca 100%)',
+          borderRadius: '0 0 0 100%',
+          transform: 'translate(25%, -25%)',
+        }}
+        aria-hidden="true"
+      />
+      
+      {/* Bottom left curved element */}
+      <div
+        className="fixed bottom-0 left-0 w-88 h-88 -translate-x-22 translate-y-22 -z-10"
+        style={{
+          background: 'linear-gradient(45deg, #7f3ffb 0%, #e14eca 100%)',
+          borderRadius: '0 100% 0 0',
+          transform: 'translate(-25%, 25%)',
+        }}
+        aria-hidden="true"
+      />
 
-      {/* Projekt Info */}
-      <section className="mb-16">
-        <h2 className="text-3xl font-semibold mb-8">
-          {language === 'de' ? 'Das Projekt' : 'The Project'}
-        </h2>
-        <div className="grid md:grid-cols-2 gap-10">
-          <Card>
-            <h3 className="text-xl font-semibold mb-4 text-purple-600">
-              {language === 'de' ? 'Was ist TryOnAI?' : 'What is TryOnAI?'}
-            </h3>
-            <p className="text-gray-700 mb-4">
-              {language === 'de' 
-                ? 'TryOnAI ist eine innovative Web-Anwendung, die Künstliche Intelligenz nutzt, um virtuelle Anproben von Kleidungsstücken zu ermöglichen. Nutzer können Fotos von sich hochladen und verschiedene Kleidungsstücke digital "anprobieren".'
-                : 'TryOnAI is an innovative web application that uses artificial intelligence to enable virtual try-ons of clothing items. Users can upload photos of themselves and digitally "try on" various clothing pieces.'}
+      <div className="max-w-6xl mx-auto px-4 py-8 relative z-10">
+        {/* Page Title */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-purple-700 mb-4">
+            {t('about.title')}
+          </h1>
+          <p className="text-xl text-purple-600 max-w-3xl mx-auto">
+            {t('about.subtitle') || 'Erfahre mehr über unsere Vision und Technologie'}
+          </p>
+        </div>
+
+        {/* Content Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          
+          {/* Mission Card */}
+          <Card className="p-8 col-span-1 lg:col-span-2">
+            <h2 className="text-3xl font-semibold mb-6 text-gray-800 text-center">
+              {t('about.mission')}
+            </h2>
+            <p className="text-gray-600 leading-relaxed text-lg text-center max-w-4xl mx-auto">
+              {t('about.missionText')}
             </p>
-            <ul className="text-gray-600 space-y-2">
-              <li>✨ {language === 'de' ? 'KI-gestützte Bildverarbeitung' : 'AI-powered image processing'}</li>
-              <li>👕 {language === 'de' ? 'Virtuelle Anprobe-Technologie' : 'Virtual try-on technology'}</li>
-              <li>🖼️ {language === 'de' ? 'Persönlicher Kleiderschrank' : 'Personal wardrobe'}</li>
-              <li>🛍️ {language === 'de' ? 'Integration mit Online-Shopping' : 'Integration with online shopping'}</li>
+          </Card>
+
+          {/* How It Works Card */}
+          <Card className="p-8">
+            <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+              {t('about.howItWorks')}
+            </h2>
+            <div className="space-y-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <span className="text-white font-bold text-lg">1</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2 text-lg text-gray-800">{t('about.step1Title')}</h3>
+                  <p className="text-gray-600">{t('about.step1Text')}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <span className="text-white font-bold text-lg">2</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2 text-lg text-gray-800">{t('about.step2Title')}</h3>
+                  <p className="text-gray-600">{t('about.step2Text')}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <span className="text-white font-bold text-lg">3</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-2 text-lg text-gray-800">{t('about.step3Title')}</h3>
+                  <p className="text-gray-600">{t('about.step3Text')}</p>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Technology Card */}
+          <Card className="p-8">
+            <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+              {t('about.technology')}
+            </h2>
+            <p className="text-gray-600 leading-relaxed mb-6">
+              {t('about.technologyText')}
+            </p>
+            <ul className="space-y-3">
+              <li className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full"></div>
+                <span className="text-gray-600">{t('about.tech1')}</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full"></div>
+                <span className="text-gray-600">{t('about.tech2')}</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full"></div>
+                <span className="text-gray-600">{t('about.tech3')}</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full"></div>
+                <span className="text-gray-600">{t('about.tech4')}</span>
+              </li>
             </ul>
           </Card>
-
-          <Card>
-            <h3 className="text-xl font-semibold mb-4 text-blue-600">
-              {language === 'de' ? 'Universitätskontext' : 'University Context'}
-            </h3>
-            <div className="space-y-3 text-gray-700">
-              <div className="flex justify-between">
-                <span className="font-medium">
-                  {language === 'de' ? 'Studiengang:' : 'Program:'}
-                </span>
-                <span>Digital Product Innovation</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-medium">
-                  {language === 'de' ? 'Semester:' : 'Semester:'}
-                </span>
-                <span>Wintersemester 2024/25</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-medium">
-                  {language === 'de' ? 'Hochschule:' : 'University:'}
-                </span>
-                <span>Friedrich Schiller Universität Jena</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-medium">
-                  {language === 'de' ? 'Betreuung:' : 'Supervision:'}
-                </span>
-                <span>Prof. Dr. Wessel</span>
-              </div>
-            </div>
-          </Card>
         </div>
-      </section>
 
-      {/* Wie es funktioniert */}
-      <Card className="mb-16">
-        <h2 className="text-2xl font-semibold mb-4">{t('about.howItWorks')}</h2>
-        <div className="space-y-4">
-          <div className="flex items-start gap-4">
-            <div className="w-8 h-8 bg-lavender rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-semibold">1</span>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-1">{t('about.step1Title')}</h3>
-              <p className="text-gray-600">{t('about.step1Text')}</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-4">
-            <div className="w-8 h-8 bg-lavender rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-semibold">2</span>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-1">{t('about.step2Title')}</h3>
-              <p className="text-gray-600">{t('about.step2Text')}</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-4">
-            <div className="w-8 h-8 bg-lavender rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-semibold">3</span>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-1">{t('about.step3Title')}</h3>
-              <p className="text-gray-600">{t('about.step3Text')}</p>
-            </div>
-          </div>
-        </div>
-      </Card>
+        {/* Privacy Card - Full Width */}
+        <Card className="p-8">
+          <h2 className="text-2xl font-semibold mb-6 text-gray-800 text-center">
+            {t('about.privacy')}
+          </h2>
+          <p className="text-gray-600 leading-relaxed text-center max-w-4xl mx-auto">
 
-      {/* Team Section */}
-      <section className="mb-16">
-        <h2 className="text-3xl font-semibold mb-8 text-center">
-          {language === 'de' ? 'Unser Team' : 'Our Team'}
-        </h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <Card className="text-center">
-            <div className="w-24 h-24 mx-auto mb-6 bg-purple-200 rounded-full flex items-center justify-center">
-              <span className="text-2xl">👨‍💻</span>
-            </div>
-            <h3 className="font-semibold text-lg mb-3">Max Franke</h3>
-            <p className="text-gray-600 mb-3">
-              {language === 'de' ? 'Platzhalter' : 'Placeholder'}
-            </p>
-            <p className="text-sm text-gray-500">
-              {language === 'de' 
-                ? 'Platzhalter' : 'Placeholder'}
-            </p>
-          </Card>
-
-          <Card className="text-center">
-            <div className="w-24 h-24 mx-auto mb-6 bg-blue-200 rounded-full flex items-center justify-center">
-              <span className="text-2xl">�‍💻</span>
-            </div>
-            <h3 className="font-semibold text-lg mb-3">Felix Heuchert</h3>
-            <p className="text-gray-600 mb-3">
-              {language === 'de' ? 'Platzhalter' : 'Placeholder'}
-            </p>
-            <p className="text-sm text-gray-500">
-              {language === 'de' 
-                ? 'Platzhalter' : 'Placeholder'}
-            </p>
-          </Card>
-
-          <Card className="text-center">
-            <div className="w-24 h-24 mx-auto mb-6 bg-green-200 rounded-full flex items-center justify-center">
-              <span className="text-2xl">👨‍💻</span>
-            </div>
-            <h3 className="font-semibold text-lg mb-3">Jonas Oppermann</h3>
-            <p className="text-gray-600 mb-3">
-              {language === 'de' ? 'Platzhalter' : 'Placeholder'}
-            </p>
-            <p className="text-sm text-gray-500">
-              {language === 'de' 
-                ? 'Platzhalter' : 'Placeholder'}
-            </p>
-          </Card>
-
-          <Card className="text-center">
-            <div className="w-24 h-24 mx-auto mb-6 bg-orange-200 rounded-full flex items-center justify-center">
-              <span className="text-2xl">👨‍💻</span>
-            </div>
-            <h3 className="font-semibold text-lg mb-3">Nils Kriz</h3>
-            <p className="text-gray-600 mb-3">
-              {language === 'de' ? 'Platzhalter' : 'Placeholder'}
-            </p>
-            <p className="text-sm text-gray-500">
-              {language === 'de' 
-                ? 'Platzhalter' : 'Placeholder'}
-            </p>
-          </Card>
-        </div>
-      </section>
-
-        {/* Technologie */}
-        <Card className="mb-16">
-          <h2 className="text-2xl font-semibold mb-4">{t('about.technology')}</h2>
-          <p className="text-gray-600 leading-relaxed mb-4">
-            {t('about.technologyText')}
-          </p>
-          <ul className="list-disc list-inside space-y-2 text-gray-600">
-            <li>{t('about.tech1')}</li>
-            <li>{t('about.tech2')}</li>
-            <li>{t('about.tech3')}</li>
-            <li>{t('about.tech4')}</li>
-          </ul>
-        </Card>
-
-        {/* Datenschutz & Sicherheit */}
-        <Card className="mb-16">
-          <h2 className="text-2xl font-semibold mb-4">{t('about.privacy')}</h2>
-          <p className="text-gray-600 leading-relaxed">
             {t('about.privacyText')}
           </p>
         </Card>
