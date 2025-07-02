@@ -1,36 +1,79 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 import MobileDrawer from './MobileDrawer';
 
 export default function Navbar() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { language, toggleLanguage, t } = useLanguage();
+  const location = useLocation();
+
+  // Funktion um zu prüfen ob der Link aktiv ist
+  const isActive = (path) => {
+    if (path === '/' && location.pathname === '/') return true;
+    if (path !== '/' && location.pathname.startsWith(path)) return true;
+    return false;
+  };
 
   return (
-    <nav className="sticky top-0 bg-cream-100 shadow-sm z-50">
+    <nav className="sticky top-0 bg-white shadow-sm z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="font-bold text-xl text-lavender flex-shrink-0">
+          <Link to="/" className="font-bold text-xl text-purple-600 flex-shrink-0">
             TryOnAI
           </Link>
 
           {/* Desktop Navigation - Zentriert */}
-          <div className="hidden md:flex items-center justify-center space-x-8 flex-1">
-            <Link to="/" className="text-gray-600 hover:text-lavender font-medium transition-colors">
+          <div className="hidden md:flex items-center justify-center space-x-2 flex-1">
+            <Link 
+              to="/" 
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                isActive('/') 
+                  ? 'bg-purple-600 text-white shadow-md' 
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
               {t('nav.home')}
             </Link>
-            <Link to="/try-on" className="text-gray-600 hover:text-lavender font-medium transition-colors">
+            <Link 
+              to="/try-on" 
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                isActive('/try-on') 
+                  ? 'bg-purple-600 text-white shadow-md' 
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
               {t('nav.tryOn')}
             </Link>
-            <Link to="/closet" className="text-gray-600 hover:text-lavender font-medium transition-colors">
+            <Link 
+              to="/closet" 
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                isActive('/closet') 
+                  ? 'bg-purple-600 text-white shadow-md' 
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
               {t('nav.closet')}
             </Link>
-            <Link to="/profile" className="text-gray-600 hover:text-lavender font-medium transition-colors">
+            <Link 
+              to="/profile" 
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                isActive('/profile') 
+                  ? 'bg-purple-600 text-white shadow-md' 
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
               {t('nav.profile')}
             </Link>
-            <Link to="/about" className="text-gray-600 hover:text-lavender font-medium transition-colors">
+            <Link 
+              to="/about" 
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                isActive('/about') 
+                  ? 'bg-purple-600 text-white shadow-md' 
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
               {t('nav.about')}
             </Link>
           </div>
@@ -40,7 +83,7 @@ export default function Navbar() {
             {/* Language Switcher */}
             <button
               onClick={toggleLanguage}
-              className="px-3 py-1.5 text-sm border border-lavender text-lavender hover:bg-lavender hover:text-white rounded-lg transition-all duration-200 font-medium"
+              className="px-3 py-1.5 text-sm border border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white rounded-lg transition-all duration-200 font-medium"
             >
               {language === 'de' ? 'EN' : 'DE'}
             </button>
@@ -49,7 +92,7 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsDrawerOpen(true)}
-            className="md:hidden p-2 rounded-lg hover:bg-cream-200"
+            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-all duration-200"
           >
             <svg
               className="w-6 h-6"
