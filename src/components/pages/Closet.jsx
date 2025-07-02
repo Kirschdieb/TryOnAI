@@ -148,7 +148,7 @@ export default function Closet() {
                     </h4>
                     
                     {/* Kleidungsstück Info */}
-                    {img.clothingItem && (
+                    {img.clothingItem ? (
                       <div className="flex items-center space-x-3">
                         {img.clothingItem.image && (
                           <img 
@@ -171,6 +171,23 @@ export default function Closet() {
                               Produkt ansehen →
                             </a>
                           )}
+                        </div>
+                      </div>
+                    ) : (
+                      // Fallback für hochgeladene Bilder ohne Produktinformationen
+                      <div className="flex items-center space-x-3">
+                        <div className="w-12 h-12 bg-gray-100 rounded border flex items-center justify-center">
+                          <span className="text-gray-400 text-xs">📷</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm text-gray-600">
+                            {language === 'de' ? 'Eigenes Kleidungsstück' : 'Own Clothing Item'}
+                          </p>
+                          <p className="text-xs text-gray-500 italic">
+                            {language === 'de' 
+                              ? 'Dieses Foto wurde von Ihnen hochgeladen' 
+                              : 'This photo was uploaded by you'}
+                          </p>
                         </div>
                       </div>
                     )}
