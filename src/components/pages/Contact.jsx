@@ -202,7 +202,10 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="font-semibold">E-Mail</h3>
-                  <p className="text-gray-600">info@tryonai.de</p>
+                  <ul className="space-y-2 text-sm text-gray-600"> 
+                    <li><a href="mailto:info@tryonai.de" className="hover:text-black transition-colors">info@tryonai.de</a></li>
+                    </ul>
+                  
                   <p className="text-sm text-gray-500">
                     {language === 'de' 
                       ? 'Wir antworten normalerweise innerhalb von 24 Stunden'
@@ -219,9 +222,9 @@ export default function Contact() {
                   <h3 className="font-semibold">
                     {language === 'de' ? 'Universitätsprojekt' : 'University Project'}
                   </h3>
-                  <p className="text-gray-600">[Ihre Universität]</p>
+                  <p className="text-gray-600">Friedrich-Schiller Universität</p>
                   <p className="text-sm text-gray-500">
-                    Digital Product Development & Innovation
+                    Digital Product Innovation
                   </p>
                 </div>
               </div>

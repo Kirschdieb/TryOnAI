@@ -215,8 +215,8 @@ export default function Datenschutz() {
         <div className="text-sm text-gray-500 mt-8 p-4 bg-gray-100 rounded-lg">
           <p>
             {language === 'de' 
-              ? 'Letzte Aktualisierung: Januar 2025 | Diese Datenschutzerklärung gilt für das Universitätsprojekt TryOnAI.'
-              : 'Last updated: January 2025 | This privacy policy applies to the university project TryOnAI.'}
+              ? 'Letzte Aktualisierung: Juli 2025 | Diese Datenschutzerklärung gilt für das Universitätsprojekt TryOnAI.'
+              : 'Last updated: July 2025 | This privacy policy applies to the university project TryOnAI.'}
           </p>
         </div>
       </div>

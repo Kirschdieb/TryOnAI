@@ -4,20 +4,20 @@ export default function Footer() {
   return (
     <footer className="bg-gray-900 text-white mt-16">
       <div className="max-w-6xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mx-auto max-w-4xl">
           
           {/* Produkt */}
-          <div>
+          <div className="text-center">
             <h3 className="font-semibold mb-4">TryOnAI</h3>
             <ul className="space-y-2 text-sm text-gray-300">
               <li><Link to="/about" className="hover:text-white transition-colors">Über uns</Link></li>
-              <li><Link to="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
+              <li><Link to="/faq" className="hover:text-white transition-colors">Hilfe & FAQ</Link></li>
               <li><Link to="/contact" className="hover:text-white transition-colors">Kontakt</Link></li>
             </ul>
           </div>
 
           {/* Features */}
-          <div>
+          <div className="text-center">
             <h3 className="font-semibold mb-4">Features</h3>
             <ul className="space-y-2 text-sm text-gray-300">
               <li><Link to="/try-on" className="hover:text-white transition-colors">Try-On Studio</Link></li>
@@ -26,18 +26,8 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Support */}
-          <div>
-            <h3 className="font-semibold mb-4">Support</h3>
-            <ul className="space-y-2 text-sm text-gray-300">
-              <li><Link to="/faq" className="hover:text-white transition-colors">Hilfe & FAQ</Link></li>
-              <li><Link to="/contact" className="hover:text-white transition-colors">Kontakt</Link></li>
-              <li><a href="mailto:info@tryonai.de" className="hover:text-white transition-colors">info@tryonai.de</a></li>
-            </ul>
-          </div>
-
           {/* Rechtliches */}
-          <div>
+          <div className="text-center">
             <h3 className="font-semibold mb-4">Rechtliches</h3>
             <ul className="space-y-2 text-sm text-gray-300">
               <li><Link to="/impressum" className="hover:text-white transition-colors">Impressum</Link></li>

@@ -45,10 +45,10 @@ export default function Impressum() {
                   : 'This project was developed as part of university studies:'}
               </strong>
             </p>
-            <p>Hochschule/Universität: [Ihre Universität]</p>
-            <p>Studiengang: Digitale Produktentwicklung & Innovation</p>
+            <p>Hochschule/Universität: Friedrich-Schiller Universität</p>
+            <p>Studiengang: Digital Product Innovation</p>
             <p>Semester: Wintersemester 2024/25</p>
-            <p>Betreuender Professor: Prof. Dr. [Name]</p>
+            <p>Betreuender Professor: Prof. Dr. Wessel</p>
           </div>
         </section>
 
