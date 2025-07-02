@@ -5,7 +5,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 
-// Hilfskomponente für "Zu Album hinzufügen"
+// Hilfskomponente für "Zu Album hinzufügen" - kompakte Version
 function AddToAlbumSection({ selectedImage, albums, currentAlbumId, addImageToAlbum }) {
   const [targetAlbumId, setTargetAlbumId] = useState('');
   const [added, setAdded] = useState(false);
@@ -14,6 +14,7 @@ function AddToAlbumSection({ selectedImage, albums, currentAlbumId, addImageToAl
   // Nur Alben anzeigen, in denen das Bild noch nicht ist und die nicht das aktuelle Album sind
   const availableAlbums = albums.filter(a => a.id !== currentAlbumId && !a.images.some(img => img.id === selectedImage.id));
   
+
   if (availableAlbums.length === 0) return null;
   
   return (
@@ -22,6 +23,7 @@ function AddToAlbumSection({ selectedImage, albums, currentAlbumId, addImageToAl
       <div className="flex gap-2 items-center">
         <select
           className="border rounded px-2 py-1 bg-white"
+
           value={targetAlbumId}
           onChange={e => setTargetAlbumId(e.target.value)}
         >
@@ -33,16 +35,20 @@ function AddToAlbumSection({ selectedImage, albums, currentAlbumId, addImageToAl
         <Button
           variant="primary"
           disabled={!targetAlbumId || added}
+          className="px-2 py-1 text-xs"
           onClick={() => {
             addImageToAlbum(targetAlbumId, { ...selectedImage, id: selectedImage.id || Date.now().toString() + Math.random().toString(36).substr(2, 5) });
             setAdded(true);
             setTimeout(() => setAdded(false), 1200);
           }}
         >
+ Optimierung-Landingpage
           {added ? '✓' : t('closet.addToAlbum')}
         </Button>
         {added && <span className="text-green-600 ml-2">✓</span>}
+
       </div>
+      {added && <span className="text-green-600 text-xs">Hinzugefügt!</span>}
     </div>
   );
 }
@@ -103,6 +109,7 @@ export default function Closet() {
   };
 
   return (
+
     <>
       {/* CSS Animations for Album Transitions */}
       <style jsx>{`
@@ -213,6 +220,7 @@ export default function Closet() {
                 >
                   + Album
                 </Button>
+
               </form>
             </div>
 
@@ -536,12 +544,14 @@ export default function Closet() {
                   </svg>
                 </button>
 
+
                 <img
                   src={selectedImage.image}
                   alt={selectedImage.customPrompt || 'Try-On Bild'}
                   className="w-full h-auto rounded-lg"
                 />
               </div>
+
 
               {/* Bild Aktionen */}
               <div className="p-4 border-t border-gray-200">
@@ -586,6 +596,7 @@ export default function Closet() {
           </div>
         )}
       </div>
+
 
       {/* Image Detail Modal */}
       {selectedImage && (
@@ -677,5 +688,6 @@ export default function Closet() {
       )}
       </div>
     </>
+
   );
 }

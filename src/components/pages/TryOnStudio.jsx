@@ -27,7 +27,7 @@ const Studio = () => {
     { value: 'armscrossed', label: t('studio.pose.armscrossed'), icon: <ArmsCrossedIcon /> },
   ];
   const navigate = useNavigate();
-  const { userPhoto, clothPhoto, albums, addGeneratedImage, addImageToAlbum } = useCloset();
+  const { userPhoto, clothPhoto, selectedClothingItem, albums, addGeneratedImage, addImageToAlbum } = useCloset();
   const [customPrompt, setCustomPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState(null);
@@ -148,6 +148,7 @@ const Studio = () => {
       clothPhoto: extractedClothImage,
       image: result,
       customPrompt: customPrompt,
+      clothingItem: selectedClothingItem, // Add clothing item information
       timestamp: new Date().toISOString(),
     };
     

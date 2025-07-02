@@ -523,6 +523,21 @@ export default function Landing() {
             ))}
           </div>
         </div>
+        
+        {/* Question not found? Section - directly after FAQ questions */}
+        <div className="mt-8 text-center">
+          <div className="bg-gray-800 text-white rounded-lg p-6 max-w-md mx-auto">
+            <p className="text-sm mb-3">
+              {t('landing.questionNotFound')}
+            </p>
+            <Link 
+              to="/faq" 
+              className="text-purple-400 hover:text-purple-300 text-sm font-medium transition-colors hover:underline"
+            >
+              {t('landing.goToFAQSection')}
+            </Link>
+          </div>
+        </div>
       </div>
 
       {/* Testimonials Section */}

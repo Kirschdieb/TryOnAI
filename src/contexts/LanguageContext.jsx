@@ -55,8 +55,10 @@ const translations = {
     'landing.faq.a2': 'Wir unterstützen JPG, PNG und GIF.',
     'landing.faq.q3': 'Ist meine Privatsphäre sicher?',
     'landing.faq.a3': 'Ja, alle Bilder werden verschlüsselt und nur temporär verarbeitet.',
+
     
     // Testimonials Section
+
     'landing.testimonials.title': 'Was unsere Nutzer sagen',
     'landing.testimonials.badge': 'Das sagen unsere Nutzer',
     'landing.testimonials.u1.name': 'Marcus Weber',
@@ -314,6 +316,7 @@ const translations = {
     'landing.faq.a2': 'We support JPG, PNG, and GIF.',
     'landing.faq.q3': 'Is my privacy protected?',
     'landing.faq.a3': 'Yes, all images are encrypted and processed temporarily only.',
+
     
     // Testimonials Section
     'landing.testimonials.title': 'What our users say',
@@ -324,6 +327,7 @@ const translations = {
     'landing.testimonials.u2.quote': 'Incredibly realistic! The AI technology is impressive and saves me so much time shopping.',
     'landing.testimonials.u3.name': 'Anna Müller',
     'landing.testimonials.u3.quote': 'Perfect for online shopping! No more wrong purchases thanks to virtual try-on.',
+
     
     // Home/Try-On Page
     'home.title': 'AI-Powered Try-On',

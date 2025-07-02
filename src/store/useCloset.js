@@ -1,4 +1,3 @@
-
 // Hilfsfunktion: Stellt sicher, dass das "Generierte Bilder"-Album immer existiert und an erster Stelle steht
 // Muss außerhalb des Store-Objekts stehen!
 function ensureGeneratedAlbum(albums) {
@@ -123,12 +122,14 @@ import { create } from 'zustand';
 export const useCloset = create((set, get) => ({
   userPhoto: null,
   clothPhoto: null, // Photo used in the studio
+  selectedClothingItem: null, // Current selected clothing item with product info
   albums: getDefaultAlbums('de'), // Standardmäßig deutsche Alben
   homeZalandoUrl: '', // Zalando URL from HomeUpload page
   homeClothPhotoUrl: null, // Cloth photo URL from HomeUpload page (extracted or uploaded)
 
   setUserPhoto: (p) => set({ userPhoto: p }),
   setClothPhoto: (p) => set({ clothPhoto: p }),
+  setSelectedClothingItem: (item) => set({ selectedClothingItem: item }),
 
 
 

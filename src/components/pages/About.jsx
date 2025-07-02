@@ -2,9 +2,10 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import Card from '../ui/Card';
 
 export default function About() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   
   return (
+
     <div className="relative min-h-screen overflow-hidden">
       {/* Decorative curved elements - consistent with other pages */}
       
@@ -125,10 +126,68 @@ export default function About() {
             {t('about.privacy')}
           </h2>
           <p className="text-gray-600 leading-relaxed text-center max-w-4xl mx-auto">
+
             {t('about.privacyText')}
           </p>
         </Card>
-      </div>
+
+      {/* Technologie Stack */}
+      <section className="mb-16">
+        <h2 className="text-3xl font-semibold mb-6">
+          {language === 'de' ? 'Technologie Stack' : 'Technology Stack'}
+        </h2>
+        <div className="grid md:grid-cols-2 gap-10">
+          <Card>
+            <h3 className="text-xl font-semibold mb-4 text-purple-600">
+              {language === 'de' ? 'Frontend' : 'Frontend'}
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              <span className="bg-gray-100 px-3 py-2 rounded text-sm">React.js</span>
+              <span className="bg-gray-100 px-3 py-2 rounded text-sm">Tailwind CSS</span>
+              <span className="bg-gray-100 px-3 py-2 rounded text-sm">Vite</span>
+              <span className="bg-gray-100 px-3 py-2 rounded text-sm">React Router</span>
+            </div>
+          </Card>
+
+          <Card>
+            <h3 className="text-xl font-semibold mb-4 text-blue-600">
+              {language === 'de' ? 'Backend & KI' : 'Backend & AI'}
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              <span className="bg-gray-100 px-3 py-2 rounded text-sm">Node.js</span>
+              <span className="bg-gray-100 px-3 py-2 rounded text-sm">Express.js</span>
+              <span className="bg-gray-100 px-3 py-2 rounded text-sm">Python</span>
+              <span className="bg-gray-100 px-3 py-2 rounded text-sm">Machine Learning</span>
+            </div>
+          </Card>
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <Card className="text-center">
+        <h2 className="text-2xl font-semibold mb-4">
+          {language === 'de' ? 'Möchten Sie TryOnAI ausprobieren?' : 'Want to try TryOnAI?'}
+        </h2>
+        <p className="text-gray-600 mb-6">
+          {language === 'de' 
+            ? 'Entdecken Sie die Zukunft der virtuellen Anprobe und geben Sie uns Ihr Feedback!'
+            : 'Discover the future of virtual try-on and give us your feedback!'}
+        </p>
+        <div className="flex justify-center gap-4">
+          <a 
+            href="/try-on" 
+            className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            {language === 'de' ? 'Jetzt ausprobieren' : 'Try it now'}
+          </a>
+          <a 
+            href="/contact" 
+            className="border border-purple-600 text-purple-600 px-6 py-3 rounded-lg hover:bg-purple-50 transition-colors"
+          >
+            {language === 'de' ? 'Kontakt aufnehmen' : 'Get in touch'}
+          </a>
+        </div>
+      </Card>
     </div>
   );
 }
