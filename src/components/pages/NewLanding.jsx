@@ -20,6 +20,9 @@ export default function Landing() {
   const ctaRef = useRef(null);
   const [isCtaOnPurple, setIsCtaOnPurple] = useState(false);
 
+  // Scroll animation states
+  const [visibleElements, setVisibleElements] = useState(new Set());
+
   useEffect(() => {
     const handleScroll = () => {
       if (heroRef.current) {
@@ -53,8 +56,116 @@ export default function Landing() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Intersection Observer for scroll animations
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '-50px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setVisibleElements(prev => new Set(prev).add(entry.target.dataset.animateId));
+        } else {
+          // Remove from visible elements when out of view (for re-triggering animations)
+          setVisibleElements(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(entry.target.dataset.animateId);
+            return newSet;
+          });
+        }
+      });
+    }, observerOptions);
+
+    // Observe all elements with data-animate-id
+    const animatedElements = document.querySelectorAll('[data-animate-id]');
+    animatedElements.forEach(el => observer.observe(el));
+
+    // Initial trigger for elements already in view
+    setTimeout(() => {
+      animatedElements.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          setVisibleElements(prev => new Set(prev).add(el.dataset.animateId));
+        }
+      });
+    }, 100);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="relative overflow-hidden min-h-screen">
+      {/* Scroll Animation CSS */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .animate-fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          }
+          
+          .animate-fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+          }
+          
+          .animate-fade-left {
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          }
+          
+          .animate-fade-left.visible {
+            opacity: 1;
+            transform: translateX(0);
+          }
+          
+          .animate-fade-right {
+            opacity: 0;
+            transform: translateX(30px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          }
+          
+          .animate-fade-right.visible {
+            opacity: 1;
+            transform: translateX(0);
+          }
+          
+          .animate-scale-up {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          }
+          
+          .animate-scale-up.visible {
+            opacity: 1;
+            transform: scale(1);
+          }
+          
+          .animate-stagger-1 {
+            transition-delay: 0.1s;
+          }
+          
+          .animate-stagger-2 {
+            transition-delay: 0.2s;
+          }
+          
+          .animate-stagger-3 {
+            transition-delay: 0.3s;
+          }
+          
+          .animate-stagger-4 {
+            transition-delay: 0.4s;
+          }
+          
+          .animate-stagger-5 {
+            transition-delay: 0.5s;
+          }
+        `
+      }} />
+
       {/* Custom Purple Gradient Background - now full width */}
       <div
         className="fixed -top-24 left-1/2 -translate-x-1/2 w-screen h-[70vh] -z-20 rotate-[-6deg] rounded-bl-[120px]"
@@ -72,16 +183,28 @@ export default function Landing() {
       <div className="mx-auto px-4 sm:px-6 lg:px-8" ref={heroRef}>
         <div className="pb-12 pt-32 md:pb-20 md:pt-40">
           <div className="text-center">
-            <div className={`mb-6 inline-flex rounded-full px-3 py-1 text-sm font-semibold shadow transition-colors duration-300 ${isHeroOnPurple ? 'bg-white/80 text-purple-700' : 'bg-purple-100 text-purple-700'}`}>
+            <div 
+              className={`mb-6 inline-flex rounded-full px-3 py-1 text-sm font-semibold shadow transition-colors duration-300 animate-fade-up ${visibleElements.has('hero-badge') ? 'visible' : ''} ${isHeroOnPurple ? 'bg-white/80 text-purple-700' : 'bg-purple-100 text-purple-700'}`}
+              data-animate-id="hero-badge"
+            >
               {t('landing.experience')}
             </div>
-            <h1 className={`mb-8 text-5xl md:text-6xl font-bold drop-shadow-lg transition-colors duration-300 ${isHeroOnPurple ? 'text-white' : 'text-purple-700'}`}>
+            <h1 
+              className={`mb-8 text-5xl md:text-6xl font-bold drop-shadow-lg transition-colors duration-300 animate-fade-up animate-stagger-1 ${visibleElements.has('hero-title') ? 'visible' : ''} ${isHeroOnPurple ? 'text-white' : 'text-purple-700'}`}
+              data-animate-id="hero-title"
+            >
               {t('landing.title')}
             </h1>
-            <p className={`text-xl mb-8 mx-auto max-w-4xl drop-shadow transition-colors duration-300 ${isHeroOnPurple ? 'text-purple-100' : 'text-gray-700'}`}>
+            <p 
+              className={`text-xl mb-8 mx-auto max-w-4xl drop-shadow transition-colors duration-300 animate-fade-up animate-stagger-2 ${visibleElements.has('hero-subtitle') ? 'visible' : ''} ${isHeroOnPurple ? 'text-purple-100' : 'text-gray-700'}`}
+              data-animate-id="hero-subtitle"
+            >
               {t('landing.subtitle')}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+            <div 
+              className={`flex flex-col sm:flex-row gap-4 justify-center mb-16 animate-fade-up animate-stagger-3 ${visibleElements.has('hero-buttons') ? 'visible' : ''}`}
+              data-animate-id="hero-buttons"
+            >
               <Link to="/try-on">
                 <Button 
                   variant="primary"
@@ -160,10 +283,21 @@ export default function Landing() {
         <div className="relative py-12">
           <div className="relative px-4 sm:px-6 lg:px-8">
             <div className="py-12 md:py-20">
-              <h2 className={`text-3xl font-bold text-center mb-12 transition-colors duration-300 ${isFeaturesOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.howItWorks')}</h2>
-              <div className="mx-auto grid max-w-7xl items-start gap-8 md:grid-cols-3 lg:gap-16">{/* Vergrößert von max-w-sm zu max-w-7xl */}
+              <h2 
+                className={`text-3xl font-bold text-center mb-12 transition-colors duration-300 animate-fade-up ${visibleElements.has('features-title') ? 'visible' : ''} ${isFeaturesOnPurple ? 'text-white' : 'text-purple-700'}`}
+                data-animate-id="features-title"
+              >
+                {t('landing.howItWorks')}
+              </h2>
+              <div 
+                className={`mx-auto grid max-w-7xl items-start gap-8 md:grid-cols-3 lg:gap-16 animate-fade-up animate-stagger-1 ${visibleElements.has('features-grid') ? 'visible' : ''}`}
+                data-animate-id="features-grid"
+              >{/* Vergrößert von max-w-sm zu max-w-7xl */}
                 {/* 1. Upload Photo - Interactive Flip Card */}
-                <div className="relative h-64 w-full [perspective:1000px] group">
+                <div 
+                  className={`relative h-64 w-full [perspective:1000px] group animate-fade-left animate-stagger-1 ${visibleElements.has('feature-1') ? 'visible' : ''}`}
+                  data-animate-id="feature-1"
+                >
                   <div className="relative h-full w-full transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                     {/* Front Side */}
                     <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex flex-col items-center justify-center p-6 border-2 ${!isFeaturesOnPurple ? 'bg-gradient-to-r from-purple-500 to-purple-600 border-purple-600' : 'bg-white border-purple-500'}`}>
@@ -189,7 +323,10 @@ export default function Landing() {
                 </div>
 
                 {/* 2. Choose Clothing - Interactive Flip Card */}
-                <div className="relative h-64 w-full [perspective:1000px] group">
+                <div 
+                  className={`relative h-64 w-full [perspective:1000px] group animate-fade-up animate-stagger-2 ${visibleElements.has('feature-2') ? 'visible' : ''}`}
+                  data-animate-id="feature-2"
+                >
                   <div className="relative h-full w-full transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                     {/* Front Side */}
                     <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex flex-col items-center justify-center p-6 border-2 ${!isFeaturesOnPurple ? 'bg-gradient-to-r from-purple-500 to-purple-600 border-purple-600' : 'bg-white border-purple-500'}`}>
@@ -215,7 +352,10 @@ export default function Landing() {
                 </div>
 
                 {/* 3. AI Magic - Interactive Flip Card */}
-                <div className="relative h-64 w-full [perspective:1000px] group">
+                <div 
+                  className={`relative h-64 w-full [perspective:1000px] group animate-fade-right animate-stagger-3 ${visibleElements.has('feature-3') ? 'visible' : ''}`}
+                  data-animate-id="feature-3"
+                >
                   <div className="relative h-full w-full transition-all duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
                     {/* Front Side */}
                     <div className={`absolute inset-0 w-full h-full [backface-visibility:hidden] rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex flex-col items-center justify-center p-6 border-2 ${!isFeaturesOnPurple ? 'bg-gradient-to-r from-purple-500 to-purple-600 border-purple-600' : 'bg-white border-purple-500'}`}>
@@ -250,16 +390,25 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto">
           {/* Überschrift */}
           <div className="text-center mb-12">
-            <h2 className={`text-3xl font-bold mb-4 transition-colors duration-300 ${isDemoOnPurple ? 'text-white' : 'text-purple-700'}`}>
+            <h2 
+              className={`text-3xl font-bold mb-4 transition-colors duration-300 animate-fade-up ${visibleElements.has('demo-title') ? 'visible' : ''} ${isDemoOnPurple ? 'text-white' : 'text-purple-700'}`}
+              data-animate-id="demo-title"
+            >
               {t('landing.demoTitle') || 'Erlebe TryOnAI in Aktion'}
             </h2>
-            <p className={`text-lg max-w-3xl mx-auto transition-colors duration-300 ${isDemoOnPurple ? 'text-purple-200' : 'text-gray-600'}`}>
+            <p 
+              className={`text-lg max-w-3xl mx-auto transition-colors duration-300 animate-fade-up animate-stagger-1 ${visibleElements.has('demo-desc') ? 'visible' : ''} ${isDemoOnPurple ? 'text-purple-200' : 'text-gray-600'}`}
+              data-animate-id="demo-desc"
+            >
               {t('landing.demoDescription') || 'Sieh dir an, wie einfach es ist, Kleidung virtuell anzuprobieren. Von der Fotoauswahl bis zum fertigen Ergebnis - alles in wenigen Sekunden.'}
             </p>
           </div>
           
           {/* Demo Video Container */}
-          <div className="relative rounded-2xl overflow-hidden border-2 border-purple-500 bg-white p-4 shadow-lg">
+          <div 
+            className={`relative rounded-2xl overflow-hidden border-2 border-purple-500 bg-white p-4 shadow-lg animate-scale-up animate-stagger-2 ${visibleElements.has('demo-video') ? 'visible' : ''}`}
+            data-animate-id="demo-video"
+          >
             <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-900">
               <img 
                 src="/src/assets/Präsentation1.gif" 
@@ -277,17 +426,33 @@ export default function Landing() {
 
       {/* Call to Action */}
       <div className="px-4 pb-16 sm:px-6 lg:px-8" ref={ctaRef}>
-        <div className={`relative rounded-2xl px-8 py-10 md:py-16 md:px-12 transition-all duration-300 max-w-7xl mx-auto ${!isCtaOnPurple ? 'bg-gradient-to-r from-purple-500 to-purple-600' : 'bg-white border-2 border-purple-500'}`}>
+        <div 
+          className={`relative rounded-2xl px-8 py-10 md:py-16 md:px-12 transition-all duration-300 max-w-7xl mx-auto animate-scale-up ${visibleElements.has('cta-section') ? 'visible' : ''} ${!isCtaOnPurple ? 'bg-gradient-to-r from-purple-500 to-purple-600' : 'bg-white border-2 border-purple-500'}`}
+          data-animate-id="cta-section"
+        >
           <div className="relative flex flex-col items-center">
-            <h2 className={`h2 mb-4 text-center text-3xl font-bold transition-colors duration-300 ${!isCtaOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.readyTransform')}</h2>
-            <p className={`mb-6 text-center text-lg transition-colors duration-300 ${!isCtaOnPurple ? 'text-purple-200' : 'text-purple-600'}`}>
+            <h2 
+              className={`h2 mb-4 text-center text-3xl font-bold transition-colors duration-300 animate-fade-up ${visibleElements.has('cta-title') ? 'visible' : ''} ${!isCtaOnPurple ? 'text-white' : 'text-purple-700'}`}
+              data-animate-id="cta-title"
+            >
+              {t('landing.readyTransform')}
+            </h2>
+            <p 
+              className={`mb-6 text-center text-lg transition-colors duration-300 animate-fade-up animate-stagger-1 ${visibleElements.has('cta-desc') ? 'visible' : ''} ${!isCtaOnPurple ? 'text-purple-200' : 'text-purple-600'}`}
+              data-animate-id="cta-desc"
+            >
               {t('landing.joinThousands')}
             </p>
-            <Link to="/try-on">
-              <Button variant="secondary" className={`w-full sm:w-auto text-lg px-8 py-3 transition-colors duration-300 ${!isCtaOnPurple ? 'bg-white text-purple-600 hover:bg-gray-100' : 'bg-purple-600 text-white hover:bg-purple-700'}`}>
-                {t('landing.getStarted')}
-              </Button>
-            </Link>
+            <div 
+              className={`animate-fade-up animate-stagger-2 ${visibleElements.has('cta-button') ? 'visible' : ''}`}
+              data-animate-id="cta-button"
+            >
+              <Link to="/try-on">
+                <Button variant="secondary" className={`w-full sm:w-auto text-lg px-8 py-3 transition-colors duration-300 ${!isCtaOnPurple ? 'bg-white text-purple-600 hover:bg-gray-100' : 'bg-purple-600 text-white hover:bg-purple-700'}`}>
+                  {t('landing.getStarted')}
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -295,8 +460,16 @@ export default function Landing() {
       {/* FAQ Section */}
       <div ref={faqRef} className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
-          <h2 className={`text-3xl font-bold text-center mb-8 transition-colors duration-300 ${isFaqOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.faq.title')}</h2>
-          <div className="space-y-4">
+          <h2 
+            className={`text-3xl font-bold text-center mb-8 transition-colors duration-300 animate-fade-up ${visibleElements.has('faq-title') ? 'visible' : ''} ${isFaqOnPurple ? 'text-white' : 'text-purple-700'}`}
+            data-animate-id="faq-title"
+          >
+            {t('landing.faq.title')}
+          </h2>
+          <div 
+            className={`space-y-4 animate-fade-up animate-stagger-1 ${visibleElements.has('faq-items') ? 'visible' : ''}`}
+            data-animate-id="faq-items"
+          >
             {[
               { qKey: 'landing.faq.q1', aKey: 'landing.faq.a1' },
               { qKey: 'landing.faq.q2', aKey: 'landing.faq.a2' },
@@ -324,14 +497,26 @@ export default function Landing() {
       {/* Testimonials Section */}
       <div ref={testimonialsRef} className="px-4 py-16 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <h2 className={`text-3xl font-bold text-center mb-8 transition-colors duration-300 ${isTestimonialsOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.testimonials.title')}</h2>
-          <div className="grid gap-8 md:grid-cols-3">
+          <h2 
+            className={`text-3xl font-bold text-center mb-8 transition-colors duration-300 animate-fade-up ${visibleElements.has('testimonials-title') ? 'visible' : ''} ${isTestimonialsOnPurple ? 'text-white' : 'text-purple-700'}`}
+            data-animate-id="testimonials-title"
+          >
+            {t('landing.testimonials.title')}
+          </h2>
+          <div 
+            className={`grid gap-8 md:grid-cols-3 animate-fade-up animate-stagger-1 ${visibleElements.has('testimonials-grid') ? 'visible' : ''}`}
+            data-animate-id="testimonials-grid"
+          >
           {[ 
             { img: 'https://randomuser.me/api/portraits/men/5.jpg', nameKey: 'landing.testimonials.u1.name', quoteKey: 'landing.testimonials.u1.quote' },
             { img: 'https://i.pravatar.cc/150?img=10', nameKey: 'landing.testimonials.u2.name', quoteKey: 'landing.testimonials.u2.quote' },
             { img: 'https://i.pravatar.cc/150?img=15', nameKey: 'landing.testimonials.u3.name', quoteKey: 'landing.testimonials.u3.quote' },
           ].map((item, idx) => (
-            <div key={idx} className="flex flex-col items-center bg-white p-6 rounded-lg shadow">
+            <div 
+              key={idx} 
+              className={`flex flex-col items-center bg-white p-6 rounded-lg shadow animate-fade-up animate-stagger-${idx + 2} ${visibleElements.has(`testimonial-${idx}`) ? 'visible' : ''}`}
+              data-animate-id={`testimonial-${idx}`}
+            >
               <img src={item.img} alt={t(item.nameKey)} className="w-16 h-16 rounded-full mb-4 object-cover" />
               <h3 className="font-semibold mb-2">{t(item.nameKey)}</h3>
               <p className="text-gray-600 text-center">“{t(item.quoteKey)}”</p>
