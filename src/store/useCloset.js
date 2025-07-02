@@ -88,6 +88,9 @@ addImageToAlbum: (albumId, image) => set((state) => ({
 removeImageFromAlbum: (albumId, imageId) => set((state) => ({
   albums: ensureGeneratedAlbum(state.albums.map(a => a.id === albumId ? { ...a, images: a.images.filter(img => img.id !== imageId) } : a))
 })),
+deleteImageFromAllAlbums: (imageId) => set((state) => ({
+  albums: ensureGeneratedAlbum(state.albums.map(a => ({ ...a, images: a.images.filter(img => img.id !== imageId) })))
+})),
 addGeneratedImage: (image) => set((state) => ({
   albums: ensureGeneratedAlbum(state.albums.map(a => a.id === 'generated' ? { ...a, images: [{...image, id: Date.now().toString() + Math.random().toString(36).substr(2, 5)}, ...a.images] } : a))
 })),
