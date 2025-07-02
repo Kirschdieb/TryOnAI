@@ -17,6 +17,7 @@ const translations = {
     'nav.home': 'Startseite',
     'nav.tryOn': 'Try On',
     'nav.closet': 'Kleiderschrank',
+    'nav.browse': 'Durchsuchen',
     'nav.profile': 'Profil',
     'nav.about': 'About',
     'nav.switchToEnglish': 'Zu English wechseln',
@@ -40,6 +41,14 @@ const translations = {
     'landing.readyTransform': 'Bereit, dein Shopping-Erlebnis zu transformieren?',
     'landing.joinThousands': 'Schließe dich Tausenden von Nutzern an, die ihr Online-Shopping mit TryOnAI revolutioniert haben.',
     'landing.getStarted': 'Jetzt loslegen',
+    // FAQ Section
+    'landing.faq.title': 'Häufig gestellte Fragen',
+    'landing.faq.q1': 'Wie funktioniert TryOnAI?',
+    'landing.faq.a1': 'Lade einfach ein Foto hoch, wähle Kleidung aus und erlebe die Vorschau in Echtzeit.',
+    'landing.faq.q2': 'Welche Dateiformate werden unterstützt?',
+    'landing.faq.a2': 'Wir unterstützen JPG, PNG und GIF.',
+    'landing.faq.q3': 'Ist meine Privatsphäre sicher?',
+    'landing.faq.a3': 'Ja, alle Bilder werden verschlüsselt und nur temporär verarbeitet.',
     
     // Home/Try-On Page
     'home.title': 'KI-gestützte Anprobe',
@@ -211,6 +220,7 @@ const translations = {
     'nav.home': 'Homepage',
     'nav.tryOn': 'Try On',
     'nav.closet': 'Closet',
+    'nav.browse': 'Browse',
     'nav.profile': 'Profile',
     'nav.about': 'About',
     'nav.switchToEnglish': 'Switch to English',
@@ -234,6 +244,14 @@ const translations = {
     'landing.readyTransform': 'Ready to transform your shopping experience?',
     'landing.joinThousands': 'Join thousands of users who have revolutionized their online shopping with TryOnAI.',
     'landing.getStarted': 'Get Started Now',
+    // FAQ Section
+    'landing.faq.title': 'Frequently Asked Questions',
+    'landing.faq.q1': 'How does TryOnAI work?',
+    'landing.faq.a1': 'Simply upload a photo, choose clothing, and see a real-time preview.',
+    'landing.faq.q2': 'Which file formats are supported?',
+    'landing.faq.a2': 'We support JPG, PNG, and GIF.',
+    'landing.faq.q3': 'Is my privacy protected?',
+    'landing.faq.a3': 'Yes, all images are encrypted and processed temporarily only.',
     
     // Home/Try-On Page
     'home.title': 'AI-Powered Try-On',

@@ -10,6 +10,7 @@ export default function Landing() {
   const [isHeroOnPurple, setIsHeroOnPurple] = useState(true);
   const featuresRef = useRef(null);
   const [isFeaturesOnPurple, setIsFeaturesOnPurple] = useState(false);
+  const [openFaq, setOpenFaq] = useState(null); // State to manage open FAQ item
 
   useEffect(() => {
     const handleScroll = () => {
@@ -190,6 +191,33 @@ export default function Landing() {
               </Button>
             </Link>
           </div>
+        </div>
+      </div>
+
+      {/* FAQ Section */}
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <h2 className="text-3xl font-bold text-center mb-8">{t('landing.faq.title')}</h2>
+        <div className="space-y-4">
+          {[
+            { qKey: 'landing.faq.q1', aKey: 'landing.faq.a1' },
+            { qKey: 'landing.faq.q2', aKey: 'landing.faq.a2' },
+            { qKey: 'landing.faq.q3', aKey: 'landing.faq.a3' },
+          ].map((item, index) => (
+            <div key={index} className="bg-white shadow rounded-lg overflow-hidden">
+              <button
+                onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                className="w-full flex justify-between items-center py-4 px-6 text-left hover:bg-gray-100 focus:outline-none focus:ring transition-colors duration-200"
+              >
+                <span className="text-lg font-semibold">{t(item.qKey)}</span>
+                <span className="text-2xl">{openFaq === index ? '−' : '+'}</span>
+              </button>
+              <div className={`overflow-hidden transition-all duration-300 ${openFaq === index ? 'max-h-40' : 'max-h-0'}`}> 
+                <div className="px-6 pb-4 text-gray-700">
+                  {t(item.aKey)}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
