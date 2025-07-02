@@ -31,24 +31,28 @@ export default function Landing() {
       }
       if (featuresRef.current) {
         const rect = featuresRef.current.getBoundingClientRect();
-        setIsFeaturesOnPurple(rect.top < 400);
+        // Länger lila bleiben - erst wechseln wenn Section weiter nach oben gescrollt ist
+        setIsFeaturesOnPurple(rect.top < window.innerHeight - 800);
       }
       if (faqRef.current) {
         const rect = faqRef.current.getBoundingClientRect();
-        // Wenn Section-Überschrift über die Mitte des Bildschirms scrollt
-        setIsFaqOnPurple(rect.top < window.innerHeight / 2);
+        // Später triggern - erst wenn Section-Überschrift näher an der Bildschirmmitte ist
+        setIsFaqOnPurple(rect.top < (window.innerHeight / 2) + 20);
       }
       if (testimonialsRef.current) {
         const rect = testimonialsRef.current.getBoundingClientRect();
-        setIsTestimonialsOnPurple(rect.top < window.innerHeight / 2);
+        // Später triggern
+        setIsTestimonialsOnPurple(rect.top < (window.innerHeight / 2) + 20);
       }
       if (demoRef.current) {
         const rect = demoRef.current.getBoundingClientRect();
-        setIsDemoOnPurple(rect.top < window.innerHeight / 2);
+        // Später triggern
+        setIsDemoOnPurple(rect.top < (window.innerHeight / 2) + 20);
       }
       if (ctaRef.current) {
         const rect = ctaRef.current.getBoundingClientRect();
-        setIsCtaOnPurple(rect.top < window.innerHeight / 2);
+        // Später triggern
+        setIsCtaOnPurple(rect.top < (window.innerHeight / 2) + 20);
       }
     };
     window.addEventListener('scroll', handleScroll);
@@ -283,12 +287,22 @@ export default function Landing() {
         <div className="relative py-12">
           <div className="relative px-4 sm:px-6 lg:px-8">
             <div className="py-12 md:py-20">
-              <h2 
-                className={`text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-8 sm:mb-12 transition-colors duration-300 animate-fade-up ${visibleElements.has('features-title') ? 'visible' : ''} ${isFeaturesOnPurple ? 'text-white' : 'text-purple-700'}`}
-                data-animate-id="features-title"
-              >
-                {t('landing.howItWorks')}
-              </h2>
+              <div className="text-center mb-8 sm:mb-12">
+                <h2 
+                  className={`text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 transition-colors duration-300 animate-fade-up ${visibleElements.has('features-title') ? 'visible' : ''} ${isFeaturesOnPurple ? 'text-white' : 'bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 bg-clip-text text-transparent'}`}
+                  data-animate-id="features-title"
+                >
+                  {t('landing.howItWorks')}
+                </h2>
+                <div className="flex items-center justify-center mb-2">
+                  <div className={`h-px w-12 sm:w-16 transition-colors duration-300 ${isFeaturesOnPurple ? 'bg-white/50' : 'bg-gradient-to-r from-purple-500 to-pink-500'}`}></div>
+                  <div className={`mx-3 w-2 h-2 rounded-full transition-colors duration-300 ${isFeaturesOnPurple ? 'bg-white/70' : 'bg-purple-500'}`}></div>
+                  <div className={`h-px w-12 sm:w-16 transition-colors duration-300 ${isFeaturesOnPurple ? 'bg-white/50' : 'bg-gradient-to-r from-pink-500 to-purple-500'}`}></div>
+                </div>
+                <p className={`text-base sm:text-lg transition-colors duration-300 animate-fade-up animate-stagger-1 ${visibleElements.has('features-subtitle') ? 'visible' : ''} ${isFeaturesOnPurple ? 'text-purple-200' : 'text-gray-600'}`} data-animate-id="features-subtitle">
+                  {t('landing.howItWorksSubtitle')}
+                </p>
+              </div>
               <div 
                 className={`mx-auto grid max-w-7xl items-start gap-6 sm:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 lg:gap-16 animate-fade-up animate-stagger-1 ${visibleElements.has('features-grid') ? 'visible' : ''}`}
                 data-animate-id="features-grid"
@@ -391,16 +405,21 @@ export default function Landing() {
           {/* Überschrift */}
           <div className="text-center mb-8 sm:mb-12 px-4">
             <h2 
-              className={`text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 transition-colors duration-300 animate-fade-up ${visibleElements.has('demo-title') ? 'visible' : ''} ${isDemoOnPurple ? 'text-white' : 'text-purple-700'}`}
+              className={`text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 transition-colors duration-300 animate-fade-up ${visibleElements.has('demo-title') ? 'visible' : ''} ${isDemoOnPurple ? 'text-white' : 'bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 bg-clip-text text-transparent'}`}
               data-animate-id="demo-title"
             >
-              {t('landing.demoTitle') || 'Erlebe TryOnAI in Aktion'}
+              {t('landing.demoTitle')}
             </h2>
+            <div className="flex items-center justify-center mb-4">
+              <div className={`h-px w-16 sm:w-20 transition-colors duration-300 ${isDemoOnPurple ? 'bg-white/50' : 'bg-gradient-to-r from-purple-500 to-pink-500'}`}></div>
+              <div className={`mx-3 w-2 h-2 rounded-full transition-colors duration-300 ${isDemoOnPurple ? 'bg-white/70' : 'bg-purple-500'}`}></div>
+              <div className={`h-px w-16 sm:w-20 transition-colors duration-300 ${isDemoOnPurple ? 'bg-white/50' : 'bg-gradient-to-r from-pink-500 to-purple-500'}`}></div>
+            </div>
             <p 
               className={`text-base sm:text-lg max-w-3xl mx-auto transition-colors duration-300 animate-fade-up animate-stagger-1 ${visibleElements.has('demo-desc') ? 'visible' : ''} ${isDemoOnPurple ? 'text-purple-200' : 'text-gray-600'}`}
               data-animate-id="demo-desc"
             >
-              {t('landing.demoDescription') || 'Sieh dir an, wie einfach es ist, Kleidung virtuell anzuprobieren. Von der Fotoauswahl bis zum fertigen Ergebnis - alles in wenigen Sekunden.'}
+              {t('landing.demoDescription')}
             </p>
           </div>
           
@@ -432,11 +451,16 @@ export default function Landing() {
         >
           <div className="relative flex flex-col items-center text-center">
             <h2 
-              className={`h2 mb-3 sm:mb-4 text-2xl sm:text-3xl lg:text-4xl font-bold transition-colors duration-300 animate-fade-up ${visibleElements.has('cta-title') ? 'visible' : ''} ${!isCtaOnPurple ? 'text-white' : 'text-purple-700'}`}
+              className={`h2 mb-3 sm:mb-4 text-2xl sm:text-3xl lg:text-4xl font-bold transition-colors duration-300 animate-fade-up ${visibleElements.has('cta-title') ? 'visible' : ''} ${!isCtaOnPurple ? 'text-white' : 'bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 bg-clip-text text-transparent'}`}
               data-animate-id="cta-title"
             >
               {t('landing.readyTransform')}
             </h2>
+            <div className="flex items-center justify-center mb-4">
+              <div className={`h-px w-12 sm:w-16 transition-colors duration-300 ${!isCtaOnPurple ? 'bg-white/50' : 'bg-gradient-to-r from-purple-500 to-pink-500'}`}></div>
+              <div className={`mx-3 w-1.5 h-1.5 rounded-full transition-colors duration-300 ${!isCtaOnPurple ? 'bg-white/70' : 'bg-purple-500'}`}></div>
+              <div className={`h-px w-12 sm:w-16 transition-colors duration-300 ${!isCtaOnPurple ? 'bg-white/50' : 'bg-gradient-to-r from-pink-500 to-purple-500'}`}></div>
+            </div>
             <p 
               className={`mb-5 sm:mb-6 text-center text-base sm:text-lg max-w-2xl transition-colors duration-300 animate-fade-up animate-stagger-1 ${visibleElements.has('cta-desc') ? 'visible' : ''} ${!isCtaOnPurple ? 'text-purple-200' : 'text-purple-600'}`}
               data-animate-id="cta-desc"
@@ -460,12 +484,19 @@ export default function Landing() {
       {/* FAQ Section */}
       <div ref={faqRef} className="px-4 py-12 sm:py-16 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
-          <h2 
-            className={`text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-6 sm:mb-8 transition-colors duration-300 animate-fade-up ${visibleElements.has('faq-title') ? 'visible' : ''} ${isFaqOnPurple ? 'text-white' : 'text-purple-700'}`}
-            data-animate-id="faq-title"
-          >
-            {t('landing.faq.title')}
-          </h2>
+          <div className="text-center mb-6 sm:mb-8">
+            <h2 
+              className={`text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 transition-colors duration-300 animate-fade-up ${visibleElements.has('faq-title') ? 'visible' : ''} ${isFaqOnPurple ? 'text-white' : 'bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 bg-clip-text text-transparent'}`}
+              data-animate-id="faq-title"
+            >
+              {t('landing.faq.title')}
+            </h2>
+            <div className="flex items-center justify-center">
+              <div className={`h-px w-16 sm:w-20 transition-colors duration-300 ${isFaqOnPurple ? 'bg-white/50' : 'bg-gradient-to-r from-purple-500 to-pink-500'}`}></div>
+              <div className={`mx-3 w-2 h-2 rounded-full transition-colors duration-300 ${isFaqOnPurple ? 'bg-white/70' : 'bg-purple-500'}`}></div>
+              <div className={`h-px w-16 sm:w-20 transition-colors duration-300 ${isFaqOnPurple ? 'bg-white/50' : 'bg-gradient-to-r from-pink-500 to-purple-500'}`}></div>
+            </div>
+          </div>
           <div 
             className={`space-y-3 sm:space-y-4 animate-fade-up animate-stagger-1 ${visibleElements.has('faq-items') ? 'visible' : ''}`}
             data-animate-id="faq-items"
@@ -497,12 +528,19 @@ export default function Landing() {
       {/* Testimonials Section */}
       <div ref={testimonialsRef} className="px-4 py-12 sm:py-16 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <h2 
-            className={`text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-6 sm:mb-8 transition-colors duration-300 animate-fade-up ${visibleElements.has('testimonials-title') ? 'visible' : ''} ${isTestimonialsOnPurple ? 'text-white' : 'text-purple-700'}`}
-            data-animate-id="testimonials-title"
-          >
-            {t('landing.testimonials.title')}
-          </h2>
+          <div className="text-center mb-6 sm:mb-8">
+            <h2 
+              className={`text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 transition-colors duration-300 animate-fade-up ${visibleElements.has('testimonials-title') ? 'visible' : ''} ${isTestimonialsOnPurple ? 'text-white' : 'bg-gradient-to-r from-purple-600 via-purple-700 to-pink-600 bg-clip-text text-transparent'}`}
+              data-animate-id="testimonials-title"
+            >
+              {t('landing.testimonials.title')}
+            </h2>
+            <div className="flex items-center justify-center">
+              <div className={`h-px w-12 sm:w-16 transition-colors duration-300 ${isTestimonialsOnPurple ? 'bg-white/50' : 'bg-gradient-to-r from-purple-500 to-pink-500'}`}></div>
+              <span className={`mx-3 text-sm transition-colors duration-300 ${isTestimonialsOnPurple ? 'text-white/70' : 'text-purple-500'}`}>⭐</span>
+              <div className={`h-px w-12 sm:w-16 transition-colors duration-300 ${isTestimonialsOnPurple ? 'bg-white/50' : 'bg-gradient-to-r from-pink-500 to-purple-500'}`}></div>
+            </div>
+          </div>
           <div 
             className={`grid gap-6 sm:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 animate-fade-up animate-stagger-1 ${visibleElements.has('testimonials-grid') ? 'visible' : ''}`}
             data-animate-id="testimonials-grid"

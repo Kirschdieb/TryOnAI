@@ -30,6 +30,7 @@ const translations = {
     'landing.tryNow': 'Jetzt testen',
     'landing.viewCloset': 'Kleiderschrank ansehen',
     'landing.howItWorks': 'So funktioniert es',
+    'landing.howItWorksSubtitle': 'In nur drei einfachen Schritten zu deinem perfekten Outfit',
     'landing.uploadPhoto': 'Lade dein Foto hoch',
     'landing.uploadPhotoDesc': 'Beginne mit dem Hochladen eines Ganzkörperfotos von dir in einer neutralen Pose. Unsere KI wird dein Bild für die perfekte Passform verarbeiten.',
     'landing.chooseClothing': 'Wähle Kleidung',
@@ -39,6 +40,7 @@ const translations = {
     'landing.aiMagic': 'KI-Magie',
     'landing.aiMagicDesc': 'Unsere KI erstellt realistische Anproben in Sekunden - ohne Umkleide!',
     'landing.readyTransform': 'Bereit, dein Shopping-Erlebnis zu transformieren?',
+    'landing.ctaBadge': 'Bereit für die Zukunft des Shopping?',
     'landing.joinThousands': 'Schließe dich Tausenden von Nutzern an, die ihr Online-Shopping mit TryOnAI revolutioniert haben.',
     'landing.getStarted': 'Jetzt loslegen',
     // Demo Section
@@ -46,6 +48,7 @@ const translations = {
     'landing.demoDescription': 'Sieh dir an, wie einfach es ist, Kleidung virtuell anzuprobieren. Von der Fotoauswahl bis zum fertigen Ergebnis - alles in wenigen Sekunden.',
     // FAQ Section
     'landing.faq.title': 'Häufig gestellte Fragen',
+    'landing.faq.badge': 'Häufig gestellte Fragen',
     'landing.faq.q1': 'Wie funktioniert TryOnAI?',
     'landing.faq.a1': 'Lade einfach ein Foto hoch, wähle Kleidung aus und erlebe die Vorschau in Echtzeit.',
     'landing.faq.q2': 'Welche Dateiformate werden unterstützt?',
@@ -55,6 +58,7 @@ const translations = {
     
     // Testimonials Section
     'landing.testimonials.title': 'Was unsere Nutzer sagen',
+    'landing.testimonials.badge': 'Das sagen unsere Nutzer',
     'landing.testimonials.u1.name': 'Marcus Weber',
     'landing.testimonials.u1.quote': 'TryOnAI hat mein Online-Shopping revolutioniert! Ich kann endlich sehen, wie Kleidung an mir aussieht, bevor ich kaufe.',
     'landing.testimonials.u2.name': 'Lisa Schmidt',
@@ -276,6 +280,7 @@ const translations = {
     'landing.tryNow': 'Try It Now',
     'landing.viewCloset': 'View Closet',
     'landing.howItWorks': 'How It Works',
+    'landing.howItWorksSubtitle': 'Your perfect outfit in just three simple steps',
     'landing.uploadPhoto': 'Upload Your Photo',
     'landing.uploadPhotoDesc': 'Start by uploading a full-body photo of yourself in a neutral pose. Our AI will process your image for the perfect fit.',
     'landing.chooseClothing': 'Choose Clothing',
@@ -285,6 +290,7 @@ const translations = {
     'landing.aiMagic': 'AI Magic',
     'landing.aiMagicDesc': 'Our AI creates realistic try-ons in seconds - no dressing room required!',
     'landing.readyTransform': 'Ready to transform your shopping experience?',
+    'landing.ctaBadge': 'Ready for the future of shopping?',
     'landing.joinThousands': 'Join thousands of users who have revolutionized their online shopping with TryOnAI.',
     'landing.getStarted': 'Get Started Now',
     // Demo Section
@@ -292,6 +298,7 @@ const translations = {
     'landing.demoDescription': 'See how easy it is to try on clothes virtually. From photo selection to final result - everything in just seconds.',
     // FAQ Section
     'landing.faq.title': 'Frequently Asked Questions',
+    'landing.faq.badge': 'Frequently Asked Questions',
     'landing.faq.q1': 'How does TryOnAI work?',
     'landing.faq.a1': 'Simply upload a photo, choose clothing, and see a real-time preview.',
     'landing.faq.q2': 'Which file formats are supported?',
@@ -301,6 +308,7 @@ const translations = {
     
     // Testimonials Section
     'landing.testimonials.title': 'What our users say',
+    'landing.testimonials.badge': 'What our users say',
     'landing.testimonials.u1.name': 'Marcus Weber',
     'landing.testimonials.u1.quote': 'TryOnAI has revolutionized my online shopping! I can finally see how clothes look on me before buying.',
     'landing.testimonials.u2.name': 'Lisa Schmidt',
