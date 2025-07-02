@@ -13,6 +13,8 @@ export default function Landing() {
   const [openFaq, setOpenFaq] = useState(null); // State to manage open FAQ item
   const faqRef = useRef(null);
   const [isFaqOnPurple, setIsFaqOnPurple] = useState(false);
+  const testimonialsRef = useRef(null);
+  const [isTestimonialsOnPurple, setIsTestimonialsOnPurple] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,6 +30,10 @@ export default function Landing() {
         const rect = faqRef.current.getBoundingClientRect();
         // Wenn Section-Überschrift über die Mitte des Bildschirms scrollt
         setIsFaqOnPurple(rect.top < window.innerHeight / 2);
+      }
+      if (testimonialsRef.current) {
+        const rect = testimonialsRef.current.getBoundingClientRect();
+        setIsTestimonialsOnPurple(rect.top < window.innerHeight / 2);
       }
     };
     window.addEventListener('scroll', handleScroll);
@@ -90,7 +96,7 @@ export default function Landing() {
         <div className="relative py-12">
           <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
             <div className="py-12 md:py-20">
-              <h2 className={`text-3xl font-bold text-center mb-12 transition-colors duration-300 ${isFeaturesOnPurple ? 'text-white' : 'text-black'}`}>{t('landing.howItWorks')}</h2>
+              <h2 className={`text-3xl font-bold text-center mb-12 transition-colors duration-300 ${isFeaturesOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.howItWorks')}</h2>
               <div className="mx-auto grid max-w-sm items-start gap-8 md:max-w-none md:grid-cols-3 lg:gap-16">
                 {/* Upload Photo - Interactive Flip Card */}
                 <div className="relative h-64 w-full [perspective:1000px] group">
@@ -202,7 +208,7 @@ export default function Landing() {
 
       {/* FAQ Section */}
       <div ref={faqRef} className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <h2 className={`text-3xl font-bold text-center mb-8 transition-colors duration-300 ${isFaqOnPurple ? 'text-white' : 'text-black'}`}>{t('landing.faq.title')}</h2>
+        <h2 className={`text-3xl font-bold text-center mb-8 transition-colors duration-300 ${isFaqOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.faq.title')}</h2>
         <div className="space-y-4">
           {[
             { qKey: 'landing.faq.q1', aKey: 'landing.faq.a1' },
@@ -228,8 +234,8 @@ export default function Landing() {
       </div>
 
       {/* Testimonials Section */}
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <h2 className="text-3xl font-bold text-center mb-8">{t('landing.testimonials.title')}</h2>
+      <div ref={testimonialsRef} className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <h2 className={`text-3xl font-bold text-center mb-8 transition-colors duration-300 ${isTestimonialsOnPurple ? 'text-white' : 'text-purple-700'}`}>{t('landing.testimonials.title')}</h2>
         <div className="grid gap-8 md:grid-cols-3">
           {[ 
             { img: 'https://randomuser.me/api/portraits/men/5.jpg', nameKey: 'landing.testimonials.u1.name', quoteKey: 'landing.testimonials.u1.quote' },
