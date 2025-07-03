@@ -1,0 +1,20 @@
+/* Custom Animations for the Landing Page */
+
+@keyframes once-pulse {
+  0% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.03);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+.animate-once-pulse {
+  animation: once-pulse 2s ease-in-out forwards; /* Animation läuft nur einmal und endet mit Opacity 0 */
+}

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 import Button from '../ui/Button';
 import { useEffect, useRef, useState } from 'react';
+import './NewLanding.css';
 
 
 export default function Landing() {
@@ -435,9 +436,9 @@ export default function Landing() {
                 className="w-full h-full object-cover"
               />
             </div>
-            {/* Decorative border animation effect */}
+            {/* Decorative border animation effect - nur als kurzer Highlight-Effekt beim Start */}
             <div className="pointer-events-none absolute inset-0 rounded-2xl">
-              <div className="absolute inset-0 border-2 border-transparent bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 rounded-2xl opacity-20 animate-pulse"></div>
+              <div className={`absolute inset-0 border-2 border-transparent bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 rounded-2xl ${visibleElements.has('demo-video') ? 'animate-once-pulse' : 'opacity-0'}`}></div>
             </div>
           </div>
         </div>
