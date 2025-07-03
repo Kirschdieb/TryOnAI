@@ -42,7 +42,6 @@ function AddToAlbumSection({ selectedImage, albums, currentAlbumId, addImageToAl
             setTimeout(() => setAdded(false), 1200);
           }}
         >
- Optimierung-Landingpage
           {added ? '✓' : t('closet.addToAlbum')}
         </Button>
         {added && <span className="text-green-600 ml-2">✓</span>}
@@ -555,21 +554,18 @@ export default function Closet() {
 
               {/* Bild Aktionen */}
               <div className="p-4 border-t border-gray-200">
-                <div className="flex gap-2 mb-4">
-                  <Button
-                    variant="primary"
-                    className="flex-1"
-                    onClick={() => {
-                      // Bild zu neuem Album hinzufügen
-                      const newAlbumId = prompt(t('closet.enterAlbumId') || 'Gib die Album-ID ein:');
-                      if (newAlbumId) {
-                        addImageToAlbum(newAlbumId, { ...selectedImage, id: selectedImage.id || Date.now().toString() + Math.random().toString(36).substr(2, 5) });
-                        setSelectedImage(null);
-                      }
-                    }}
-                  >
-                    {t('closet.addToAlbum')}
-                  </Button>
+                {/* Album-Auswahl mit Dropdown */}
+                <AddToAlbumSection
+                  selectedImage={selectedImage}
+                  albums={albums}
+                  currentAlbumId={null}
+                  addImageToAlbum={(albumId, image) => {
+                    addImageToAlbum(albumId, { ...image, id: image.id || Date.now().toString() + Math.random().toString(36).substr(2, 5) });
+                    setSelectedImage(null);
+                  }}
+                />
+                
+                <div className="flex gap-2 mt-4">
                   <Button
                     variant="danger"
                     className="flex-1"
@@ -599,7 +595,7 @@ export default function Closet() {
 
 
       {/* Image Detail Modal */}
-      {selectedImage && (
+      {selectedImage && viewMode !== 'album-content' && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}

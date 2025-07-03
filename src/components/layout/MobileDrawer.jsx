@@ -156,12 +156,32 @@ export default function MobileDrawer({ isOpen, onClose }) {
                   </Link>
                 </motion.div>
 
-                {/* About Link */}
+                {/* FAQ Link */}
                 <motion.div
                   variants={linkVariants}
                   initial="hidden"
                   animate="visible"
                   custom={4}
+                >
+                  <Link
+                    to="/faq"
+                    onClick={onClose}
+                    className={`block p-3 rounded-lg font-medium relative ${
+                      isActive('/faq') 
+                        ? 'bg-purple-600 text-white shadow-md' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    {t('nav.faq')}
+                  </Link>
+                </motion.div>
+                
+                {/* About Link */}
+                <motion.div
+                  variants={linkVariants}
+                  initial="hidden"
+                  animate="visible"
+                  custom={5}
                 >
                   <Link
                     to="/about"

@@ -59,6 +59,7 @@ export default function Navbar() {
             <NavLink to="/try-on">{t('nav.tryOn')}</NavLink>
             <NavLink to="/closet">{t('nav.closet')}</NavLink>
             <NavLink to="/profile">{t('nav.profile')}</NavLink>
+            <NavLink to="/faq">{t('nav.faq')}</NavLink>
             <NavLink to="/about">{t('nav.about')}</NavLink>
           </div>
           
