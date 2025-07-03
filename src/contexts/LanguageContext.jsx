@@ -272,6 +272,9 @@ const translations = {
 
     // Studio tooltips
     'studio.clothingExtractionTip': 'Das Extrahieren des Kleidungsstücks ist nicht perfekt. Achte bitte darauf, dass das Kleidungsstück vollständig und gut sichtbar auf dem Bild zu sehen ist.',
+    
+    // Studio quality warning
+    'studio.qualityWarning': 'Bei niedriger Qualität kann es zu stärkeren Abweichungen und Ungenauigkeiten im Vergleich zum Originalbild kommen.',
   },
   en: {    // Navigation
     'nav.home': 'Homepage',

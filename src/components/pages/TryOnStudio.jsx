@@ -18,9 +18,11 @@ function LoadingSpinner() {
 
 // Custom Tooltip component
 const Tooltip = ({ children }) => (
-  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-sm text-white bg-gray-800 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
-    {children}
-    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1 border-4 border-transparent border-t-gray-800"></div>
+  <div className="absolute bottom-full right-0 mb-2 px-3 py-2 text-sm text-white bg-gray-800 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 w-max max-w-[2400px]">
+    <div className="inline-block">
+      {children}
+    </div>
+    <div className="absolute bottom-0 right-4 transform translate-y-1 border-4 border-transparent border-t-gray-800"></div>
   </div>
 );
 
@@ -447,7 +449,17 @@ const Studio = () => {
                   className={`flex items-center w-full justify-start text-left rounded-2xl px-4 py-2 font-medium transition-all duration-200 ${imageQuality === option.value ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg' : 'bg-white border border-purple-200 text-purple-700 hover:bg-purple-50'} `}
                   onClick={() => setImageQuality(option.value)}
                 >
-                  {option.label}
+                  <div className="flex items-center justify-between w-full">
+                    <span>{option.label}</span>
+                    {option.value === 'low' && (
+                      <div className="relative group">
+                        <FaInfoCircle className="text-current ml-2" />
+                        <Tooltip>
+                          {t('studio.qualityWarning')}
+                        </Tooltip>
+                      </div>
+                    )}
+                  </div>
                 </Button>
               ))}
             </div>
