@@ -102,6 +102,9 @@ const translations = {
     'browse.categories.outerwear': 'Außenbekleidung',
     'browse.categories.tshirts': 'Shirts',
     'browse.categories.jackets': 'Jacken',
+    'browse.categories.shirts': 'Hemden',
+    'browse.categories.pants': 'Hosen',
+    'browse.categoryTitle': 'Kategorien',
     'browse.tryNow': 'Jetzt anprobieren',
     'browse.clickHint': 'Klicke auf Bild oder Name, um bei Zalando anzuzeigen',
     'browse.cantFind': 'Findest du nicht, was du suchst?',
@@ -251,6 +254,10 @@ const translations = {
     'common.cancel': 'Abbrechen',
     'common.ok': 'OK',
     
+    // Closet / Album
+    'closet.addedToAlbum': 'Erfolgreich zum Album hinzugefügt!',
+    'closet.noAlbumsAvailable': 'Keine weiteren Alben verfügbar',
+    
     // Albums
     'albums.generated': 'Generierte Bilder',
     'albums.summer': 'Sommer',
@@ -348,6 +355,9 @@ const translations = {
     'browse.categories.tops': 'Tops',
     'browse.categories.bottoms': 'Bottoms',
     'browse.categories.outerwear': 'Outerwear',
+    'browse.categories.shirts': 'Shirts',
+    'browse.categories.pants': 'Pants',
+    'browse.categoryTitle': 'Categories',
     'browse.categories.tshirts': 'T-Shirts',
     'browse.categories.jackets': 'Jackets',
     'browse.tryNow': 'Try Now',
@@ -483,6 +493,10 @@ const translations = {
     'common.next': 'Next',
     'common.cancel': 'Cancel',
     'common.ok': 'OK',
+    
+    // Closet / Album
+    'closet.addedToAlbum': 'Successfully added to album!',
+    'closet.noAlbumsAvailable': 'No other albums available',
     
     // Albums
     'albums.generated': 'Generated Pictures',

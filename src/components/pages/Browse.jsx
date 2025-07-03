@@ -148,7 +148,7 @@ export default function Browse() {
           </p>
         </div>        {/* Category Filter */}
         <div className="mb-12">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Kategorien</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">{t('browse.categoryTitle')}</h2>
           <div className="flex flex-wrap gap-3 items-center justify-center mb-6">
             {categories.map((category) => (
               <div
