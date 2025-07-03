@@ -29,6 +29,7 @@ const Studio = () => {
   const navigate = useNavigate();
   const { userPhoto, clothPhoto, selectedClothingItem, albums, addGeneratedImage, addImageToAlbum } = useCloset();
   const [customPrompt, setCustomPrompt] = useState('');
+  const [fullGeneratedPrompt, setFullGeneratedPrompt] = useState(''); // Store the complete prompt sent to server
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState(null);
   const [extractedClothImage, setExtractedClothImage] = useState(null);
@@ -148,6 +149,7 @@ const Studio = () => {
       clothPhoto: extractedClothImage,
       image: result,
       customPrompt: customPrompt,
+      fullGeneratedPrompt: fullGeneratedPrompt, // Save the complete prompt that was sent to the backend
       clothingItem: selectedClothingItem, // Add clothing item information
       timestamp: new Date().toISOString(),
     };
@@ -221,6 +223,10 @@ const Studio = () => {
       if (customPrompt) {
         fullPrompt += ' ' + customPrompt;
       }
+      
+      // Store the full prompt that will be sent to the backend
+      setFullGeneratedPrompt(fullPrompt.trim());
+      
       formData.append('customPrompt', fullPrompt.trim());
       formData.append('imageQuality', imageQuality);
       

@@ -95,6 +95,13 @@ export default function Closet() {
   const [renamingAlbumId, setRenamingAlbumId] = useState(null);
   const [renameValue, setRenameValue] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
+  const [showPrompt, setShowPrompt] = useState(false);
+
+  // Hilfsfunktion zum Schließen des Modals
+  const closeModal = () => {
+    setSelectedImage(null);
+    setShowPrompt(false);
+  };
   const [viewMode, setViewMode] = useState('albums'); // 'albums' oder 'album-content'
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [animationClass, setAnimationClass] = useState('');
@@ -587,14 +594,14 @@ export default function Closet() {
         {/* Bild Detail Modal - nur im Album-Inhalt sichtbar */}
         {viewMode === 'album-content' && selectedImage && (
           <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-            <div className="absolute inset-0 bg-black opacity-50" onClick={() => setSelectedImage(null)}></div>
+            <div className="absolute inset-0 bg-black opacity-50" onClick={closeModal}></div>
             
             <div className="bg-white rounded-2xl shadow-xl max-w-4xl w-full z-10 overflow-hidden">
               {/* Header mit X-Button */}
               <div className="flex items-center justify-between p-4 border-b">
                 <h2 className="text-2xl font-bold text-gray-800">{t('closet.imageDetails')}</h2>
                 <button
-                  onClick={() => setSelectedImage(null)}
+                  onClick={closeModal}
                   className="text-gray-500 hover:text-gray-700 transition-colors"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -618,19 +625,96 @@ export default function Closet() {
 
                 {/* Bild Aktionen - rechts bei größeren Bildschirmen */}
                 <div className="md:w-1/2 flex flex-col">
+                  {/* Anprobiertes Produkt - Miniatur */}
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-3 flex items-center">
+                      <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+                      {t('closet.triedOnProduct') || 'Anprobiertes Produkt'}
+                    </h3>
+                    
+                    {selectedImage.clothingItem ? (
+                      // Produkt aus Browse-Bereich
+                      <div className="flex items-center space-x-4 p-3 bg-gray-50 rounded-xl border">
+                        {selectedImage.clothingItem.image && (
+                          <img 
+                            src={selectedImage.clothingItem.image} 
+                            alt={selectedImage.clothingItem.name || 'Kleidungsstück'} 
+                            className="w-16 h-16 object-cover rounded-lg border shadow-sm"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm text-gray-800 truncate">
+                            {selectedImage.clothingItem.name || 'Unbekanntes Kleidungsstück'}
+                          </p>
+                          {selectedImage.clothingItem.link ? (
+                            <a 
+                              href={selectedImage.clothingItem.link} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center text-sm text-purple-600 hover:text-purple-800 hover:underline mt-1"
+                            >
+                              Produkt ansehen 
+                              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                            </a>
+                          ) : (
+                            <p className="text-sm text-gray-500 italic mt-1">
+                              {language === 'de' ? 'Kein Link verfügbar' : 'No link available'}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ) : selectedImage.clothPhoto ? (
+                      // Lokal hochgeladenes Kleidungsstück mit clothPhoto
+                      <div className="flex items-center space-x-4 p-3 bg-gray-50 rounded-xl border">
+                        <img 
+                          src={selectedImage.clothPhoto} 
+                          alt="Hochgeladenes Kleidungsstück" 
+                          className="w-16 h-16 object-cover rounded-lg border shadow-sm"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm text-gray-600">
+                            {language === 'de' ? 'Eigenes Kleidungsstück' : 'Own Clothing Item'}
+                          </p>
+                          <p className="text-sm text-gray-500 italic">
+                            {language === 'de' 
+                              ? 'Dieses Foto wurde lokal von Ihnen hochgeladen' 
+                              : 'This photo was uploaded locally by you'}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      // Fallback wenn keine Kleidungsinformationen verfügbar sind
+                      <div className="flex items-center space-x-4 p-3 bg-gray-50 rounded-xl border">
+                        <div className="w-16 h-16 bg-gray-200 rounded-lg border flex items-center justify-center">
+                          <span className="text-gray-400 text-lg">👕</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm text-gray-600">
+                            {language === 'de' ? 'Kleidungsstück' : 'Clothing Item'}
+                          </p>
+                          <p className="text-sm text-gray-500 italic">
+                            {language === 'de' 
+                              ? 'Keine zusätzlichen Informationen verfügbar' 
+                              : 'No additional information available'}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
                   {/* Bild Info falls vorhanden */}
-                  {(selectedImage.timestamp || selectedImage.customPrompt) && (
-                    <div className="mb-6 space-y-2">
-                      {selectedImage.timestamp && (
+                  {selectedImage.timestamp && (
+                    <div className="mb-6">
+                      <div className="flex items-center space-x-2">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                         <p className="text-gray-600">
                           <span className="font-medium">{t('closet.created')}:</span> {new Date(selectedImage.timestamp).toLocaleDateString()}
                         </p>
-                      )}
-                      {selectedImage.customPrompt && (
-                        <p className="text-gray-600">
-                          <span className="font-medium">{t('closet.prompt')}:</span> {selectedImage.customPrompt}
-                        </p>
-                      )}
+                      </div>
                     </div>
                   )}
                   
@@ -645,6 +729,33 @@ export default function Closet() {
                     />
                   </div>
                   
+                  {/* Prompt anzeigen/verstecken - immer sichtbar */}
+                  <div className="mb-6">
+                    {/* Debug: Log image data to console */}
+                    {selectedImage && console.log('Selected Image Data:', selectedImage)}
+                    <button
+                      onClick={() => setShowPrompt(!showPrompt)}
+                      className="flex items-center space-x-2 text-purple-600 hover:text-purple-800 font-medium transition-colors"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
+                      <span>{t('closet.showPrompt') || 'Prompt anzeigen'}</span>
+                      <svg className={`w-4 h-4 transition-transform ${showPrompt ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {showPrompt && (
+                      <div className="mt-3 p-3 bg-gray-50 border rounded-xl">
+                        {selectedImage.fullGeneratedPrompt || selectedImage.customPrompt || selectedImage.prompt ? (
+                          <p className="text-gray-700 italic">"{selectedImage.fullGeneratedPrompt || selectedImage.customPrompt || selectedImage.prompt}"</p>
+                        ) : (
+                          <p className="text-gray-500 italic">{language === 'de' ? 'Kein Prompt gefunden' : 'No prompt found'}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  
                   {/* Action Buttons */}
                   <div className="mt-auto">
                     <div className="flex gap-3 mb-3">
@@ -654,7 +765,7 @@ export default function Closet() {
                         onClick={() => {
                           if (window.confirm(t('closet.confirmDeleteImage') || 'Bild wirklich löschen?')) {
                             deleteImageFromAllAlbums(selectedImage.id);
-                            setSelectedImage(null);
+                            closeModal();
                           }
                         }}
                       >
@@ -667,7 +778,7 @@ export default function Closet() {
                       <Button
                         variant="outline"
                         className="flex-1 py-3"
-                        onClick={() => setSelectedImage(null)}
+                        onClick={closeModal}
                       >
                         {t('closet.close')}
                       </Button>
@@ -713,18 +824,128 @@ export default function Closet() {
 
               {/* Bild Aktionen - rechts bei größeren Bildschirmen */}
               <div className="md:w-1/2 flex flex-col">
-                {/* Image Info */}
-                <div className="mb-6 space-y-2">
+                {/* Anprobiertes Produkt - Miniatur */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-3 flex items-center">
+                    <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+                    {t('closet.triedOnProduct') || 'Anprobiertes Produkt'}
+                  </h3>
+                  
+                  {selectedImage.clothingItem ? (
+                    // Produkt aus Browse-Bereich
+                    <div className="flex items-center space-x-4 p-3 bg-gray-50 rounded-xl border">
+                      {selectedImage.clothingItem.image && (
+                        <img 
+                          src={selectedImage.clothingItem.image} 
+                          alt={selectedImage.clothingItem.name || 'Kleidungsstück'} 
+                          className="w-16 h-16 object-cover rounded-lg border shadow-sm"
+                        />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm text-gray-800 truncate">
+                          {selectedImage.clothingItem.name || 'Unbekanntes Kleidungsstück'}
+                        </p>
+                        {selectedImage.clothingItem.link ? (
+                          <a 
+                            href={selectedImage.clothingItem.link} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center text-sm text-purple-600 hover:text-purple-800 hover:underline mt-1"
+                          >
+                            Produkt ansehen 
+                            <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                          </a>
+                        ) : (
+                          <p className="text-sm text-gray-500 italic mt-1">
+                            {language === 'de' ? 'Kein Link verfügbar' : 'No link available'}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ) : selectedImage.clothPhoto ? (
+                    // Lokal hochgeladenes Kleidungsstück mit clothPhoto
+                    <div className="flex items-center space-x-4 p-3 bg-gray-50 rounded-xl border">
+                      <img 
+                        src={selectedImage.clothPhoto} 
+                        alt="Hochgeladenes Kleidungsstück" 
+                        className="w-16 h-16 object-cover rounded-lg border shadow-sm"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm text-gray-600">
+                          {language === 'de' ? 'Eigenes Kleidungsstück' : 'Own Clothing Item'}
+                        </p>
+                        <p className="text-sm text-gray-500 italic">
+                          {language === 'de' 
+                            ? 'Dieses Foto wurde lokal von Ihnen hochgeladen' 
+                            : 'This photo was uploaded locally by you'}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    // Fallback wenn keine Kleidungsinformationen verfügbar sind
+                    <div className="flex items-center space-x-4 p-3 bg-gray-50 rounded-xl border">
+                      <div className="w-16 h-16 bg-gray-200 rounded-lg border flex items-center justify-center">
+                        <span className="text-gray-400 text-lg">👕</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm text-gray-600">
+                          {language === 'de' ? 'Kleidungsstück' : 'Clothing Item'}
+                        </p>
+                        <p className="text-sm text-gray-500 italic">
+                          {language === 'de' 
+                            ? 'Keine zusätzlichen Informationen verfügbar' 
+                            : 'No additional information available'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Image Info mit Prompt Toggle */}
+                <div className="mb-6 space-y-3">
                   {selectedImage.timestamp && (
-                    <p className="text-gray-600">
-                      <span className="font-medium">{t('closet.created')}:</span> {new Date(selectedImage.timestamp).toLocaleDateString()}
-                    </p>
+                    <div className="flex items-center space-x-2">
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <p className="text-gray-600">
+                        <span className="font-medium">{t('closet.created')}:</span> {new Date(selectedImage.timestamp).toLocaleDateString()}
+                      </p>
+                    </div>
                   )}
-                  {selectedImage.customPrompt && (
-                    <p className="text-gray-600">
-                      <span className="font-medium">{t('closet.prompt')}:</span> {selectedImage.customPrompt}
-                    </p>
-                  )}
+                  {/* Prompt anzeigen/verstecken - immer sichtbar */}
+                  <div className="space-y-2">
+                    {/* Debug: Log image data to console */}
+                    {selectedImage && console.log('Selected Image Data (Modal 2):', selectedImage)}
+                    <button
+                      onClick={() => setShowPrompt(!showPrompt)}
+                      className="flex items-center space-x-2 text-purple-600 hover:text-purple-800 font-medium transition-colors"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
+                      <span>{t('closet.showPrompt') || 'Prompt anzeigen'}</span>
+                      <svg className={`w-4 h-4 transition-transform ${showPrompt ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    {showPrompt && (
+                      <div className="p-3 bg-white border rounded-lg animate-fadeIn">
+                        {selectedImage.customPrompt || selectedImage.prompt ? (
+                          <p className="text-gray-700 italic">"{selectedImage.customPrompt || selectedImage.prompt}"</p>
+                        ) : (
+                          <div>
+                            <p className="text-gray-500 italic">{language === 'de' ? 'Kein Prompt gefunden' : 'No prompt found'}</p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              Debug: customPrompt = "{selectedImage.customPrompt}", prompt = "{selectedImage.prompt}"
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Add to Album Section - nur wenn nicht in einem Album oder in anderen Alben */}
