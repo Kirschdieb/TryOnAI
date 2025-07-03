@@ -131,38 +131,6 @@ export default function About() {
           </p>
         </Card>
 
-      {/* Technologie Stack */}
-      <section className="mb-16">
-        <h2 className="text-3xl font-semibold mb-6">
-          {language === 'de' ? 'Technologie Stack' : 'Technology Stack'}
-        </h2>
-        <div className="grid md:grid-cols-2 gap-10">
-          <Card>
-            <h3 className="text-xl font-semibold mb-4 text-purple-600">
-              {language === 'de' ? 'Frontend' : 'Frontend'}
-            </h3>
-            <div className="grid grid-cols-2 gap-3">
-              <span className="bg-gray-100 px-3 py-2 rounded text-sm">React.js</span>
-              <span className="bg-gray-100 px-3 py-2 rounded text-sm">Tailwind CSS</span>
-              <span className="bg-gray-100 px-3 py-2 rounded text-sm">Vite</span>
-              <span className="bg-gray-100 px-3 py-2 rounded text-sm">React Router</span>
-            </div>
-          </Card>
-
-          <Card>
-            <h3 className="text-xl font-semibold mb-4 text-blue-600">
-              {language === 'de' ? 'Backend & KI' : 'Backend & AI'}
-            </h3>
-            <div className="grid grid-cols-2 gap-3">
-              <span className="bg-gray-100 px-3 py-2 rounded text-sm">Node.js</span>
-              <span className="bg-gray-100 px-3 py-2 rounded text-sm">Express.js</span>
-              <span className="bg-gray-100 px-3 py-2 rounded text-sm">Python</span>
-              <span className="bg-gray-100 px-3 py-2 rounded text-sm">Machine Learning</span>
-            </div>
-          </Card>
-        </div>
-      </section>
-
       {/* Call to Action */}
       <Card className="text-center">
         <h2 className="text-2xl font-semibold mb-4">
@@ -188,6 +156,7 @@ export default function About() {
           </a>
         </div>
       </Card>
+    </div>
     </div>
   );
 }

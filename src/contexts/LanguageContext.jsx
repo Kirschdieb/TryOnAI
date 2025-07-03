@@ -19,6 +19,7 @@ const translations = {
     'nav.closet': 'Kleiderschrank',
     'nav.browse': 'Durchsuchen',
     'nav.profile': 'Profil',
+    'nav.faq': 'FAQ',
     'nav.about': 'About',
     'nav.switchToEnglish': 'Zu English wechseln',
     'nav.switchToGerman': 'Zu Deutsch wechseln',
@@ -55,7 +56,8 @@ const translations = {
     'landing.faq.a2': 'Wir unterstützen JPG, PNG und GIF.',
     'landing.faq.q3': 'Ist meine Privatsphäre sicher?',
     'landing.faq.a3': 'Ja, alle Bilder werden verschlüsselt und nur temporär verarbeitet.',
-
+    'landing.questionNotFound': 'Deine Frage nicht gefunden?',
+    'landing.goToFAQSection': 'Zum kompletten FAQ-Bereich',
     
     // Testimonials Section
 
@@ -100,6 +102,9 @@ const translations = {
     'browse.categories.outerwear': 'Außenbekleidung',
     'browse.categories.tshirts': 'Shirts',
     'browse.categories.jackets': 'Jacken',
+    'browse.categories.shirts': 'Hemden',
+    'browse.categories.pants': 'Hosen',
+    'browse.categoryTitle': 'Kategorien',
     'browse.tryNow': 'Jetzt anprobieren',
     'browse.clickHint': 'Klicke auf Bild oder Name, um bei Zalando anzuzeigen',
     'browse.cantFind': 'Findest du nicht, was du suchst?',
@@ -128,6 +133,8 @@ const translations = {
     'closet.deleteImage': 'Bild löschen',
     'closet.confirmDeleteImage': 'Dieses Bild wirklich dauerhaft löschen?',
     'closet.selectAlbum': 'Album wählen...',
+    'closet.close': 'Schließen',
+    'closet.enterAlbumId': 'Album auswählen',
     'closet.browseClothes': 'Kleidung durchsuchen',
     'closet.browseBoxTitle': 'Weitere Kleidung entdecken',
     'closet.browseBoxDesc': 'Hier kannst du weitere Kleidungsideen über Zalando durchstöbern und Inspiration für deinen Kleiderschrank sammeln.',
@@ -247,6 +254,10 @@ const translations = {
     'common.cancel': 'Abbrechen',
     'common.ok': 'OK',
     
+    // Closet / Album
+    'closet.addedToAlbum': 'Erfolgreich zum Album hinzugefügt!',
+    'closet.noAlbumsAvailable': 'Keine weiteren Alben verfügbar',
+    
     // Albums
     'albums.generated': 'Generierte Bilder',
     'albums.summer': 'Sommer',
@@ -256,23 +267,6 @@ const translations = {
     'albums.formal': 'Formal & Business',
     'albums.casual': 'Casual & Alltag',
     'albums.sport': 'Sport & Fitness',
-
-    // Try-On Studio Section Titles & Save
-    'studio.backgroundTitle': 'Hintergrund wählen',
-    'studio.poseTitle': 'Pose wählen',
-    'studio.qualityTitle': 'Bildqualität',
-    'studio.qualityDescription': 'Wählen Sie die Qualität des generierten Bildes. Höhere Qualität kann länger dauern.',
-    'studio.qualityLow': 'Niedrig',
-    'studio.qualityMedium': 'Mittel',
-    'studio.qualityHigh': 'Hoch',
-    'studio.saveTitle': 'Bild speichern',
-    'studio.saveDescription1': 'Das Bild wird automatisch im Album ',
-    'studio.saveDescriptionBold': 'Generierte Bilder',
-    'studio.saveDescription2': ' gespeichert. Sie können es zusätzlich in einem weiteren Album speichern.',
-    'studio.saveToAlbumLabel': 'In weiteres Album speichern:',
-    'studio.selectAlbum': 'Album auswählen...',
-    'studio.saveButton': 'Im Kleiderschrank speichern',
-    'studio.saveButtonSaved': 'Im Kleiderschrank gespeichert',
   },
   en: {    // Navigation
     'nav.home': 'Homepage',
@@ -280,6 +274,7 @@ const translations = {
     'nav.closet': 'Closet',
     'nav.browse': 'Browse',
     'nav.profile': 'Profile',
+    'nav.faq': 'FAQ',
     'nav.about': 'About',
     'nav.switchToEnglish': 'Switch to English',
     'nav.switchToGerman': 'Switch to German',
@@ -316,7 +311,8 @@ const translations = {
     'landing.faq.a2': 'We support JPG, PNG, and GIF.',
     'landing.faq.q3': 'Is my privacy protected?',
     'landing.faq.a3': 'Yes, all images are encrypted and processed temporarily only.',
-
+    'landing.questionNotFound': 'Didn\'t find your question?',
+    'landing.goToFAQSection': 'Go to complete FAQ section',
     
     // Testimonials Section
     'landing.testimonials.title': 'What our users say',
@@ -359,6 +355,9 @@ const translations = {
     'browse.categories.tops': 'Tops',
     'browse.categories.bottoms': 'Bottoms',
     'browse.categories.outerwear': 'Outerwear',
+    'browse.categories.shirts': 'Shirts',
+    'browse.categories.pants': 'Pants',
+    'browse.categoryTitle': 'Categories',
     'browse.categories.tshirts': 'T-Shirts',
     'browse.categories.jackets': 'Jackets',
     'browse.tryNow': 'Try Now',
@@ -389,6 +388,8 @@ const translations = {
     'closet.deleteImage': 'Delete Image',
     'closet.confirmDeleteImage': 'Really delete this image permanently?',
     'closet.selectAlbum': 'Select album...',
+    'closet.close': 'Close',
+    'closet.enterAlbumId': 'Select album',
     'closet.browseClothes': 'Browse Clothes',
     'closet.browseBoxTitle': 'Discover more clothing',
     'closet.browseBoxDesc': 'Here you can browse more clothing ideas via Zalando and get inspiration for your closet.',
@@ -492,6 +493,10 @@ const translations = {
     'common.next': 'Next',
     'common.cancel': 'Cancel',
     'common.ok': 'OK',
+    
+    // Closet / Album
+    'closet.addedToAlbum': 'Successfully added to album!',
+    'closet.noAlbumsAvailable': 'No other albums available',
     
     // Albums
     'albums.generated': 'Generated Pictures',

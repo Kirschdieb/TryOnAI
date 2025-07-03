@@ -4,6 +4,7 @@ export default function Button({ children, disabled, onClick, variant = 'primary
     primary: 'bg-lavender text-white hover:bg-opacity-90',
     secondary: 'bg-cream-300 text-gray-800 hover:bg-cream-400',
     outline: 'border-2 border-lavender text-lavender hover:bg-lavender hover:text-white',
+    danger: 'bg-red-500 text-white hover:bg-red-600',
   };
 
   return (

@@ -5,8 +5,8 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 
-// Hilfskomponente für "Zu Album hinzufügen" - kompakte Version
-function AddToAlbumSection({ selectedImage, albums, currentAlbumId, addImageToAlbum }) {
+// Hilfskomponente für "Zu Album hinzufügen" - verbesserte Version
+function AddToAlbumSection({ selectedImage, albums, currentAlbumId, addImageToAlbum, onImageAdded = null }) {
   const [targetAlbumId, setTargetAlbumId] = useState('');
   const [added, setAdded] = useState(false);
   const { t } = useLanguage();
@@ -14,20 +14,19 @@ function AddToAlbumSection({ selectedImage, albums, currentAlbumId, addImageToAl
   // Nur Alben anzeigen, in denen das Bild noch nicht ist und die nicht das aktuelle Album sind
   const availableAlbums = albums.filter(a => a.id !== currentAlbumId && !a.images.some(img => img.id === selectedImage.id));
   
-
-  if (availableAlbums.length === 0) return null;
+  if (availableAlbums.length === 0) return (
+    <p className="text-gray-500 italic">{t('closet.noAlbumsAvailable')}</p>
+  );
   
   return (
-    <div className="mt-4">
-      <label className="block mb-1 font-medium">{t('closet.addToAlbum')}:</label>
-      <div className="flex gap-2 items-center">
+    <div className="w-full">
+      <div className="flex flex-col sm:flex-row gap-3 items-center">
         <select
-          className="border rounded px-2 py-1 bg-white"
-
+          className="border-2 border-gray-200 rounded-xl px-4 py-2 bg-white focus:border-lavender focus:outline-none focus:ring-2 focus:ring-lavender/30 transition-all w-full sm:flex-1"
           value={targetAlbumId}
           onChange={e => setTargetAlbumId(e.target.value)}
         >
-          <option value="">{t('closet.selectAlbum') || 'Album wählen...'}</option>
+          <option value="">{t('closet.selectAlbum')}</option>
           {availableAlbums.map(album => (
             <option key={album.id} value={album.id}>{album.name}</option>
           ))}
@@ -35,20 +34,46 @@ function AddToAlbumSection({ selectedImage, albums, currentAlbumId, addImageToAl
         <Button
           variant="primary"
           disabled={!targetAlbumId || added}
-          className="px-2 py-1 text-xs"
+          className="px-4 py-2 sm:w-auto w-full"
           onClick={() => {
-            addImageToAlbum(targetAlbumId, { ...selectedImage, id: selectedImage.id || Date.now().toString() + Math.random().toString(36).substr(2, 5) });
+            const newImageId = selectedImage.id || Date.now().toString() + Math.random().toString(36).substr(2, 5);
+            // Album Name für Erfolgsanzeige speichern
+            const albumName = albums.find(a => a.id === targetAlbumId)?.name || '';
+            
+            // Bild zum Album hinzufügen
+            addImageToAlbum(targetAlbumId, { ...selectedImage, id: newImageId });
+            
+            // UI-Status aktualisieren
             setAdded(true);
-            setTimeout(() => setAdded(false), 1200);
+            setTargetAlbumId('');
+            
+            // Optional Callback ausführen (falls übergeben)
+            if (onImageAdded) {
+              onImageAdded(targetAlbumId, albumName);
+            }
+            
+            // Nach 3 Sekunden die Erfolgsmeldung zurücksetzen
+            setTimeout(() => setAdded(false), 3000);
           }}
         >
- Optimierung-Landingpage
-          {added ? '✓' : t('closet.addToAlbum')}
+          {added ? (
+            <span className="flex items-center gap-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              {t('studio.saveButtonSaved').replace('✓', '')}
+            </span>
+          ) : t('closet.addToAlbum')}
         </Button>
-        {added && <span className="text-green-600 ml-2">✓</span>}
-
       </div>
-      {added && <span className="text-green-600 text-xs">Hinzugefügt!</span>}
+      {added && (
+        <div className="mt-3 py-2 px-3 bg-green-50 border-l-4 border-green-500 text-green-700 rounded-md flex items-center gap-2 animate-fadeIn">
+          <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+          <span>{t('closet.addedToAlbum')}</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -159,6 +184,15 @@ export default function Closet() {
             opacity: 1;
             transform: translateX(0);
           }
+        }
+        
+        @keyframes fadeIn {
+          0% { opacity: 0; }
+          100% { opacity: 1; }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-in-out;
         }
       `}</style>
       
@@ -463,7 +497,30 @@ export default function Closet() {
                     {t('closet.albumEmptyDesc')}
                   </p>
                 </Card>
+              ) : selectedAlbum.images.length <= 4 ? (
+                // Flex-Layout für 1-4 Bilder, um die Lücke zwischen Bildern zu vermeiden
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+                  {selectedAlbum.images.map((img, idx) => (
+                    <Card
+                      key={img.id || idx}
+                      onClick={() => setSelectedImage(img)}
+                      className="cursor-pointer hover:shadow-lg transition-shadow duration-200"
+                    >
+                      <div className="relative aspect-[3/4]">
+                        <img
+                          src={img.image}
+                          alt={img.customPrompt || 'Try-On'}
+                          className="absolute inset-0 w-full h-full object-cover rounded-2xl"
+                        />
+                      </div>
+                      <p className="mt-2 text-sm text-gray-500 text-center">
+                        {img.timestamp ? new Date(img.timestamp).toLocaleDateString() : ''}
+                      </p>
+                    </Card>
+                  ))}
+                </div>
               ) : (
+                // Columns-Layout für mehr als 4 Bilder
                 <div className="columns-1 sm:columns-2 lg:columns-4 gap-4 space-y-4 mb-10">
                   {selectedAlbum.images.map((img, idx) => (
                     <Card
@@ -529,68 +586,94 @@ export default function Closet() {
 
         {/* Bild Detail Modal - nur im Album-Inhalt sichtbar */}
         {viewMode === 'album-content' && selectedImage && (
-          <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
             <div className="absolute inset-0 bg-black opacity-50" onClick={() => setSelectedImage(null)}></div>
             
-            <div className="bg-white rounded-lg shadow-lg max-w-lg w-full z-10 overflow-hidden">
-              {/* Bild Anzeige */}
-              <div className="relative pt-4 pb-2">
+            <div className="bg-white rounded-2xl shadow-xl max-w-4xl w-full z-10 overflow-hidden">
+              {/* Header mit X-Button */}
+              <div className="flex items-center justify-between p-4 border-b">
+                <h2 className="text-2xl font-bold text-gray-800">{t('closet.imageDetails')}</h2>
                 <button
                   onClick={() => setSelectedImage(null)}
-                  className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
+                  className="text-gray-500 hover:text-gray-700 transition-colors"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
-
-
-                <img
-                  src={selectedImage.image}
-                  alt={selectedImage.customPrompt || 'Try-On Bild'}
-                  className="w-full h-auto rounded-lg"
-                />
               </div>
 
-
-              {/* Bild Aktionen */}
-              <div className="p-4 border-t border-gray-200">
-                <div className="flex gap-2 mb-4">
-                  <Button
-                    variant="primary"
-                    className="flex-1"
-                    onClick={() => {
-                      // Bild zu neuem Album hinzufügen
-                      const newAlbumId = prompt(t('closet.enterAlbumId') || 'Gib die Album-ID ein:');
-                      if (newAlbumId) {
-                        addImageToAlbum(newAlbumId, { ...selectedImage, id: selectedImage.id || Date.now().toString() + Math.random().toString(36).substr(2, 5) });
-                        setSelectedImage(null);
-                      }
-                    }}
-                  >
-                    {t('closet.addToAlbum')}
-                  </Button>
-                  <Button
-                    variant="danger"
-                    className="flex-1"
-                    onClick={() => {
-                      if (window.confirm(t('closet.confirmDeleteImage') || 'Bild wirklich löschen?')) {
-                        deleteImageFromAllAlbums(selectedImage.id);
-                        setSelectedImage(null);
-                      }
-                    }}
-                  >
-                    {t('closet.deleteImage')}
-                  </Button>
+              {/* Hauptinhalt - Bild neben Aktionen */}
+              <div className="flex flex-col md:flex-row p-6">
+                {/* Bild Anzeige - links bei größeren Bildschirmen */}
+                <div className="md:w-1/2 flex items-center justify-center mb-6 md:mb-0 md:pr-6">
+                  <div className="max-h-[60vh] overflow-hidden flex items-center justify-center">
+                    <img
+                      src={selectedImage.image}
+                      alt={selectedImage.customPrompt || 'Try-On Bild'}
+                      className="max-w-full max-h-full object-contain rounded-xl shadow-lg"
+                    />
+                  </div>
                 </div>
 
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => setSelectedImage(null)}
-                >
-                  {t('closet.close')}
-                </Button>
+                {/* Bild Aktionen - rechts bei größeren Bildschirmen */}
+                <div className="md:w-1/2 flex flex-col">
+                  {/* Bild Info falls vorhanden */}
+                  {(selectedImage.timestamp || selectedImage.customPrompt) && (
+                    <div className="mb-6 space-y-2">
+                      {selectedImage.timestamp && (
+                        <p className="text-gray-600">
+                          <span className="font-medium">{t('closet.created')}:</span> {new Date(selectedImage.timestamp).toLocaleDateString()}
+                        </p>
+                      )}
+                      {selectedImage.customPrompt && (
+                        <p className="text-gray-600">
+                          <span className="font-medium">{t('closet.prompt')}:</span> {selectedImage.customPrompt}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Album-Auswahl mit Dropdown */}
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-3">{t('closet.addToAlbum')}</h3>
+                    <AddToAlbumSection
+                      selectedImage={selectedImage}
+                      albums={albums}
+                      currentAlbumId={selectedAlbum?.id}
+                      addImageToAlbum={addImageToAlbum}
+                    />
+                  </div>
+                  
+                  {/* Action Buttons */}
+                  <div className="mt-auto">
+                    <div className="flex gap-3 mb-3">
+                      <Button
+                        variant="danger"
+                        className="flex-1 flex items-center justify-center gap-2 py-3"
+                        onClick={() => {
+                          if (window.confirm(t('closet.confirmDeleteImage') || 'Bild wirklich löschen?')) {
+                            deleteImageFromAllAlbums(selectedImage.id);
+                            setSelectedImage(null);
+                          }
+                        }}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        {t('closet.deleteImage')}
+                      </Button>
+                      
+                      <Button
+                        variant="outline"
+                        className="flex-1 py-3"
+                        onClick={() => setSelectedImage(null)}
+                      >
+                        {t('closet.close')}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -599,11 +682,11 @@ export default function Closet() {
 
 
       {/* Image Detail Modal */}
-      {selectedImage && (
+      {selectedImage && viewMode !== 'album-content' && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b">
+            <div className="flex items-center justify-between p-4 border-b">
               <h2 className="text-2xl font-bold text-gray-800">{t('closet.imageDetails')}</h2>
               <button
                 onClick={() => setSelectedImage(null)}
@@ -615,72 +698,92 @@ export default function Closet() {
               </button>
             </div>
 
-            {/* Modal Content */}
-            <div className="p-6">
-              {/* Image Display */}
-              <div className="mb-6">
-                <img
-                  src={selectedImage.image}
-                  alt={selectedImage.customPrompt || 'Try-On'}
-                  className="w-full max-w-md mx-auto rounded-lg shadow-lg"
-                />
+            {/* Hauptinhalt - Bild neben Aktionen */}
+            <div className="flex flex-col md:flex-row p-6">
+              {/* Bild Anzeige - links bei größeren Bildschirmen */}
+              <div className="md:w-1/2 flex items-center justify-center mb-6 md:mb-0 md:pr-6">
+                <div className="max-h-[60vh] overflow-hidden flex items-center justify-center">
+                  <img
+                    src={selectedImage.image}
+                    alt={selectedImage.customPrompt || 'Try-On'}
+                    className="max-w-full max-h-full object-contain rounded-xl shadow-lg"
+                  />
+                </div>
               </div>
 
-              {/* Image Info */}
-              <div className="mb-6 space-y-2">
-                {selectedImage.timestamp && (
-                  <p className="text-gray-600">
-                    <span className="font-medium">{t('closet.created')}:</span> {new Date(selectedImage.timestamp).toLocaleDateString()}
-                  </p>
-                )}
-                {selectedImage.customPrompt && (
-                  <p className="text-gray-600">
-                    <span className="font-medium">{t('closet.prompt')}:</span> {selectedImage.customPrompt}
-                  </p>
-                )}
-              </div>
+              {/* Bild Aktionen - rechts bei größeren Bildschirmen */}
+              <div className="md:w-1/2 flex flex-col">
+                {/* Image Info */}
+                <div className="mb-6 space-y-2">
+                  {selectedImage.timestamp && (
+                    <p className="text-gray-600">
+                      <span className="font-medium">{t('closet.created')}:</span> {new Date(selectedImage.timestamp).toLocaleDateString()}
+                    </p>
+                  )}
+                  {selectedImage.customPrompt && (
+                    <p className="text-gray-600">
+                      <span className="font-medium">{t('closet.prompt')}:</span> {selectedImage.customPrompt}
+                    </p>
+                  )}
+                </div>
 
-              {/* Add to Album Section - nur wenn nicht in einem Album oder in anderen Alben */}
-              <AddToAlbumSection
-                selectedImage={selectedImage}
-                albums={albums}
-                currentAlbumId={selectedAlbum?.id}
-                addImageToAlbum={addImageToAlbum}
-              />
+                {/* Add to Album Section - nur wenn nicht in einem Album oder in anderen Alben */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-3">{t('closet.addToAlbum')}</h3>
+                  <AddToAlbumSection
+                    selectedImage={selectedImage}
+                    albums={albums}
+                    currentAlbumId={selectedAlbum?.id}
+                    addImageToAlbum={addImageToAlbum}
+                  />
+                </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 mt-6">
-                {/* Remove from Album - nur wenn in einem spezifischen Album und nicht "Generierte Bilder" */}
-                {selectedAlbum && selectedAlbum.id !== 'generated' && (
-                  <Button
-                    onClick={() => {
-                      removeImageFromAlbum(selectedAlbum.id, selectedImage.id);
-                      setSelectedImage(null);
-                    }}
-                    className="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl font-semibold transition-all duration-200 flex items-center gap-2 justify-center"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                    </svg>
-                    {t('closet.removeFromAlbum')}
-                  </Button>
-                )}
+                {/* Action Buttons */}
+                <div className="mt-auto">
+                  <div className="flex flex-col sm:flex-row gap-3 mb-3">
+                    {/* Remove from Album - nur wenn in einem spezifischen Album und nicht "Generierte Bilder" */}
+                    {selectedAlbum && selectedAlbum.id !== 'generated' && (
+                      <Button
+                        variant="secondary"
+                        className="flex-1 flex items-center justify-center gap-2 py-3"
+                        onClick={() => {
+                          removeImageFromAlbum(selectedAlbum.id, selectedImage.id);
+                          setSelectedImage(null);
+                        }}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                        </svg>
+                        {t('closet.removeFromAlbum')}
+                      </Button>
+                    )}
 
-                {/* Delete Image Permanently */}
-                <Button
-                  onClick={() => {
-                    if (window.confirm(t('closet.confirmDeleteImage'))) {
-                      deleteImageFromAllAlbums(selectedImage.id);
-                      setSelectedImage(null);
-                    }
-                  }}
-                  className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-semibold transition-all duration-200 flex items-center gap-2 justify-center"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  {t('closet.deleteImage')}
-                </Button>
+                    {/* Delete Image Permanently */}
+                    <Button
+                      variant="danger"
+                      className="flex-1 flex items-center justify-center gap-2 py-3"
+                      onClick={() => {
+                        if (window.confirm(t('closet.confirmDeleteImage'))) {
+                          deleteImageFromAllAlbums(selectedImage.id);
+                          setSelectedImage(null);
+                        }
+                      }}
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      {t('closet.deleteImage')}
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      className="flex-1 py-3"
+                      onClick={() => setSelectedImage(null)}
+                    >
+                      {t('closet.close')}
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
