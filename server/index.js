@@ -982,19 +982,7 @@ app.get('/api/product-info', async (req, res) => {
       const html = await shopResp.text();
       const $ = cheerio.load(html);
       
-      // Try to find the image in this order: og:image -> picture -> generic img
-      const ogImg = $('meta[property="og:image"], meta[name="og:image"]').attr("content");
-      const pictureImg = $("picture img").first().attr("src");
-      const genericImg = $("img").first().attr("src");
-      
-      const foundImg = ogImg || pictureImg || genericImg;
-      let result = null;
-      
-      if (foundImg) {
-        result = { imageUrl: foundImg.split('?')[0] };
-      }
-
-      // Extract fit information without modifying image extraction
+      // Nur Passform-Extraktion, keine Bildextraktion mehr
       const fitKeywords = ['Passform', 'Modelgröße', 'Schnitt', 'trägt Größe', 'Regular Fit', 'Slim Fit', 'Loose Fit'];
       let fitInfo = [];
       
@@ -1006,11 +994,13 @@ app.get('/api/product-info', async (req, res) => {
       });
       
       if (fitInfo.length > 0) {
-        result = result || {};
-        result.fit = [...new Set(fitInfo)].join(' | ');
+        return {
+          fit: [...new Set(fitInfo)].join(' | '),
+          url: targetUrl
+        };
       }
       
-      return result;
+      return null;
     } catch (err) {
       return null;
     }
@@ -1028,22 +1018,11 @@ app.get('/api/product-info', async (req, res) => {
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36");
       
       await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 10000 });
-      await page.waitForSelector('img[src]', { timeout: 5000 }).catch(() => {});
       
-      // Keep original image extraction logic
-      const biggestImg = await page.$$eval('img[src]', imgs => {
-        return imgs.reduce((best, img) => {
-          const area = (img.naturalWidth || img.width || 0) * (img.naturalHeight || img.height || 0);
-          return (!best || area > best.area) ? { src: img.src, area } : best;
-        }, null)?.src;
-      });
-
-      let result = null;
-      if (biggestImg) {
-        result = { imageUrl: biggestImg.split('?')[0] };
-      }
-
-      // Add fit information extraction
+      // Warten auf Selektoren, die für Passform-Infos relevant sind
+      await page.waitForSelector('[data-testid="pdp-description-content"], [data-testid*="fit"], [data-testid*="size"]', { timeout: 5000 }).catch(() => {});
+      
+      // Nur Passform-Information extrahieren
       const fitInfo = await page.$$eval('[data-testid="pdp-description-content"], [data-testid*="fit"], [data-testid*="size"]', 
         (elements, keywords) => {
           const texts = elements.map(el => el.textContent.trim().replace(/\s+/g, ' '))
@@ -1054,11 +1033,13 @@ app.get('/api/product-info', async (req, res) => {
       );
 
       if (fitInfo.length > 0) {
-        result = result || {};
-        result.fit = fitInfo.join(' | ');
+        return {
+          fit: fitInfo.join(' | '),
+          url: targetUrl
+        };
       }
       
-      return result;
+      return null;
     } catch (err) {
       return null;
     } finally {
@@ -1090,9 +1071,15 @@ app.get('/api/product-info', async (req, res) => {
     }
     
     // If no result was found
-    return respondOnce({ error: "Keine Informationen gefunden" }, 404);
+    return respondOnce({ 
+      fit: "Keine Passform-Information verfügbar",
+      url: targetUrl
+    });
   } catch (err) {
-    return respondOnce({ error: err.message || "Fehler bei der Extraktion" }, 500);
+    return respondOnce({ 
+      fit: "Fehler bei der Extraktion der Passform-Information", 
+      url: targetUrl
+    }, 500);
   }
 });
 
