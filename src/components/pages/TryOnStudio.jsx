@@ -27,7 +27,7 @@ const Tooltip = ({ children }) => (
 );
 
 // Product Info Dialog Component
-const ProductInfoDialog = ({ isOpen, onClose }) => {
+const ProductInfoDialog = ({ isOpen, onClose, productInfo, isLoading, isZalandoProduct, originalProductUrl, onFetchProductInfo }) => {
   if (!isOpen) return null;
   
   return (
@@ -41,7 +41,77 @@ const ProductInfoDialog = ({ isOpen, onClose }) => {
         </button>
         <h2 className="text-2xl font-semibold mb-4">Produktinformationen</h2>
         <div className="prose">
-          <p>Hier könnte Passform von Zalando reingescraped werden?!-jaaaaaaaaaaaaaaaa</p>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <LoadingSpinner />
+            </div>
+          ) : productInfo ? (
+            <div className="space-y-4">
+              {/* Titel und Marke */}
+              {productInfo.brand && (
+                <h3 className="text-xl font-medium">{productInfo.brand}</h3>
+              )}
+              {productInfo.name && (
+                <p className="text-lg">{productInfo.name}</p>
+              )}
+              
+              {/* Passforminformationen */}
+              {productInfo.fit && (
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <h4 className="font-medium mb-2">Passform</h4>
+                  <p>{productInfo.fit}</p>
+                </div>
+              )}
+              
+              {/* Materialbeschreibung */}
+              {productInfo.material && (
+                <div>
+                  <h4 className="font-medium mb-2">Material</h4>
+                  <p>{productInfo.material}</p>
+                </div>
+              )}
+              
+              {/* Pflegehinweise */}
+              {productInfo.care && (
+                <div>
+                  <h4 className="font-medium mb-2">Pflegehinweise</h4>
+                  <p>{productInfo.care}</p>
+                </div>
+              )}
+              
+              {/* Link zum Produkt */}
+              {productInfo.url && (
+                <div className="mt-6">
+                  <a 
+                    href={productInfo.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-purple-600 hover:text-purple-700 underline"
+                  >
+                    Zum Produkt bei Zalando →
+                  </a>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-gray-500">
+              <p className="mb-4">
+                {isZalandoProduct 
+                  ? "Produktinformationen für dieses Zalando-Produkt konnten nicht geladen werden."
+                  : "Keine Produktinformationen verfügbar. Dies ist kein Zalando-Produkt."
+                }
+              </p>
+              {isZalandoProduct && originalProductUrl && onFetchProductInfo && (
+                <button
+                  onClick={() => onFetchProductInfo(originalProductUrl)}
+                  className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Lädt...' : 'Produktinformationen laden'}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -51,6 +121,10 @@ const ProductInfoDialog = ({ isOpen, onClose }) => {
 const Studio = () => {
   const { t } = useLanguage();
   const [isProductInfoOpen, setIsProductInfoOpen] = useState(false);
+  const [productInfo, setProductInfo] = useState(null);
+  const [isLoadingProductInfo, setIsLoadingProductInfo] = useState(false);
+  const [originalProductUrl, setOriginalProductUrl] = useState(null); // Store original Zalando URL
+  const [isZalandoProduct, setIsZalandoProduct] = useState(false); // Track if this is a Zalando product
   // Pose-Optionen
   const [selectedPose, setSelectedPose] = useState('standing');
   const poseOptions = [
@@ -60,7 +134,7 @@ const Studio = () => {
     { value: 'armscrossed', label: t('studio.pose.armscrossed'), icon: <ArmsCrossedIcon /> },
   ];
   const navigate = useNavigate();
-  const { userPhoto, clothPhoto, selectedClothingItem, albums, addGeneratedImage, addImageToAlbum } = useCloset();
+  const { userPhoto, clothPhoto, selectedClothingItem, albums, addGeneratedImage, addImageToAlbum, homeZalandoUrl, setHomeZalandoUrl } = useCloset();
   const [customPrompt, setCustomPrompt] = useState('');
   const [fullGeneratedPrompt, setFullGeneratedPrompt] = useState(''); // Store the complete prompt sent to server
   const [isGenerating, setIsGenerating] = useState(false);
@@ -130,28 +204,135 @@ const Studio = () => {
     }
   }, [userPhoto, clothPhoto, navigate]);
 
+  // Initialize Zalando product state and original URL
+  useEffect(() => {
+    if (clothPhoto) {
+      const isZalandoLink = /^https?:\/\/(www\.)?zalando\./i.test(clothPhoto);
+      const isZalandoImage = /ztat\.net/i.test(clothPhoto);
+      
+      if (isZalandoLink) {
+        setIsZalandoProduct(true);
+        setOriginalProductUrl(clothPhoto);
+        console.log('Initialized with Zalando product URL:', clothPhoto);
+      } else if (isZalandoImage) {
+        setIsZalandoProduct(true);
+        if (homeZalandoUrl && /^https?:\/\/(www\.)?zalando\./i.test(homeZalandoUrl)) {
+          setOriginalProductUrl(homeZalandoUrl);
+          console.log('Initialized with Zalando image URL, using stored original URL:', homeZalandoUrl);
+        } else {
+          console.log('Initialized with Zalando image URL, but no original URL available');
+        }
+      } else {
+        setIsZalandoProduct(false);
+        setOriginalProductUrl(null);
+        console.log('Initialized with non-Zalando URL:', clothPhoto);
+      }
+    }
+  }, [clothPhoto, homeZalandoUrl]);
+
+  // Cleanup effect to clear homeZalandoUrl when component unmounts
+  useEffect(() => {
+    return () => {
+      if (homeZalandoUrl) {
+        setHomeZalandoUrl('');
+        console.log('Cleared homeZalandoUrl on component unmount');
+      }
+    };
+  }, [homeZalandoUrl, setHomeZalandoUrl]);
+
   if (!userPhoto || !clothPhoto) {
     return null;
   }
 
   const extractClothImage = async () => {
     const isZalandoLink = clothPhoto && /^https?:\/\/(www\.)?zalando\./i.test(clothPhoto);
-    if (isZalandoLink) {
-      setIsExtractingCloth(true);
-      setExtractError(null);
-      try {
+    const isZalandoImage = clothPhoto && /ztat\.net/i.test(clothPhoto);
+    
+    console.log('Extracting cloth image for URL:', clothPhoto);
+    console.log('Is Zalando link?', isZalandoLink);
+    console.log('Is Zalando image?', isZalandoImage);
+    console.log('Stored original Zalando URL:', homeZalandoUrl);
+    
+    setIsExtractingCloth(true);
+    setExtractError(null);
+    
+    try {
+      // If it's a direct Zalando link, extract both image and product info
+      if (isZalandoLink) {
+        setOriginalProductUrl(clothPhoto);
+        setIsZalandoProduct(true);
+        console.log('Fetching image from Zalando URL:', clothPhoto);
+        
+        // First get the image
         const res = await fetch(`http://localhost:3001/api/extract?url=${encodeURIComponent(clothPhoto)}`);
         if (!res.ok) throw new Error(`Extraction failed (${res.status})`);
         const data = await res.json();
-        if (data.imageUrl) setExtractedClothImage(data.imageUrl);
-        else throw new Error(data.error || 'No image found');
-      } catch (err) {
-        setExtractError(err.message);
-      } finally {
-        setIsExtractingCloth(false);
+        console.log('Image extraction response:', data);
+        
+        if (data.imageUrl) {
+          setExtractedClothImage(data.imageUrl);
+          
+          // Then get product info using the original Zalando URL
+          await fetchProductInfo(clothPhoto);
+        } else {
+          throw new Error(data.error || 'No image found');
+        }
       }
-    } else {
-      setExtractedClothImage(clothPhoto);
+      // If it's a Zalando image URL (ztat.net), use original URL if available
+      else if (isZalandoImage) {
+        setExtractedClothImage(clothPhoto);
+        setIsZalandoProduct(true);
+        
+        // Check for stored original URL first, then fallback to originalProductUrl state
+        const originalUrlToUse = homeZalandoUrl || originalProductUrl;
+        
+        if (originalUrlToUse && /^https?:\/\/(www\.)?zalando\./i.test(originalUrlToUse)) {
+          console.log('Using stored/original URL for product info:', originalUrlToUse);
+          setOriginalProductUrl(originalUrlToUse); // Ensure it's stored in state too
+          await fetchProductInfo(originalUrlToUse);
+        } else {
+          console.log('Zalando image URL detected, but no original product URL available');
+          setProductInfo(null);
+        }
+      }
+      // Not a Zalando URL at all
+      else {
+        setExtractedClothImage(clothPhoto);
+        setProductInfo(null);
+        setOriginalProductUrl(null);
+        setIsZalandoProduct(false);
+      }
+    } catch (err) {
+      console.error('Extraction error:', err);
+      setExtractError(err.message);
+      setProductInfo(null);
+      setIsZalandoProduct(false);
+    } finally {
+      setIsExtractingCloth(false);
+    }
+  };
+
+  // Helper function to fetch product info
+  const fetchProductInfo = async (url) => {
+    try {
+      setIsLoadingProductInfo(true);
+      console.log('Fetching product info for URL:', url);
+      const infoRes = await fetch(`http://localhost:3001/api/product-info?url=${encodeURIComponent(url)}`);
+      const productData = await infoRes.json();
+      console.log('Product info response:', productData);
+      
+      if (infoRes.ok && !productData.error) {
+        setProductInfo(productData);
+        setOriginalProductUrl(url);
+      } else {
+        console.error('Product info error:', productData.error || 'Unknown error');
+        setProductInfo(null);
+      }
+    } catch (err) {
+      console.error('Product info fetch error:', err);
+      setProductInfo(null);
+    } finally {
+      setIsLoadingProductInfo(false);
     }
   };
 
@@ -575,7 +756,12 @@ const Studio = () => {
       {/* Product Info Dialog */}
       <ProductInfoDialog 
         isOpen={isProductInfoOpen} 
-        onClose={() => setIsProductInfoOpen(false)} 
+        onClose={() => setIsProductInfoOpen(false)}
+        productInfo={productInfo}
+        isLoading={isLoadingProductInfo}
+        isZalandoProduct={isZalandoProduct}
+        originalProductUrl={originalProductUrl}
+        onFetchProductInfo={fetchProductInfo}
       />
     </div>
   );

@@ -85,8 +85,15 @@ export default function HomeUpload() {
     // Use local state (synced with store) for cloth photo decision
     setClothPhoto(localClothPhotoUrl || localZalandoUrl); // Set cloth photo for /studio
 
-    // Clear the home page specific inputs from the store after they've been used for the studio
-    setHomeZalandoUrl('');
+    // Only clear homeClothPhotoUrl, but preserve homeZalandoUrl if it's a Zalando URL
+    // This preserves the original Zalando URL for product info extraction in the studio
+    if (localZalandoUrl && /^https?:\/\/(www\.)?zalando\./i.test(localZalandoUrl)) {
+      // Keep the original Zalando URL for product info extraction
+      setHomeZalandoUrl(localZalandoUrl);
+    } else {
+      // Clear it if it's not a Zalando URL
+      setHomeZalandoUrl('');
+    }
     setHomeClothPhotoUrl(null);
 
     navigate('/studio');

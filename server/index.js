@@ -1,10 +1,10 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const { OpenAI, toFile } = require('openai');
 const fs = require('fs');
 const fsp = fs.promises;
-const path = require('path');
 const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
 const cheerio = require('cheerio');
@@ -21,6 +21,7 @@ const port = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors()); // Enable CORS for all routes
+app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true }));
 
 const TEMP_DIR = path.join(__dirname, 'temp');
@@ -234,6 +235,8 @@ app.get('/api/extract', async (req, res) => {
   const respondOnce = (data, status = 200) => {
     if (!responded) {
       responded = true;
+      clearTimeout(puppeteerTimeout);
+      clearTimeout(hardTimeout);
       if (status === 200) res.json(data);
       else res.status(status).json(data);
     }
@@ -242,99 +245,94 @@ app.get('/api/extract', async (req, res) => {
   // --- Methode 1: Schnelle Extraktion mit fetch/cheerio ---
   const fastExtract = async () => {
     try {
-      console.log(`[extract] Starte fetch/cheerio für: ${targetUrl}`);
       const shopResp = await fetch(targetUrl, {
         headers: {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
           "Accept": "text/html,application/xhtml+xml",
         },
       });
-      console.log(`[extract] fetch Status: ${shopResp.status} für ${targetUrl}`);
-      if (!shopResp.ok) {
-        console.warn(`[extract] fetch fehlgeschlagen (${shopResp.status}) für ${targetUrl}`);
-        // NICHT direkt antworten, damit Puppeteer übernehmen kann
-        return;
-      }
+      
+      if (!shopResp.ok) return null;
+
       const html = await shopResp.text();
       const $ = cheerio.load(html);
+      
+      // Try to find the image in this order: og:image -> picture -> generic img
       const ogImg = $('meta[property="og:image"], meta[name="og:image"]').attr("content");
-      if (ogImg) {
-        const cleanImageUrl = ogImg.split('?')[0];
-        console.log(`[extract] fetch/cheerio: og:image gefunden: ${cleanImageUrl}`);
-        respondOnce({ imageUrl: cleanImageUrl });
-        return;
+      const pictureImg = $("picture img").first().attr("src");
+      const genericImg = $("img").first().attr("src");
+      
+      const foundImg = ogImg || pictureImg || genericImg;
+      if (foundImg) {
+        return { imageUrl: foundImg.split('?')[0] };
       }
-      const img = $("picture img").first().attr("src") || $("img").first().attr("src");
-      if (img) {
-        const cleanImageUrl = img.split('?')[0];
-        console.log(`[extract] fetch/cheerio: <img> gefunden: ${cleanImageUrl}`);
-        respondOnce({ imageUrl: cleanImageUrl });
-        return;
-      }
-      console.warn(`[extract] fetch/cheerio: Kein Bild gefunden für ${targetUrl}`);
-      // Kein Bild gefunden, aber nicht direkt antworten, falls Puppeteer noch läuft
+      
+      return null;
     } catch (err) {
-      console.error(`[extract] fetch/cheerio Fehler:`, err);
-      // Fehler ignorieren, Puppeteer übernimmt ggf.
+      return null;
     }
   };
 
   // --- Methode 2: Puppeteer als Fallback ---
   const puppeteerExtract = async () => {
+    let browser;
     try {
-      console.log(`[extract] Starte Puppeteer für: ${targetUrl}`);
-      const puppeteer = require('puppeteer');
-      const browser = await puppeteer.launch({
+      browser = await puppeteer.launch({
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        headless: true,
+        headless: "new",
       });
       const page = await browser.newPage();
       await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36");
-      await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
-      // Warte auf irgendein Bild im DOM (max. 10s)
-      try {
-        await page.waitForSelector('img[src]', { timeout: 10000 });
-      } catch (e) {
-        console.warn('[extract] Kein <img> mit src nach 10s gefunden.');
-      }
-      // Nimm das größte Bild auf der Seite
+      
+      await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 10000 });
+      await page.waitForSelector('img[src]', { timeout: 5000 }).catch(() => {});
+      
       const biggestImg = await page.$$eval('img[src]', imgs => {
-        let maxArea = 0, best = null;
-        for (const img of imgs) {
+        return imgs.reduce((best, img) => {
           const area = (img.naturalWidth || img.width || 0) * (img.naturalHeight || img.height || 0);
-          if (img.src && area > maxArea) {
-            maxArea = area;
-            best = img.src;
-          }
-        }
-        return best;
+          return (!best || area > best.area) ? { src: img.src, area } : best;
+        }, null)?.src;
       });
-      await browser.close();
+      
       if (biggestImg) {
-        console.log(`[extract] Puppeteer: Größtes Bild gefunden: ${biggestImg.split('?')[0]}`);
-        respondOnce({ imageUrl: biggestImg.split('?')[0] });
-        return;
+        return { imageUrl: biggestImg.split('?')[0] };
       }
-      console.warn(`[extract] Puppeteer: Kein Bild gefunden für ${targetUrl}`);
-      respondOnce({ error: "Kein Bild gefunden (Puppeteer)" }, 404);
+      return null;
     } catch (err) {
-      console.error(`[extract] Puppeteer Fehler:`, err);
-      respondOnce({ error: err.message || "Unbekannter Fehler (Puppeteer)" }, 500);
+      return null;
+    } finally {
+      if (browser) await browser.close();
     }
   };
 
-  // --- Ablaufsteuerung: Fast-First, dann Fallback ---
-  let fastDone = false;
-  const fastPromise = fastExtract().then(() => { fastDone = true; });
-  // Starte Puppeteer nach 2s, falls fastExtract nicht erfolgreich war
-  const puppeteerTimeout = setTimeout(() => {
-    if (!responded) puppeteerExtract();
-  }, 2000);
+  let puppeteerTimeout, hardTimeout;
 
-  // Harte Timeout-Grenze (z.B. 15s)
-  setTimeout(() => {
-    if (!responded) respondOnce({ error: "Timeout bei der Bildextraktion" }, 504);
-  }, 15000);
+  try {
+    // Try fast extraction first
+    const fastResult = await fastExtract();
+    if (fastResult) {
+      return respondOnce(fastResult);
+    }
+
+    // If fast extraction fails, set up Puppeteer with timeout
+    const puppeteerPromise = puppeteerExtract();
+    
+    // Set up timeouts
+    const timeoutPromise = new Promise((_, reject) => {
+      hardTimeout = setTimeout(() => reject(new Error("Timeout")), 15000);
+    });
+
+    // Wait for either Puppeteer or timeout
+    const result = await Promise.race([puppeteerPromise, timeoutPromise]);
+    if (result) {
+      return respondOnce(result);
+    }
+    
+    // If no result was found
+    return respondOnce({ error: "Kein Bild gefunden" }, 404);
+  } catch (err) {
+    return respondOnce({ error: err.message || "Fehler bei der Bildextraktion" }, 500);
+  }
 });
 
 // Function to scrape Zalando products using Puppeteer (fallback method)
@@ -948,6 +946,153 @@ app.get('/api/test-scrape', async (req, res) => {
       error: error.message,
       message: 'Error occurred during scraping test'
     });
+  }
+});
+
+// Add product info extraction endpoint
+app.get('/api/product-info', async (req, res) => {
+  const targetUrl = req.query.url;
+  if (!targetUrl) {
+    return res.status(400).json({ error: "Parameter ?url fehlt" });
+  }
+
+  let responded = false;
+  const respondOnce = (data, status = 200) => {
+    if (!responded) {
+      responded = true;
+      clearTimeout(puppeteerTimeout);
+      clearTimeout(hardTimeout);
+      if (status === 200) res.json(data);
+      else res.status(status).json(data);
+    }
+  };
+
+  // --- Methode 1: Schnelle Extraktion mit fetch/cheerio ---
+  const fastExtract = async () => {
+    try {
+      const shopResp = await fetch(targetUrl, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+          "Accept": "text/html,application/xhtml+xml",
+        },
+      });
+      
+      if (!shopResp.ok) return null;
+
+      const html = await shopResp.text();
+      const $ = cheerio.load(html);
+      
+      // Try to find the image in this order: og:image -> picture -> generic img
+      const ogImg = $('meta[property="og:image"], meta[name="og:image"]').attr("content");
+      const pictureImg = $("picture img").first().attr("src");
+      const genericImg = $("img").first().attr("src");
+      
+      const foundImg = ogImg || pictureImg || genericImg;
+      let result = null;
+      
+      if (foundImg) {
+        result = { imageUrl: foundImg.split('?')[0] };
+      }
+
+      // Extract fit information without modifying image extraction
+      const fitKeywords = ['Passform', 'Modelgröße', 'Schnitt', 'trägt Größe', 'Regular Fit', 'Slim Fit', 'Loose Fit'];
+      let fitInfo = [];
+      
+      $('[data-testid="pdp-description-content"], [data-testid*="fit"], [data-testid*="size"]').each((_, elem) => {
+        const text = $(elem).text().trim().replace(/\s+/g, ' ');
+        if (text && fitKeywords.some(keyword => text.includes(keyword))) {
+          fitInfo.push(text);
+        }
+      });
+      
+      if (fitInfo.length > 0) {
+        result = result || {};
+        result.fit = [...new Set(fitInfo)].join(' | ');
+      }
+      
+      return result;
+    } catch (err) {
+      return null;
+    }
+  };
+
+  // --- Methode 2: Puppeteer als Fallback ---
+  const puppeteerExtract = async () => {
+    let browser;
+    try {
+      browser = await puppeteer.launch({
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        headless: "new",
+      });
+      const page = await browser.newPage();
+      await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36");
+      
+      await page.goto(targetUrl, { waitUntil: 'domcontentloaded', timeout: 10000 });
+      await page.waitForSelector('img[src]', { timeout: 5000 }).catch(() => {});
+      
+      // Keep original image extraction logic
+      const biggestImg = await page.$$eval('img[src]', imgs => {
+        return imgs.reduce((best, img) => {
+          const area = (img.naturalWidth || img.width || 0) * (img.naturalHeight || img.height || 0);
+          return (!best || area > best.area) ? { src: img.src, area } : best;
+        }, null)?.src;
+      });
+
+      let result = null;
+      if (biggestImg) {
+        result = { imageUrl: biggestImg.split('?')[0] };
+      }
+
+      // Add fit information extraction
+      const fitInfo = await page.$$eval('[data-testid="pdp-description-content"], [data-testid*="fit"], [data-testid*="size"]', 
+        (elements, keywords) => {
+          const texts = elements.map(el => el.textContent.trim().replace(/\s+/g, ' '))
+            .filter(text => keywords.some(keyword => text.includes(keyword)));
+          return [...new Set(texts)];
+        }, 
+        ['Passform', 'Modelgröße', 'Schnitt', 'trägt Größe', 'Regular Fit', 'Slim Fit', 'Loose Fit']
+      );
+
+      if (fitInfo.length > 0) {
+        result = result || {};
+        result.fit = fitInfo.join(' | ');
+      }
+      
+      return result;
+    } catch (err) {
+      return null;
+    } finally {
+      if (browser) await browser.close();
+    }
+  };
+
+  let puppeteerTimeout, hardTimeout;
+
+  try {
+    // Try fast extraction first
+    const fastResult = await fastExtract();
+    if (fastResult) {
+      return respondOnce(fastResult);
+    }
+
+    // If fast extraction fails, set up Puppeteer with timeout
+    const puppeteerPromise = puppeteerExtract();
+    
+    // Set up timeouts
+    const timeoutPromise = new Promise((_, reject) => {
+      hardTimeout = setTimeout(() => reject(new Error("Timeout")), 15000);
+    });
+
+    // Wait for either Puppeteer or timeout
+    const result = await Promise.race([puppeteerPromise, timeoutPromise]);
+    if (result) {
+      return respondOnce(result);
+    }
+    
+    // If no result was found
+    return respondOnce({ error: "Keine Informationen gefunden" }, 404);
+  } catch (err) {
+    return respondOnce({ error: err.message || "Fehler bei der Extraktion" }, 500);
   }
 });
 
