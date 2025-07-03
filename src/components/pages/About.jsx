@@ -131,8 +131,52 @@ export default function About() {
           </p>
         </Card>
 
+        {/* Team Section - Full Width */}
+        <Card className="p-8 mt-8">
+          <h2 className="text-2xl font-semibold mb-6 text-gray-800 text-center">
+            {language === 'de' ? 'Unser Team' : 'Our Team'}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Team Member 1 */}
+            <div className="flex flex-col items-center ">
+              <div className="w-32 h-32 rounded-full overflow-hidden mb-4 bg-purple-100 flex items-center justify-center shadow-md">
+                <span className="text-purple-500 text-4xl">MF</span>
+              </div>
+              <h3 className="font-semibold text-lg text-gray-800">Max Franke</h3>
+              <p className="text-purple-600 text-sm">{language === 'de' ? 'Teammitglied' : 'Team Member'}</p>
+            </div>
+            
+            {/* Team Member 2 */}
+            <div className="flex flex-col items-center">
+              <div className="w-32 h-32 rounded-full overflow-hidden mb-4 bg-purple-100 flex items-center justify-center shadow-md">
+                <span className="text-purple-500 text-4xl">FH</span>
+              </div>
+              <h3 className="font-semibold text-lg text-gray-800">Felix Heuchert</h3>
+              <p className="text-purple-600 text-sm">{language === 'de' ? 'Teammitglied' : 'Team Member'}</p>
+            </div>
+            
+            {/* Team Member 3 */}
+            <div className="flex flex-col items-center">
+              <div className="w-32 h-32 rounded-full overflow-hidden mb-4 bg-purple-100 flex items-center justify-center shadow-md">
+                <span className="text-purple-500 text-4xl">NK</span>
+              </div>
+              <h3 className="font-semibold text-lg text-gray-800">Nils Kriz</h3>
+              <p className="text-purple-600 text-sm">{language === 'de' ? 'Teammitglied' : 'Team Member'}</p>
+            </div>
+            
+            {/* Team Member 4 */}
+            <div className="flex flex-col items-center">
+              <div className="w-32 h-32 rounded-full overflow-hidden mb-4 bg-purple-100 flex items-center justify-center shadow-md">
+                <span className="text-purple-500 text-4xl">JO</span>
+              </div>
+              <h3 className="font-semibold text-lg text-gray-800">Jonas Oppermann</h3>
+              <p className="text-purple-600 text-sm">{language === 'de' ? 'Teammitglied' : 'Team Member'}</p>
+            </div>
+          </div>
+        </Card>
+
       {/* Call to Action */}
-      <Card className="text-center">
+      <Card className="text-center mt-8">
         <h2 className="text-2xl font-semibold mb-4">
           {language === 'de' ? 'Möchten Sie TryOnAI ausprobieren?' : 'Want to try TryOnAI?'}
         </h2>
