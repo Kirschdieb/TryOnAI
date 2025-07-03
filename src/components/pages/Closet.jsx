@@ -91,7 +91,8 @@ export default function Closet() {
     addImageToAlbum,
     removeImageFromAlbum,
     deleteImageFromAllAlbums,
-    initializeSampleImages
+    initializeSampleImages,
+    updateImageLabel
   } = useCloset();
   const [selectedAlbumId, setSelectedAlbumId] = useState(null);
   const [newAlbumName, setNewAlbumName] = useState('');
@@ -99,6 +100,28 @@ export default function Closet() {
   const [renameValue, setRenameValue] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
   const [showPrompt, setShowPrompt] = useState(false);
+  const [isEditingLabel, setIsEditingLabel] = useState(false);
+
+  const handleLabelEdit = (e, image) => {
+    if (e.key === 'Enter' || e.key === 'Escape') {
+      e.preventDefault();
+      setIsEditingLabel(false);
+      // For Escape key, revert to the previous value
+      if (e.key === 'Escape') {
+        handleLabelChange(image, image.customLabel || (image.isExample ? 'Beispielfoto' : 'Anprobiertes Kleidungsstück'));
+      }
+    }
+  };
+
+  const handleLabelChange = (image, newLabel) => {
+    // Update the store
+    updateImageLabel(image.id, newLabel);
+    // Update the local selected image state to show changes immediately
+    setSelectedImage({
+      ...image,
+      customLabel: newLabel
+    });
+  };
 
   // Hilfsfunktion zum Schließen des Modals
   const closeModal = () => {
@@ -628,11 +651,25 @@ export default function Closet() {
 
                 {/* Bild Aktionen - rechts bei größeren Bildschirmen */}
                 <div className="md:w-1/2 flex flex-col">
-                  {/* Anprobiertes Produkt - Miniatur */}
+                  {/* Beispielfoto - Miniatur */}
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold mb-3 flex items-center">
                       <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
-                      {t('closet.triedOnProduct') || 'Anprobiertes Produkt'}
+                      {isEditingLabel ? (
+                        <input
+                          type="text"
+                          value={selectedImage.customLabel || (selectedImage.isExample ? 'Beispielfoto' : 'Anprobiertes Kleidungsstück')}
+                          onChange={(e) => handleLabelChange(selectedImage, e.target.value)}
+                          onKeyDown={(e) => handleLabelEdit(e, selectedImage)}
+                          onBlur={() => setIsEditingLabel(false)}
+                          className="bg-transparent font-semibold text-lg w-full focus:outline-none"
+                          autoFocus
+                        />
+                      ) : (
+                        <span onClick={() => setIsEditingLabel(true)} className="cursor-text">
+                          {selectedImage.customLabel || (selectedImage.isExample ? 'Beispielfoto' : 'Anprobiertes Kleidungsstück')}
+                        </span>
+                      )}
                     </h3>
                     
                     {selectedImage.clothingItem ? (
@@ -949,63 +986,63 @@ export default function Closet() {
                       </div>
                     )}
                   </div>
-                </div>
 
-                {/* Add to Album Section - nur wenn nicht in einem Album oder in anderen Alben */}
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold mb-3">{t('closet.addToAlbum')}</h3>
-                  <AddToAlbumSection
-                    selectedImage={selectedImage}
-                    albums={albums}
-                    currentAlbumId={selectedAlbum?.id}
-                    addImageToAlbum={addImageToAlbum}
-                  />
-                </div>
+                  {/* Add to Album Section - nur wenn nicht in einem Album oder in anderen Alben */}
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-3">{t('closet.addToAlbum')}</h3>
+                    <AddToAlbumSection
+                      selectedImage={selectedImage}
+                      albums={albums}
+                      currentAlbumId={selectedAlbum?.id}
+                      addImageToAlbum={addImageToAlbum}
+                    />
+                  </div>
 
-                {/* Action Buttons */}
-                <div className="mt-auto">
-                  <div className="flex flex-col sm:flex-row gap-3 mb-3">
-                    {/* Remove from Album - nur wenn in einem spezifischen Album und nicht "Generierte Bilder" */}
-                    {selectedAlbum && selectedAlbum.id !== 'generated' && (
+                  {/* Action Buttons */}
+                  <div className="mt-auto">
+                    <div className="flex flex-col sm:flex-row gap-3 mb-3">
+                      {/* Remove from Album - nur wenn in einem spezifischen Album und nicht "Generierte Bilder" */}
+                      {selectedAlbum && selectedAlbum.id !== 'generated' && (
+                        <Button
+                          variant="secondary"
+                          className="flex-1 flex items-center justify-center gap-2 py-3"
+                          onClick={() => {
+                            removeImageFromAlbum(selectedAlbum.id, selectedImage.id);
+                            setSelectedImage(null);
+                          }}
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                          </svg>
+                          {t('closet.removeFromAlbum')}
+                        </Button>
+                      )}
+
+                      {/* Delete Image Permanently */}
                       <Button
-                        variant="secondary"
+                        variant="danger"
                         className="flex-1 flex items-center justify-center gap-2 py-3"
                         onClick={() => {
-                          removeImageFromAlbum(selectedAlbum.id, selectedImage.id);
-                          setSelectedImage(null);
+                          if (window.confirm(t('closet.confirmDeleteImage'))) {
+                            deleteImageFromAllAlbums(selectedImage.id);
+                            setSelectedImage(null);
+                          }
                         }}
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
-                        {t('closet.removeFromAlbum')}
+                        {t('closet.deleteImage')}
                       </Button>
-                    )}
-
-                    {/* Delete Image Permanently */}
-                    <Button
-                      variant="danger"
-                      className="flex-1 flex items-center justify-center gap-2 py-3"
-                      onClick={() => {
-                        if (window.confirm(t('closet.confirmDeleteImage'))) {
-                          deleteImageFromAllAlbums(selectedImage.id);
-                          setSelectedImage(null);
-                        }
-                      }}
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                      {t('closet.deleteImage')}
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      className="flex-1 py-3"
-                      onClick={() => setSelectedImage(null)}
-                    >
-                      {t('closet.close')}
-                    </Button>
+                      
+                      <Button
+                        variant="outline"
+                        className="flex-1 py-3"
+                        onClick={() => setSelectedImage(null)}
+                      >
+                        {t('closet.close')}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
