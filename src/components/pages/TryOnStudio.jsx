@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCloset } from '../../store/useCloset';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { FaUpload, FaTrash, FaPlus, FaCheck } from 'react-icons/fa';
+import { FaUpload, FaTrash, FaPlus, FaCheck, FaInfoCircle } from 'react-icons/fa';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import { BeachIcon, RainIcon, SnowIcon, OriginalIcon, StandingIcon, SittingIcon, HandsInPocketsIcon, ArmsCrossedIcon } from '../ui/BackgroundIcon';
@@ -15,6 +15,14 @@ function LoadingSpinner() {
     </div>
   );
 }
+
+// Custom Tooltip component
+const Tooltip = ({ children }) => (
+  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 text-sm text-white bg-gray-800 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
+    {children}
+    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1 border-4 border-transparent border-t-gray-800"></div>
+  </div>
+);
 
 const Studio = () => {
   const { t } = useLanguage();

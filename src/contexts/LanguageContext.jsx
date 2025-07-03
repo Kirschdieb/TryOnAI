@@ -269,6 +269,9 @@ const translations = {
     'albums.formal': 'Formal & Business',
     'albums.casual': 'Casual & Alltag',
     'albums.sport': 'Sport & Fitness',
+
+    // Studio tooltips
+    'studio.clothingExtractionTip': 'Das Extrahieren des Kleidungsstücks ist nicht perfekt. Achte bitte darauf, dass das Kleidungsstück vollständig und gut sichtbar auf dem Bild zu sehen ist.',
   },
   en: {    // Navigation
     'nav.home': 'Homepage',
