@@ -18,15 +18,33 @@ import Beispiel5 from '../assets/Beispiel5.png';
 import Beispiel6 from '../assets/Beispiel6.png';
 import Beispiel7 from '../assets/Beispiel7.png';
 import Beispiel8 from '../assets/Beispiel8.png';
+import Beispiel9 from '../assets/Beispiel9.png';
+import Beispiel10 from '../assets/Beispiel10.png';
+import Beispiel11 from '../assets/Beispiel11.png';
+import Beispiel12 from '../assets/Beispiel12.png';
+import Beispiel13 from '../assets/Beispiel13.png';
+import Beispiel14 from '../assets/Beispiel14.png';
+import Beispiel15 from '../assets/Beispiel15.png';
+import Beispiel16 from '../assets/Beispiel16.png';
+import Beispiel17 from '../assets/Beispiel17.png';
+import Beispiel18 from '../assets/Beispiel18.png';
+import Beispiel19 from '../assets/Beispiel19.png';
+import Beispiel20 from '../assets/Beispiel20.png';
+import Beispiel21 from '../assets/Beispiel21.png';
+
+// Fallback-Datum wenn kein Datum vorhanden ist (1. Juli 2025)
+const FIXED_DATE = new Date("2025-07-01").toISOString();
 
 // Beispielbilder-Daten
 const sampleImages = [
+  // Original Beispielbilder
   {
     id: 'sample1',
     image: Beispiel1,
     name: 'Herbst Outfit 1',
     category: 'herbst',
     description: 'Gemütlicher Herbstlook'
+    // Kein Timestamp - wird bei Bedarf durch das Fallback-Datum ersetzt
   },
   {
     id: 'sample2',
@@ -76,6 +94,116 @@ const sampleImages = [
     name: 'Winter Style',
     category: 'winter',
     description: 'Warmer Winter-Look'
+  },
+  
+  // Neue Bilder - Sommer Kategorie (Download, Download(1), Download(5), Download(6))
+  {
+    id: 'sample9',
+    image: Beispiel9,
+    name: 'Sommer Look 2',
+    category: 'sommer',
+    description: 'Leichtes Sommer-Outfit',
+    timestamp: new Date("2025-07-01T18:41:00").toISOString() // Download.png - Originaldatum
+  },
+  {
+    id: 'sample10',
+    image: Beispiel10,
+    name: 'Sommer Style',
+    category: 'sommer',
+    description: 'Frisches Sommer-Outfit',
+    timestamp: new Date("2025-07-01T19:00:00").toISOString() // Download (1).png - Originaldatum
+  },
+  {
+    id: 'sample11',
+    image: Beispiel11,
+    name: 'Sommer Casual',
+    category: 'sommer',
+    description: 'Lässiger Sommerlook',
+    timestamp: new Date("2025-07-01T23:01:00").toISOString() // Download (5).png - Originaldatum
+  },
+  {
+    id: 'sample12',
+    image: Beispiel12,
+    name: 'Sommer Trend',
+    category: 'sommer',
+    description: 'Moderner Sommertrend',
+    timestamp: new Date("2025-07-01T23:26:00").toISOString() // Download (6).png - Originaldatum
+  },
+  
+  // Neue Bilder - Winter Kategorie (Download(15), Download(18), Download(20), Download(3), Download(19))
+  {
+    id: 'sample13',
+    image: Beispiel13,
+    name: 'Winter Look 2',
+    category: 'winter',
+    description: 'Warmer Winterlook',
+    timestamp: new Date("2025-07-02T23:05:00").toISOString() // Download (15).png - Originaldatum
+  },
+  {
+    id: 'sample14',
+    image: Beispiel14,
+    name: 'Winter Style 2',
+    category: 'winter',
+    description: 'Elegantes Winter-Outfit',
+    timestamp: new Date("2025-07-03T12:13:00").toISOString() // Download (18).png - Originaldatum
+  },
+  {
+    id: 'sample15',
+    image: Beispiel15,
+    name: 'Winter Modern',
+    category: 'winter',
+    description: 'Moderner Winterlook',
+    timestamp: new Date("2025-07-03T13:03:00").toISOString() // Download (20).png - Originaldatum
+  },
+  {
+    id: 'sample16',
+    image: Beispiel16,
+    name: 'Winter Casual',
+    category: 'winter',
+    description: 'Lässiger Winterlook',
+    timestamp: new Date("2025-07-01T22:20:00").toISOString() // Download (3).png - Originaldatum
+  },
+  {
+    id: 'sample17',
+    image: Beispiel17,
+    name: 'Winter Trend',
+    category: 'winter',
+    description: 'Trendiger Winterlook',
+    timestamp: new Date("2025-07-03T13:03:00").toISOString() // Download (19).png - Originaldatum
+  },
+  
+  // Neue Bilder - Herbst Kategorie (Rest)
+  {
+    id: 'sample18',
+    image: Beispiel18,
+    name: 'Herbst Casual',
+    category: 'herbst',
+    description: 'Lässiger Herbstlook',
+    timestamp: new Date("2025-07-01T20:34:00").toISOString() // Download (2).png - Originaldatum
+  },
+  {
+    id: 'sample19',
+    image: Beispiel19,
+    name: 'Herbst Modern',
+    category: 'herbst',
+    description: 'Moderner Herbstlook',
+    timestamp: new Date("2025-07-01T22:57:00").toISOString() // Download (4).png - Originaldatum
+  },
+  {
+    id: 'sample20',
+    image: Beispiel20,
+    name: 'Herbst Trend',
+    category: 'herbst',
+    description: 'Trendiger Herbstlook',
+    timestamp: new Date("2025-07-01T23:39:00").toISOString() // Download (7).png - Originaldatum
+  },
+  {
+    id: 'sample21',
+    image: Beispiel21,
+    name: 'Herbst Style 2',
+    category: 'herbst',
+    description: 'Eleganter Herbstlook',
+    timestamp: new Date("2025-07-02T18:18:00").toISOString() // Download (14).png - Originaldatum
   }
 ];
 
@@ -162,7 +290,18 @@ deleteImageFromAllAlbums: (imageId) => set((state) => ({
   albums: ensureGeneratedAlbum(state.albums.map(a => ({ ...a, images: a.images.filter(img => img.id !== imageId) })))
 })),
 addGeneratedImage: (image) => set((state) => ({
-  albums: ensureGeneratedAlbum(state.albums.map(a => a.id === 'generated' ? { ...a, images: [{...image, id: Date.now().toString() + Math.random().toString(36).substr(2, 5)}, ...a.images] } : a))
+  albums: ensureGeneratedAlbum(state.albums.map(a => a.id === 'generated' ? { 
+    ...a, 
+    images: [
+      {
+        ...image, 
+        id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+        // Only use fixed date if no timestamp exists
+        timestamp: image.timestamp || FIXED_DATE
+      }, 
+      ...a.images
+    ] 
+  } : a))
 })),
 
 // Funktion zum Aktualisieren der Album-Namen basierend auf der Sprache

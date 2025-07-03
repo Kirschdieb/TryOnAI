@@ -5,6 +5,9 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 
+// Fallback-Datum für Bilder ohne Timestamp
+const FALLBACK_DATE = new Date("2025-07-01").toLocaleDateString();
+
 // Hilfskomponente für "Zu Album hinzufügen" - verbesserte Version
 function AddToAlbumSection({ selectedImage, albums, currentAlbumId, addImageToAlbum, onImageAdded = null }) {
   const [targetAlbumId, setTargetAlbumId] = useState('');
@@ -521,19 +524,19 @@ export default function Closet() {
                         />
                       </div>
                       <p className="mt-2 text-sm text-gray-500 text-center">
-                        {img.timestamp ? new Date(img.timestamp).toLocaleDateString() : ''}
+                        {img.timestamp ? new Date(img.timestamp).toLocaleDateString() : FALLBACK_DATE}
                       </p>
                     </Card>
                   ))}
                 </div>
               ) : (
-                // Columns-Layout für mehr als 4 Bilder
-                <div className="columns-1 sm:columns-2 lg:columns-4 gap-4 space-y-4 mb-10">
+                // Grid-Layout für mehr als 4 Bilder (ersetzt das Columns-Layout für bessere Verteilung)
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
                   {selectedAlbum.images.map((img, idx) => (
                     <Card
                       key={img.id || idx}
                       onClick={() => setSelectedImage(img)}
-                      className="break-inside-avoid cursor-pointer hover:shadow-lg transition-shadow duration-200"
+                      className="cursor-pointer hover:shadow-lg transition-shadow duration-200"
                     >
                       <div className="relative aspect-[3/4]">
                         <img
@@ -543,7 +546,7 @@ export default function Closet() {
                         />
                       </div>
                       <p className="mt-2 text-sm text-gray-500 text-center">
-                        {img.timestamp ? new Date(img.timestamp).toLocaleDateString() : ''}
+                        {img.timestamp ? new Date(img.timestamp).toLocaleDateString() : FALLBACK_DATE}
                       </p>
                     </Card>
                   ))}
@@ -704,19 +707,19 @@ export default function Closet() {
                     )}
                   </div>
 
-                  {/* Bild Info falls vorhanden */}
-                  {selectedImage.timestamp && (
-                    <div className="mb-6">
-                      <div className="flex items-center space-x-2">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <p className="text-gray-600">
-                          <span className="font-medium">{t('closet.created')}:</span> {new Date(selectedImage.timestamp).toLocaleDateString()}
-                        </p>
-                      </div>
+                  {/* Bild Info - Zeigt Datum immer an, nutzt FIXED_DATE als Fallback */}
+                  <div className="mb-6">
+                    <div className="flex items-center space-x-2">
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <p className="text-gray-600">
+                        <span className="font-medium">{t('closet.created')}:</span> {selectedImage.timestamp ? 
+                          new Date(selectedImage.timestamp).toLocaleDateString() : 
+                          FALLBACK_DATE}
+                      </p>
                     </div>
-                  )}
+                  </div>
                   
                   {/* Album-Auswahl mit Dropdown */}
                   <div className="mb-6">
@@ -905,16 +908,16 @@ export default function Closet() {
 
                 {/* Image Info mit Prompt Toggle */}
                 <div className="mb-6 space-y-3">
-                  {selectedImage.timestamp && (
-                    <div className="flex items-center space-x-2">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <p className="text-gray-600">
-                        <span className="font-medium">{t('closet.created')}:</span> {new Date(selectedImage.timestamp).toLocaleDateString()}
-                      </p>
-                    </div>
-                  )}
+                  <div className="flex items-center space-x-2">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-gray-600">
+                      <span className="font-medium">{t('closet.created')}:</span> {selectedImage.timestamp ? 
+                        new Date(selectedImage.timestamp).toLocaleDateString() : 
+                        FALLBACK_DATE}
+                    </p>
+                  </div>
                   {/* Prompt anzeigen/verstecken - immer sichtbar */}
                   <div className="space-y-2">
                     {/* Debug: Log image data to console */}
