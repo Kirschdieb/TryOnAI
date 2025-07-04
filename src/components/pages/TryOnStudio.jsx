@@ -26,6 +26,29 @@ const Tooltip = ({ children }) => (
   </div>
 );
 
+// Format fit information with proper line breaks and styling
+const formatFitInfo = (fitText) => {
+  if (!fitText) return '';
+
+  // Pattern for identifying the start of new points (Passform:, Modelgröße:, etc.)
+  const keywordPattern = /(Passform|Modelgröße|Schnitt|Länge|Ärmellänge|trägt Größe|Regular Fit|Slim Fit|Loose Fit|Dehnbarkeit):/gi;
+  
+  // Replace pipe separators with spaces (from backend joining)
+  let formattedText = fitText.replace(/\s*\|\s*/g, ' ');
+  
+  // Add line breaks before each new point
+  formattedText = formattedText.replace(keywordPattern, '\n$&');
+  
+  // Remove duplicate Passform headers that might appear at the beginning
+  formattedText = formattedText.replace(/^Passform\s+Passform/i, 'Passform');
+  
+  // Remove the standalone "Passform" header at the beginning
+  formattedText = formattedText.replace(/^Passform\s*\n/i, '');
+  
+  // Trim extra spaces and line breaks
+  return formattedText.trim();
+};
+
 // Product Info Dialog Component
 const ProductInfoDialog = ({ isOpen, onClose, productInfo, isLoading, isZalandoProduct, originalProductUrl, onFetchProductInfo }) => {
   if (!isOpen) return null;
@@ -39,7 +62,7 @@ const ProductInfoDialog = ({ isOpen, onClose, productInfo, isLoading, isZalandoP
         >
           ✕
         </button>
-        <h2 className="text-2xl font-semibold mb-4">Produktinformationen</h2>
+        <h2 className="text-2xl font-semibold mb-4">Passform Informationen</h2>
         <div className="prose">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
@@ -58,26 +81,11 @@ const ProductInfoDialog = ({ isOpen, onClose, productInfo, isLoading, isZalandoP
               {/* Passforminformationen */}
               {productInfo.fit && (
                 <div className="bg-purple-50 p-4 rounded-lg">
-                  <h4 className="font-medium mb-2">Passform</h4>
-                  <p>{productInfo.fit}</p>
+                  <p className="whitespace-pre-line">{formatFitInfo(productInfo.fit)}</p>
                 </div>
               )}
               
-              {/* Materialbeschreibung */}
-              {productInfo.material && (
-                <div>
-                  <h4 className="font-medium mb-2">Material</h4>
-                  <p>{productInfo.material}</p>
-                </div>
-              )}
               
-              {/* Pflegehinweise */}
-              {productInfo.care && (
-                <div>
-                  <h4 className="font-medium mb-2">Pflegehinweise</h4>
-                  <p>{productInfo.care}</p>
-                </div>
-              )}
               
               {/* Link zum Produkt */}
               {productInfo.url && (
