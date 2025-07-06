@@ -131,6 +131,47 @@ Locally serves the production build from the `dist` folder. This command is usef
 *   **State Management:** Zustand
 *   **Styling:** Tailwind CSS with DaisyUI component library
 
+## Testing
+
+This project includes **two unit test suites**: one for the backend (Node) and one for the frontend (React).
+
+### 1. Backend ‑ Jest
+
+* **Location:** `server/zalando-puppeteer.test.js`
+* **Tested module:** `server/zalando-puppeteer.js`
+* **Purpose:** Ensures the `extractProductImage()` scraper correctly returns
+  * the `og:image` URL when present, and
+  * `null` when no suitable image can be found.
+* **Run all backend tests**
+  ```bash
+  cd server
+  npm test
+  ```
+  Jest outputs green ✅ on success and a coverage table. Coverage is currently ~55 %; add more tests to increase this number.
+
+### 2. Frontend ‑ Vitest + React Testing Library
+
+* **Location:** `src/components/pages/HomeUpload.test.jsx`
+* **Tested component:** `HomeUpload.jsx`
+* **Purpose:** Verifies that typing a Zalando URL into the input field
+  updates component state and triggers the store action `setHomeZalandoUrl()`.
+* **Run all frontend tests**
+  ```bash
+  npx vitest run
+  ```
+  Vitest prints a summary; each test line prefixed with a green ✔ means success.
+
+### Watching tests during development
+To re-run tests on file changes, you can start the Vitest watch mode:
+```bash
+npx vitest
+```
+
+For Jest, add `--watch` if preferred:
+```bash
+cd server && npm test -- --watch
+```
+
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
