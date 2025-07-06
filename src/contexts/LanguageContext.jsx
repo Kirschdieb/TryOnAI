@@ -226,6 +226,7 @@ const translations = {
     'studio.background.summer': 'Sommerliches Strandambiente',
     'studio.background.autumn': 'Herbstliche Regenszene',
     'studio.background.winter': 'Winterliche Schneelandschaft',
+    'studio.background.empty': 'Leerer weißer Hintergrund',
     
     // About Page
     'about.title': 'Über TryOnAI',
@@ -474,6 +475,7 @@ const translations = {
     'studio.background.summer': 'Summer beach scene',
     'studio.background.autumn': 'Autumn rain scene',
     'studio.background.winter': 'Winter snow landscape',
+    'studio.background.empty': 'Empty white background',
     
     // About Page
     'about.title': 'About TryOnAI',

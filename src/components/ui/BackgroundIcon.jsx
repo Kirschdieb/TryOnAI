@@ -85,6 +85,14 @@ export function SnowIcon({ className = "w-5 h-5 mr-2 inline-block align-middle" 
   );
 }
 
+export function EmptyIcon({ className = "w-5 h-5 mr-2 inline-block align-middle" }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" fill="#FFFFFF" stroke="#E0E0E0" />
+    </svg>
+  );
+}
+
 export function OriginalIcon({ className = "w-5 h-5 mr-2 inline-block align-middle" }) {
   // Stern
   return (

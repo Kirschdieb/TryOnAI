@@ -5,7 +5,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { FaUpload, FaTrash, FaPlus, FaCheck, FaInfoCircle } from 'react-icons/fa';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
-import { BeachIcon, RainIcon, SnowIcon, OriginalIcon, StandingIcon, SittingIcon, HandsInPocketsIcon, ArmsCrossedIcon } from '../ui/BackgroundIcon';
+import { BeachIcon, RainIcon, SnowIcon, OriginalIcon, EmptyIcon, StandingIcon, SittingIcon, HandsInPocketsIcon, ArmsCrossedIcon } from '../ui/BackgroundIcon';
 
 // LoadingSpinner Komponente
 function LoadingSpinner() {
@@ -170,6 +170,7 @@ const Studio = () => {
   // Hintergrundoptionen
   const backgroundOptions = [
     { value: 'original', label: t('studio.background.original'), icon: <OriginalIcon /> },
+    { value: 'empty', label: t('studio.background.empty'), icon: <EmptyIcon /> },
     { value: 'summer', label: t('studio.background.summer'), icon: <BeachIcon /> },
     { value: 'autumn', label: t('studio.background.autumn'), icon: <RainIcon /> },
     { value: 'winter', label: t('studio.background.winter'), icon: <SnowIcon /> },
@@ -430,6 +431,9 @@ const Studio = () => {
           break;
         case 'winter':
           backgroundPrompt = 'Bitte generiere das Bild mit einer winterlichen Schneelandschaft als Hintergrund. Körper und Gesicht sollen exakt wie auf dem Originalfoto bleiben.';
+          break;
+        case 'empty':
+          backgroundPrompt = 'Bitte generiere das Bild mit einem leeren weißen Hintergrund. Körper und Gesicht sollen exakt wie auf dem Originalfoto bleiben.';
           break;
         case 'original':
         default:
