@@ -91,8 +91,10 @@ export default function Closet() {
     addImageToAlbum,
     removeImageFromAlbum,
     deleteImageFromAllAlbums,
-    initializeSampleImages,
-    updateImageLabel
+    updateImageLabel,
+    getSessionImage,
+    hasSessionImage,
+    getBestImageSrc
   } = useCloset();
   const [selectedAlbumId, setSelectedAlbumId] = useState(null);
   const [newAlbumName, setNewAlbumName] = useState('');
@@ -135,10 +137,8 @@ export default function Closet() {
   // Album Auswahl: Standardmäßig erstes Album auswählen
   const selectedAlbum = albums.find(a => a.id === selectedAlbumId) || albums[0];
 
-  // Initialisiere Beispielbilder beim ersten Laden
-  useEffect(() => {
-    initializeSampleImages();
-  }, [initializeSampleImages]);
+  // Albums are now initialized automatically when the store is created
+  // No need to manually initialize sample images
 
   // Funktion zum Öffnen eines Albums mit Animation
   const openAlbum = (albumId) => {
@@ -164,6 +164,17 @@ export default function Closet() {
       setAnimationClass('animate-slide-in-left');
       setIsTransitioning(false);
     }, 300);
+  };
+
+  // Helper function to get image source - prioritizes session storage over regular image property
+  const getImageSrc = (image) => {
+    // For generated images, check session storage first
+    if (image.hasSessionData && hasSessionImage(image.id)) {
+      const sessionData = getSessionImage(image.id);
+      return sessionData?.mainImage || image.image || null;
+    }
+    // Fallback to regular image property (for example images)
+    return image.image || null;
   };
 
   return (
@@ -306,7 +317,7 @@ export default function Closet() {
                     <div className="relative aspect-square bg-gray-100 overflow-hidden rounded-2xl">
                       {firstImage ? (
                         <img
-                          src={firstImage.image}
+                          src={getImageSrc(firstImage)}
                           alt={album.name}
                           className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
@@ -642,7 +653,7 @@ export default function Closet() {
                 <div className="md:w-1/2 flex items-center justify-center mb-6 md:mb-0 md:pr-6">
                   <div className="max-h-[60vh] overflow-hidden flex items-center justify-center">
                     <img
-                      src={selectedImage.image}
+                      src={getImageSrc(selectedImage)}
                       alt={selectedImage.customPrompt || 'Try-On Bild'}
                       className="max-w-full max-h-full object-contain rounded-xl shadow-lg"
                     />
@@ -855,7 +866,7 @@ export default function Closet() {
               <div className="md:w-1/2 flex items-center justify-center mb-6 md:mb-0 md:pr-6">
                 <div className="max-h-[60vh] overflow-hidden flex items-center justify-center">
                   <img
-                    src={selectedImage.image}
+                    src={getImageSrc(selectedImage)}
                     alt={selectedImage.customPrompt || 'Try-On'}
                     className="max-w-full max-h-full object-contain rounded-xl shadow-lg"
                   />

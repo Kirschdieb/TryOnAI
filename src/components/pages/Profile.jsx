@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useCloset } from '../../store/useCloset';
 import Card from '../ui/Card';
 
 export default function ProfilePage() {
   const { t } = useLanguage();
+  const { 
+    loadAlbumsFromProfile, 
+    saveAlbumsToProfile, 
+    albums, 
+    exportProfileWithImages, 
+    importProfileWithImages 
+  } = useCloset();
   
   const [showModal, setShowModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -17,7 +25,8 @@ export default function ProfilePage() {
     size: "",
     imageUrl: "",
     tryonImageFrontUrl: "",
-    tryonImageBackUrl: ""
+    tryonImageBackUrl: "",
+    albums: []
   });
 
   // Check if user is logged in on component mount
@@ -29,25 +38,63 @@ export default function ProfilePage() {
       setIsLoggedIn(true);
       try {
         const parsedProfile = JSON.parse(savedProfile);
+        
+        // Ensure profile has an ID
+        if (!parsedProfile.id) {
+          parsedProfile.id = Date.now().toString();
+        }
+        
         // Ensure we only use base64 image URLs
-        setProfile({
+        const profileWithDefaults = {
           ...parsedProfile,
           imageUrl: parsedProfile.imageUrl || "",
           tryonImageFrontUrl: parsedProfile.tryonImageFrontUrl || "",
-          tryonImageBackUrl: parsedProfile.tryonImageBackUrl || ""
-        });
+          tryonImageBackUrl: parsedProfile.tryonImageBackUrl || "",
+          albums: parsedProfile.albums || []
+        };
+        
+        setProfile(profileWithDefaults);
+        
+        // Only load albums if they haven't been loaded already (e.g., from ZIP import)
+        // Check if albums are already loaded in the store
+        const storeState = useCloset.getState();
+        if (!storeState.isAlbumDataLoaded || storeState.currentProfileId !== profileWithDefaults.id) {
+          console.log('[Profile] Loading albums from profile...');
+          // Load user's albums into closet store (this will merge with defaults)
+          loadAlbumsFromProfile(profileWithDefaults);
+
+          // After loading, save the merged albums back to localStorage
+          setTimeout(() => {
+            saveAlbumsToProfile();
+          }, 100);
+        } else {
+          console.log('[Profile] Albums already loaded, skipping loadAlbumsFromProfile');
+        }
+        
       } catch (error) {
-        console.error('Error parsing saved profile:', error);
+        console.error('[Profile] Error parsing saved profile:', error);
         handleLogout(); // Reset if corrupted
       }
     } else {
+      console.log('[Profile] No valid login found, showing modal');
       setShowModal(true);
     }
-  }, []);
+  }, [loadAlbumsFromProfile, saveAlbumsToProfile]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setProfile((prev) => ({ ...prev, [name]: value }));
+    setProfile((prev) => {
+      const updatedProfile = { ...prev, [name]: value };
+      // Save the updated profile to localStorage with error handling
+      try {
+        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+        console.log(`[Profile] ${name} field updated and saved to localStorage`);
+      } catch (storageError) {
+        console.warn('[Profile] Could not save profile to localStorage:', storageError);
+        // Continue without localStorage - profile will still work in current session
+      }
+      return updatedProfile;
+    });
   };
 
   const convertFileToBase64 = (file) => {
@@ -68,14 +115,20 @@ export default function ProfilePage() {
     if (file) {
       try {
         const base64 = await convertFileToBase64(file);
-        setProfile((prev) => ({ 
-          ...prev, 
-          imageUrl: base64 
-        }));
-        // Immediately save to localStorage
-        const updatedProfile = { ...profile, imageUrl: base64 };
-        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+        setProfile((prev) => {
+          const updatedProfile = { ...prev, imageUrl: base64 };
+          // Save the updated profile to localStorage with error handling
+          try {
+            localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+            console.log('[Profile] Profile image updated and saved to localStorage');
+          } catch (storageError) {
+            console.warn('[Profile] Could not save profile to localStorage (quota exceeded?):', storageError);
+            // Continue without localStorage - profile will still work in current session
+          }
+          return updatedProfile;
+        });
       } catch (error) {
+        console.error('[Profile] Error converting image:', error);
         alert('Error converting image. Please try again.');
       }
     }
@@ -86,14 +139,20 @@ export default function ProfilePage() {
     if (file) {
       try {
         const base64 = await convertFileToBase64(file);
-        setProfile((prev) => ({ 
-          ...prev, 
-          tryonImageFrontUrl: base64 
-        }));
-        // Immediately save to localStorage
-        const updatedProfile = { ...profile, tryonImageFrontUrl: base64 };
-        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+        setProfile((prev) => {
+          const updatedProfile = { ...prev, tryonImageFrontUrl: base64 };
+          // Save the updated profile to localStorage with error handling
+          try {
+            localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+            console.log('[Profile] Front tryon image updated and saved to localStorage');
+          } catch (storageError) {
+            console.warn('[Profile] Could not save profile to localStorage (quota exceeded?):', storageError);
+            // Continue without localStorage - profile will still work in current session
+          }
+          return updatedProfile;
+        });
       } catch (error) {
+        console.error('[Profile] Error converting tryon front image:', error);
         alert('Error converting image. Please try again.');
       }
     }
@@ -104,14 +163,20 @@ export default function ProfilePage() {
     if (file) {
       try {
         const base64 = await convertFileToBase64(file);
-        setProfile((prev) => ({ 
-          ...prev, 
-          tryonImageBackUrl: base64 
-        }));
-        // Immediately save to localStorage
-        const updatedProfile = { ...profile, tryonImageBackUrl: base64 };
-        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+        setProfile((prev) => {
+          const updatedProfile = { ...prev, tryonImageBackUrl: base64 };
+          // Save the updated profile to localStorage with error handling
+          try {
+            localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+            console.log('[Profile] Back tryon image updated and saved to localStorage');
+          } catch (storageError) {
+            console.warn('[Profile] Could not save profile to localStorage (quota exceeded?):', storageError);
+            // Continue without localStorage - profile will still work in current session
+          }
+          return updatedProfile;
+        });
       } catch (error) {
+        console.error('[Profile] Error converting tryon back image:', error);
         alert('Error converting image. Please try again.');
       }
     }
@@ -120,35 +185,29 @@ export default function ProfilePage() {
   const handleLogin = () => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.json';
+    input.accept = '.zip';
     input.onchange = async (e) => {
       const file = e.target.files[0];
       if (file) {
         try {
-          const text = await file.text();
-          const importedProfile = JSON.parse(text);
-          
-          // Clean the imported profile to ensure only base64 images
-          const cleanProfile = {
-            name: importedProfile.name || "",
-            email: importedProfile.email || "",
-            phone: importedProfile.phone || "",
-            address: importedProfile.address || "",
-            height: importedProfile.height || "",
-            size: importedProfile.size || "",
-            imageUrl: (importedProfile.imageUrl && isValidBase64Image(importedProfile.imageUrl)) ? importedProfile.imageUrl : "",
-            tryonImageFrontUrl: (importedProfile.tryonImageFrontUrl && isValidBase64Image(importedProfile.tryonImageFrontUrl)) ? importedProfile.tryonImageFrontUrl : "",
-            tryonImageBackUrl: (importedProfile.tryonImageBackUrl && isValidBase64Image(importedProfile.tryonImageBackUrl)) ? importedProfile.tryonImageBackUrl : ""
-          };
-          
-          setProfile(cleanProfile);
-          localStorage.setItem('userProfile', JSON.stringify(cleanProfile));
-          localStorage.setItem('isLoggedIn', 'true');
-          setIsLoggedIn(true);
-          setShowModal(false);
-          alert(t('profile.importSuccess'));
+          const result = await importProfileWithImages(file);
+          if (result.success) {
+            // Update local state with imported profile
+            setProfile(result.profile);
+            setIsLoggedIn(true);
+            setShowModal(false);
+
+            // IMPORTANT: Save both profile AND login status to localStorage
+            localStorage.setItem('userProfile', JSON.stringify(result.profile));
+            localStorage.setItem('isLoggedIn', 'true');
+
+            console.log('[Profile] Profile imported and login status saved to localStorage');
+
+            alert(`✅ Profile imported successfully!\n\n👤 Profile: ${result.profile.name}\n📁 Albums: ${result.albumCount}\n🖼️ Images: ${result.imageCount}\n\n🎉 All your albums and images have been restored!`);
+          }
         } catch (error) {
-          alert(t('profile.importError'));
+          console.error('ZIP import error:', error);
+          alert('❌ Error importing profile from ZIP: ' + error.message + '\n\nPlease make sure you selected a valid TryOnAI export file.');
         }
       }
     };
@@ -165,16 +224,27 @@ export default function ProfilePage() {
       size: "",
       imageUrl: "",
       tryonImageFrontUrl: "",
-      tryonImageBackUrl: ""
+      tryonImageBackUrl: "",
+      albums: [],
+      id: Date.now().toString()
     };
     setProfile(newProfile);
     localStorage.setItem('userProfile', JSON.stringify(newProfile));
     localStorage.setItem('isLoggedIn', 'true');
     setIsLoggedIn(true);
     setShowModal(false);
+    
+    // Load default albums into store (this will add all default albums)
+    loadAlbumsFromProfile(newProfile);
+    
+    // Save the merged albums (with defaults) back to localStorage
+    setTimeout(() => {
+      saveAlbumsToProfile();
+    }, 100);
   };
 
   const handleLogout = () => {
+    console.log('[Profile] Logout triggered');
     localStorage.removeItem('userProfile');
     localStorage.removeItem('isLoggedIn');
     setIsLoggedIn(false);
@@ -187,51 +257,29 @@ export default function ProfilePage() {
       size: "",
       imageUrl: "",
       tryonImageFrontUrl: "",
-      tryonImageBackUrl: ""
+      tryonImageBackUrl: "",
+      albums: []
     });
     setShowModal(true);
   };
 
-  const handleExportProfile = () => {
+  // ZIP Export/Import handlers
+  const handleZipExport = async () => {
     try {
-      // Only export base64 images
-      const exportData = {
-        ...profile,
-        exportDate: new Date().toISOString()
-      };
-      
-      const dataStr = JSON.stringify(exportData, null, 2);
-      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-      
-      const exportFileDefaultName = `profile_${profile.name || 'user'}_${new Date().toISOString().split('T')[0]}.json`;
-      
-      const linkElement = document.createElement('a');
-      linkElement.setAttribute('href', dataUri);
-      linkElement.setAttribute('download', exportFileDefaultName);
-      linkElement.click();
-      
-      alert(t('profile.exportSuccess'));
-    } catch (error) {
-      alert('Error exporting profile: ' + error.message);
-    }
-  };
+      // Auto-save current albums to profile first
+      saveAlbumsToProfile();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    try {
-      // Save profile to localStorage
+      // Update profile in localStorage
       localStorage.setItem('userProfile', JSON.stringify(profile));
-      
-      // Export profile as JSON
-      handleExportProfile();
-    } catch (error) {
-      if (error.name === 'QuotaExceededError') {
-        alert('Storage full! Profile will only be exported as file, not saved locally.');
-        handleExportProfile();
-      } else {
-        alert('Error saving profile: ' + error.message);
+
+      // Export as ZIP with images
+      const result = await exportProfileWithImages();
+      if (result.success) {
+        alert(`✅ Profile exported successfully!\n\n📦 ZIP file: ${result.fileName}\n🖼️ Images included: ${result.imageCount}\n\n💾 You can now import this ZIP file on any device to restore your complete profile with all images and albums.`);
       }
+    } catch (error) {
+      console.error('ZIP export error:', error);
+      alert('❌ Error exporting profile as ZIP: ' + error.message);
     }
   };
 
@@ -239,27 +287,28 @@ export default function ProfilePage() {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-8 max-w-md w-mx-4">
-          <h2 className="text-2xl font-bold mb-2 text-center">{t('profile.modal.welcome')}</h2>
-          <p className="text-gray-600 mb-6 text-center">{t('profile.modal.subtitle')}</p>
-          
+          <h2 className="text-2xl font-bold mb-2 text-center">Welcome to TryOnAI</h2>
+          <p className="text-gray-600 mb-6 text-center">Load an existing profile or create a new one</p>
+
           <div className="space-y-4">
             <button
               onClick={handleLogin}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition"
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition flex items-center justify-center gap-2"
             >
-              {t('profile.modal.login')}
+              <span>📦</span>
+              Load Profile from Backup
             </button>
-            <p className="text-sm text-gray-500 text-center">{t('profile.modal.loginDesc')}</p>
-            
+            <p className="text-sm text-gray-500 text-center">Import your complete profile with all images from a ZIP backup</p>
+
             <hr className="my-4" />
-            
+
             <button
               onClick={handleRegister}
               className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition"
             >
-              {t('profile.modal.register')}
+              Create New Profile
             </button>
-            <p className="text-sm text-gray-500 text-center">{t('profile.modal.registerDesc')}</p>
+            <p className="text-sm text-gray-500 text-center">Start fresh with a new profile and default albums</p>
           </div>
         </div>
       </div>
@@ -362,7 +411,7 @@ export default function ProfilePage() {
               {t('profile.profileInfo')}
             </h2>
             
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-6">
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium mb-2 text-gray-700">{t('profile.name')}</label>
@@ -412,7 +461,7 @@ export default function ProfilePage() {
                   />
                 </div>
               </div>
-            </form>
+            </div>
           </Card>
         </div>
 
@@ -530,14 +579,55 @@ export default function ProfilePage() {
         {/* Save Button */}
         <div className="flex justify-center">
           <button
-            type="submit"
-            onClick={handleSubmit}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-4 px-12 rounded-xl transition-all duration-200 shadow-lg text-lg"
+            type="button"
+            onClick={handleZipExport}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-4 px-12 rounded-xl transition-all duration-200 shadow-lg text-lg flex items-center gap-3"
           >
-            {t('profile.saveProfile')}
+            <span className="text-xl">📦</span>
+            Export Profile as ZIP
           </button>
         </div>
+
+        {/* Album Statistics Section */}
+        <Card className="p-8 mb-8">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+            Album Overview
+          </h2>
+          <AlbumStatistics />
+        </Card>
       </div>
     </div>
   );
 }
+
+// Simple Album Statistics Component (Essential functionality only)
+const AlbumStatistics = () => {
+  const { albums } = useCloset();
+
+  const totalImages = albums.reduce((sum, album) => sum + album.images.length, 0);
+  const customAlbums = albums.filter(a => !['generated', 'sommer', 'herbst', 'winter', 'fruehling', 'formal', 'casual', 'sport'].includes(a.id));
+
+  return (
+    <div className="bg-gray-50 rounded-lg p-4 mt-4">
+      <h4 className="font-semibold mb-2">Your Albums</h4>
+      <div className="grid grid-cols-2 gap-4 text-sm">
+        <div>
+          <span className="text-gray-600">Total Albums:</span>
+          <span className="ml-2 font-medium">{albums.length}</span>
+        </div>
+        <div>
+          <span className="text-gray-600">Total Images:</span>
+          <span className="ml-2 font-medium">{totalImages}</span>
+        </div>
+        <div>
+          <span className="text-gray-600">Custom Albums:</span>
+          <span className="ml-2 font-medium">{customAlbums.length}</span>
+        </div>
+        <div>
+          <span className="text-gray-600">Generated Images:</span>
+          <span className="ml-2 font-medium">{albums.find(a => a.id === 'generated')?.images.length || 0}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
