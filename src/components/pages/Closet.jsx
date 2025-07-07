@@ -165,16 +165,45 @@ export default function Closet() {
       setIsTransitioning(false);
     }, 300);
   };
+  
+  // Add a useEffect to log and check session images on component mount
+  useEffect(() => {
+    const { ensureSessionImages } = useCloset.getState();
+    // Make sure we have all session images
+    ensureSessionImages();
+    
+    // Log current state
+    const sessionImageCount = Object.keys(sessionStorage)
+      .filter(key => key.startsWith('tryonai_session_')).length;
+    console.log('[Closet] Component mounted, sessionImages count:', sessionImageCount);
+    
+    const albumTotalImages = albums.reduce((sum, album) => sum + album.images.length, 0);
+    console.log('[Closet] Session images vs album images:', {
+      sessionImageCount,
+      totalImagesInAlbums: albumTotalImages,
+      albumsCount: albums.length
+    });
+  }, [albums]);
 
-  // Helper function to get image source - prioritizes session storage over regular image property
+  // Helper function to get image source - uses getBestImageSrc but with sync behavior for immediate rendering
   const getImageSrc = (image) => {
-    // For generated images, check session storage first
-    if (image.hasSessionData && hasSessionImage(image.id)) {
-      const sessionData = getSessionImage(image.id);
-      return sessionData?.mainImage || image.image || null;
+    if (!image) return null;
+    
+    // For example images, try to use the direct image property first (which is the import path)
+    if (image.type === 'example' || image.isExample) {
+      return image.image || null;
     }
-    // Fallback to regular image property (for example images)
-    return image.image || null;
+    
+    // For generated images, check session storage first
+    if (image.id && hasSessionImage(image.id)) {
+      const sessionData = getSessionImage(image.id);
+      if (sessionData?.mainImage) {
+        return sessionData.mainImage;
+      }
+    }
+    
+    // Fallbacks in order of preference
+    return image.image || image.url || image.filePath || null;
   };
 
   return (
@@ -298,7 +327,6 @@ export default function Closet() {
                 >
                   + Album
                 </Button>
-
               </form>
             </div>
 
@@ -440,7 +468,7 @@ export default function Closet() {
                         title="Zurück zu allen Alben"
                       >
                         <img
-                          src={selectedAlbum.images[0].image}
+                          src={getImageSrc(selectedAlbum.images[0])}
                           alt={selectedAlbum.name}
                           className="w-full h-full object-cover"
                         />
@@ -552,7 +580,7 @@ export default function Closet() {
                     >
                       <div className="relative aspect-[3/4]">
                         <img
-                          src={img.image}
+                          src={getImageSrc(img)}
                           alt={img.customPrompt || 'Try-On'}
                           className="absolute inset-0 w-full h-full object-cover rounded-2xl"
                         />
@@ -574,7 +602,7 @@ export default function Closet() {
                     >
                       <div className="relative aspect-[3/4]">
                         <img
-                          src={img.image}
+                          src={getImageSrc(img)}
                           alt={img.customPrompt || 'Try-On'}
                           className="absolute inset-0 w-full h-full object-cover rounded-2xl"
                         />

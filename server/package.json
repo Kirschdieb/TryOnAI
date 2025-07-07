@@ -21,6 +21,7 @@
     "node-fetch": "^2.7.0",
     "openai": "^4.104.0",
     "puppeteer": "^24.10.0",
+    "tryonai": "file:..",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

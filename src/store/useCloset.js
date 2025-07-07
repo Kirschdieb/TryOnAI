@@ -3,8 +3,37 @@ import { create } from 'zustand';
 
 // Session-based image storage to avoid localStorage quota issues
 // ⚠️ LIMITATION: Images are only available during the current browser session
-// TODO: Implement local file system storage in assets/albums/
+// Try to recover images from sessionStorage on page reload/navigation
 const sessionImages = new Map();
+
+// Initialize session storage from sessionStorage API if available
+try {
+  const savedSessionData = sessionStorage.getItem('tryonai_session_images');
+  if (savedSessionData) {
+    const parsedData = JSON.parse(savedSessionData);
+    Object.keys(parsedData).forEach(key => {
+      sessionImages.set(key, parsedData[key]);
+    });
+    console.log(`[SessionStorage] Restored ${sessionImages.size} images from session storage`);
+  }
+} catch (error) {
+  console.error('[SessionStorage] Failed to restore from sessionStorage:', error);
+}
+
+// Helper to persist session images to sessionStorage
+const persistSessionImages = () => {
+  try {
+    // Convert Map to plain object for storage
+    const sessionObject = {};
+    sessionImages.forEach((value, key) => {
+      sessionObject[key] = value;
+    });
+    sessionStorage.setItem('tryonai_session_images', JSON.stringify(sessionObject));
+    console.log(`[SessionStorage] Persisted ${sessionImages.size} images to session storage`);
+  } catch (error) {
+    console.error('[SessionStorage] Failed to persist to sessionStorage:', error);
+  }
+};
 
 // File system storage utilities
 const ALBUMS_BASE_PATH = '/src/assets/albums';
@@ -324,16 +353,35 @@ function getDefaultAlbums(language = 'de') {
     { id: 'sport', name: t.sport, images: [] }
   ];
 
-  // Add sample images to the correct categories
-  sampleImages.forEach(sample => {
+  // Process sample images with proper metadata
+  const processedSampleImages = sampleImages.map(sample => ({
+    ...sample,
+    timestamp: sample.timestamp || FIXED_DATE,
+    id: sample.id,
+    createdAt: FIXED_DATE,
+    hasSessionData: false, // Example images don't use session storage
+    hasFileSystemData: true, // They are stored in the filesystem
+    filePath: sample.image, // The imported image path
+    type: 'example',
+    metadata: {
+      isExample: true,
+      category: sample.category,
+      timestamp: FIXED_DATE
+    }
+  }));
+
+  // Add sample images to their categories
+  processedSampleImages.forEach(sample => {
     const albumIndex = defaultAlbums.findIndex(album => album.id === sample.category);
     if (albumIndex !== -1) {
-      defaultAlbums[albumIndex].images.push({
-        ...sample,
-        timestamp: sample.timestamp || FIXED_DATE
-      });
+      defaultAlbums[albumIndex].images.push(sample);
     }
   });
+
+  // IMPORTANT: Also add all example images to the generated album (master collection)
+  defaultAlbums[0].images = [...processedSampleImages];
+  
+  console.log(`[getDefaultAlbums] Created ${defaultAlbums.length} albums with ${processedSampleImages.length} example images in generated album`);
 
   return defaultAlbums;
 }
@@ -361,6 +409,28 @@ export const useCloset = create((set, get) => ({
   currentProfileId: null,
   isAlbumDataLoaded: false,
 
+  // Session management
+  preserveSessionImages: true, // New flag to control session image preservation
+
+  // Helper to ensure session images are preserved
+  ensureSessionImages: () => {
+    // Check if we have any images in sessionStorage
+    try {
+      const savedSessionData = sessionStorage.getItem('tryonai_session_images');
+      if (savedSessionData) {
+        const parsedData = JSON.parse(savedSessionData);
+        Object.keys(parsedData).forEach(key => {
+          if (!sessionImages.has(key)) {
+            sessionImages.set(key, parsedData[key]);
+            console.log(`[SessionStorage] Restored missing image ${key}`);
+          }
+        });
+      }
+    } catch (error) {
+      console.error('[SessionStorage] Failed to restore images:', error);
+    }
+  },
+
   // Basic setters
   setUserPhoto: (p) => set({ userPhoto: p }),
   setClothPhoto: (p) => set({ clothPhoto: p }),
@@ -369,7 +439,8 @@ export const useCloset = create((set, get) => ({
   setHomeClothPhotoUrl: (url) => set({ homeClothPhotoUrl: url }),
 
   // ESSENTIAL: Load albums from profile (with image restoration)
-  loadAlbumsFromProfile: (profileData) => {
+  loadAlbumsFromProfile: (profileData, preserveSessionImages = false) => {
+    const { ensureSessionImages } = get();
     const profileAlbums = profileData.albums || [];
     const defaultAlbums = getDefaultAlbums('de');
     const profileId = profileData.id || 'default';
@@ -377,8 +448,14 @@ export const useCloset = create((set, get) => ({
     console.log('[Profile] Loading albums from profile:', {
       profileId: profileId,
       albumCount: profileAlbums.length,
+      preserveSessionImages: preserveSessionImages,
       totalImages: profileAlbums.reduce((sum, album) => sum + (album.images?.length || 0), 0)
     });
+
+    // First ensure we have all our session images
+    if (preserveSessionImages) {
+      ensureSessionImages();
+    }
     
     // Merge: default albums first, then add any custom albums
     const mergedAlbums = [
@@ -388,43 +465,27 @@ export const useCloset = create((set, get) => ({
       }),
       ...profileAlbums.filter(album => !defaultAlbums.some(da => da.id === album.id)) // Add custom albums
     ];
-    
-    // Restore images from profile's stored image data (if available)
-    // Check both legacy format (profileData.savedImages) and new separate storage
-    let savedImages = profileData.savedImages || {};
-    
-    // Try to load images from separate localStorage key
-    try {
-      const separateImagesData = localStorage.getItem(`userProfile_images_${profileId}`);
-      if (separateImagesData) {
-        const parsedImages = JSON.parse(separateImagesData);
-        savedImages = { ...savedImages, ...parsedImages };
-        console.log('[Profile] Loaded images from separate storage:', Object.keys(parsedImages).length);
-      }
-    } catch (error) {
-      console.warn('[Profile] Could not load separate image storage:', error.message);
-    }
-    
-    if (Object.keys(savedImages).length > 0) {
-      console.log('[Profile] Restoring saved images to session storage:', Object.keys(savedImages).length);
-      
-      // Clear current session images and restore from profile
-      sessionImages.clear();
-      for (const [imageId, imageData] of Object.entries(savedImages)) {
-        sessionImages.set(imageId, imageData);
-        console.log(`[Profile] Restored image ${imageId} to session storage`);
-      }
-    } else {
-      console.log('[Profile] No saved images found for profile');
-    }
-    
+
+    // Store current session image count for logging
+    const sessionImageCount = sessionImages.size;
+
+    // Set the state first
     set({ 
       albums: ensureGeneratedAlbum(mergedAlbums), 
       currentProfileId: profileId,
-      isAlbumDataLoaded: true 
+      isAlbumDataLoaded: true,
+      preserveSessionImages: preserveSessionImages // Update the preservation flag
     });
-    
-    console.log('[Profile] Albums loaded successfully with', mergedAlbums.length, 'albums and', sessionImages.size, 'restored images');
+
+    // Log the final state
+    console.log('[Profile] Albums loaded successfully:', {
+      albumCount: mergedAlbums.length,
+      sessionImages: sessionImageCount,
+      preserveSessionImages: preserveSessionImages
+    });
+
+    // Always persist the current state of session images
+    persistSessionImages();
   },
 
   // ESSENTIAL: Save albums to profile (with image preservation)
@@ -506,15 +567,29 @@ export const useCloset = create((set, get) => ({
         // Save profile without images first (to avoid quota issues)
         localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
         
-        // Try to save images separately (with error handling for quota)
-        try {
-          if (Object.keys(savedImages).length > 0) {
-            localStorage.setItem(`userProfile_images_${currentProfileId}`, JSON.stringify(savedImages));
-            console.log(`[Profile] Saved ${Object.keys(savedImages).length} images separately`);
+        // Try to save images separately (with smart size checking)
+        if (Object.keys(savedImages).length > 0) {
+          try {
+            const imagesString = JSON.stringify(savedImages);
+            const imageSizeMB = imagesString.length / (1024 * 1024);
+            
+            console.log(`[Profile] Attempting to save ${Object.keys(savedImages).length} images (${imageSizeMB.toFixed(2)}MB) to localStorage`);
+            
+            // Only try to save if under 8MB (leaving buffer for other data)
+            if (imageSizeMB < 8) {
+              localStorage.setItem(`userProfile_images_${currentProfileId}`, imagesString);
+              console.log(`[Profile] ✅ Successfully saved all ${Object.keys(savedImages).length} images to localStorage`);
+            } else {
+              console.log(`[Profile] ℹ️ Images too large (${imageSizeMB.toFixed(2)}MB) for localStorage. Images remain in session only.`);
+              console.log(`[Profile] 💡 Tip: Use "Export Profile" to save all images permanently, then "Import Profile" to restore them later.`);
+            }
+          } catch (imageError) {
+            // localStorage quota exceeded - this is NORMAL and EXPECTED for many images
+            console.log(`[Profile] ℹ️ localStorage quota exceeded (this is normal with many images). Images are available during this session and can be exported via ZIP.`);
+            console.log(`[Profile] 💡 Tip: Use "Export Profile" to save all images permanently, then "Import Profile" to restore them later.`);
+            
+            // Don't rethrow - this is expected behavior, not an error
           }
-        } catch (imageError) {
-          console.warn('[Profile] Could not save images to localStorage (quota exceeded), images will be session-only:', imageError.message);
-          // Profile is still saved, just without persistent images
         }
         
         console.log('Albums saved to profile successfully (lightweight version)');
@@ -572,23 +647,33 @@ export const useCloset = create((set, get) => ({
   },
 
   addImageToAlbum: (albumId, image) => {
-    console.log('addImageToAlbum called:', { albumId, imageType: typeof image, hasImage: !!image.image }); // Debug log
+    console.log('addImageToAlbum called:', { albumId, imageId: image.id, imageType: typeof image, hasImage: !!image.image }); // Debug log
     
     // Handle different image formats
     let imageToAdd;
     const imageId = image.id || Date.now().toString() + Math.random().toString(36).substr(2, 5);
-    const { currentProfileId } = get();
+    const { currentProfileId, albums } = get();
+    
+    // Check for duplicates in the target album
+    const targetAlbum = albums.find(a => a.id === albumId);
+    if (targetAlbum && targetAlbum.images.some(img => img.id === imageId)) {
+      console.log(`[useCloset] Image ${imageId} already exists in album ${albumId}, skipping add`);
+      return; // Skip adding if image already exists in this album
+    }
     
     if (image.image) {
       // Generated image format from TryOnStudio
       // Store the actual image data in session storage (immediate availability)
-      sessionImages.set(imageId, {
-        mainImage: image.image,
-        userPhoto: image.userPhoto,
-        clothPhoto: image.clothPhoto
-      });
-      
-      console.log('[useCloset] Stored large image in session storage with ID:', imageId);
+      if (!sessionImages.has(imageId)) {
+        sessionImages.set(imageId, {
+          mainImage: image.image,
+          userPhoto: image.userPhoto,
+          clothPhoto: image.clothPhoto
+        });
+        // Persist to sessionStorage after adding new image
+        persistSessionImages();
+        console.log('[useCloset] Stored and persisted large image in session storage with ID:', imageId);
+      }
       
       // Also save to file system for persistence (async)
       if (currentProfileId) {
@@ -605,7 +690,7 @@ export const useCloset = create((set, get) => ({
       imageToAdd = {
         id: imageId,
         customPrompt: image.customPrompt,
-        timestamp: image.timestamp,
+        timestamp: image.timestamp || new Date().toISOString(),
         createdAt: new Date().toISOString(),
         type: 'generated',
         hasSessionData: true, // Flag to indicate session data exists
@@ -615,9 +700,25 @@ export const useCloset = create((set, get) => ({
         // Remove all large data properties - only metadata
         metadata: {
           prompt: image.customPrompt,
-          timestamp: image.timestamp
+          timestamp: image.timestamp || new Date().toISOString()
         }
-        // Do NOT include: image, userPhoto, clothPhoto, or any large data
+      };
+    } else if (image.type === 'example' || image.isExample) {
+      // Example image
+      imageToAdd = {
+        ...image,
+        id: image.id,
+        timestamp: image.timestamp || FIXED_DATE,
+        createdAt: image.createdAt || FIXED_DATE,
+        type: 'example',
+        hasSessionData: false,
+        hasFileSystemData: true,
+        filePath: image.image, // The imported image path
+        metadata: {
+          isExample: true,
+          category: image.category,
+          timestamp: FIXED_DATE
+        }
       };
     } else {
       // Simple image format (small images or URLs only)
@@ -633,13 +734,34 @@ export const useCloset = create((set, get) => ({
 
     console.log('About to add image to album:', { imageId, albumId, imageToAddKeys: Object.keys(imageToAdd) });
 
-    set((state) => ({
-      albums: ensureGeneratedAlbum(state.albums.map(a => 
+    set((state) => {
+      let updatedAlbums = ensureGeneratedAlbum(state.albums.map(a => 
         a.id === albumId 
           ? { ...a, images: [...a.images, imageToAdd] }
           : a
-      ))
-    }));
+      ));
+
+      // IMPORTANT: For generated images, also add to the 'generated' album if not already there
+      if (imageToAdd.type === 'generated' && albumId !== 'generated') {
+        const generatedAlbum = updatedAlbums.find(a => a.id === 'generated');
+        
+        // Check if image already exists in generated album
+        const existsInGenerated = generatedAlbum && generatedAlbum.images.some(img => img.id === imageToAdd.id);
+        
+        if (!existsInGenerated) {
+          console.log(`[useCloset] Adding generated image to 'generated' album as well`);
+          updatedAlbums = updatedAlbums.map(a => 
+            a.id === 'generated'
+              ? { ...a, images: [...a.images, { ...imageToAdd }] }
+              : a
+          );
+        } else {
+          console.log(`[useCloset] Image ${imageToAdd.id} already exists in 'generated' album, skipping duplicate`);
+        }
+      }
+
+      return { albums: updatedAlbums };
+    });
     
     console.log('Image added to album, triggering save'); // Debug log
     setTimeout(() => get().saveAlbumsToProfile(), 0);
@@ -647,8 +769,26 @@ export const useCloset = create((set, get) => ({
 
   // Add missing function for generated images
   addGeneratedImage: (image) => {
-    console.log('addGeneratedImage called:', image); // Debug log
-    get().addImageToAlbum('generated', image);
+    console.log('addGeneratedImage called:', { imageId: image.id }); // Debug log
+    
+    // Make sure image has an ID - use the one provided or generate a new one
+    const imageId = image.id || Date.now().toString() + Math.random().toString(36).substr(2, 5);
+    
+    // First check if this image already exists in the generated album
+    const { albums } = get();
+    const generatedAlbum = albums.find(a => a.id === 'generated');
+    
+    // Check for duplicates by ID
+    if (generatedAlbum) {
+      const exists = generatedAlbum.images.some(img => img.id === imageId);
+      if (exists) {
+        console.log(`[useCloset] Image ${imageId} already exists in generated album, skipping duplicate add`);
+        return; // Skip adding if already exists
+      }
+    }
+    
+    // Use the addImageToAlbum function to ensure consistent handling
+    get().addImageToAlbum('generated', { ...image, id: imageId });
   },
 
   // Helper function to get image data from session storage or file system
@@ -945,5 +1085,28 @@ export const useCloset = create((set, get) => ({
       console.error('[Cleanup] Error clearing old profile images:', error);
       return 0;
     }
+  },
+
+  // Helper function to reset albums to default state (useful for debugging)
+  resetAlbumsToDefault: () => {
+    console.log('[Reset] Resetting albums to default state...');
+    const defaultAlbums = getDefaultAlbums('de');
+    set({ albums: ensureGeneratedAlbum(defaultAlbums) });
+    console.log('[Reset] Albums reset to default with', defaultAlbums[0].images.length, 'example images in generated album');
+  },
+
+  // Helper function to get image label for UI display
+  updateImageLabel: (imageId, newLabel) => {
+    set((state) => ({
+      albums: state.albums.map(album => ({
+        ...album,
+        images: album.images.map(img => 
+          img.id === imageId 
+            ? { ...img, customLabel: newLabel }
+            : img
+        )
+      }))
+    }));
+    setTimeout(() => get().saveAlbumsToProfile(), 0);
   },
 }));

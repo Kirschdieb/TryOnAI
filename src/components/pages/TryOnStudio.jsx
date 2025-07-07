@@ -377,10 +377,17 @@ const Studio = () => {
       timestamp: new Date().toISOString(),
     };
     
-    // Speichere im State (temporär für die Sitzung)
-    addGeneratedImage(imageObj);
+    // Create a consistent ID for the image that will be used in all albums
+    const consistentImageId = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+    const imageWithId = { ...imageObj, id: consistentImageId };
+    
+    // Always add to the generated album first
+    addGeneratedImage(imageWithId);
+    
+    // Then optionally add to another album if selected (use the same ID)
     if (selectedAlbumId && selectedAlbumId !== 'generated') {
-      addImageToAlbum(selectedAlbumId, { ...imageObj, id: Date.now().toString() + Math.random().toString(36).substr(2, 5) });
+      // Use the same image object with same ID to avoid duplicates
+      addImageToAlbum(selectedAlbumId, imageWithId);
     }
     
     console.log('Image saved successfully (in session)'); // Debug log
