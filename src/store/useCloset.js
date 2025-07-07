@@ -668,7 +668,12 @@ export const useCloset = create((set, get) => ({
         sessionImages.set(imageId, {
           mainImage: image.image,
           userPhoto: image.userPhoto,
-          clothPhoto: image.clothPhoto
+          clothPhoto: image.clothPhoto,
+          // Also store these important metadata in session storage for consistency
+          fullGeneratedPrompt: image.fullGeneratedPrompt,
+          customPrompt: image.customPrompt,
+          prompt: image.prompt,
+          clothingItem: image.clothingItem
         });
         // Persist to sessionStorage after adding new image
         persistSessionImages();
@@ -690,6 +695,8 @@ export const useCloset = create((set, get) => ({
       imageToAdd = {
         id: imageId,
         customPrompt: image.customPrompt,
+        fullGeneratedPrompt: image.fullGeneratedPrompt, // Add the full generated prompt
+        prompt: image.prompt, // Also store the original prompt if available
         timestamp: image.timestamp || new Date().toISOString(),
         createdAt: new Date().toISOString(),
         type: 'generated',
@@ -697,9 +704,12 @@ export const useCloset = create((set, get) => ({
         hasFileSystemData: true, // Flag to indicate file system storage
         filePath: currentProfileId ? `${getProfileAlbumPath(currentProfileId)}/${sanitizeFileName(albumId)}/${imageId}.png` : null,
         customLabel: image.customLabel || 'Anprobiertes Kleidungsstück',
+        // Keep the clothing item information (it's important metadata, not large data)
+        clothingItem: image.clothingItem,
         // Remove all large data properties - only metadata
         metadata: {
           prompt: image.customPrompt,
+          fullGeneratedPrompt: image.fullGeneratedPrompt,
           timestamp: image.timestamp || new Date().toISOString()
         }
       };

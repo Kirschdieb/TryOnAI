@@ -828,6 +828,8 @@ export default function Closet() {
                       <div className="mt-3 p-3 bg-gray-50 border rounded-xl">
                         {selectedImage.fullGeneratedPrompt || selectedImage.customPrompt || selectedImage.prompt ? (
                           <p className="text-gray-700 italic">"{selectedImage.fullGeneratedPrompt || selectedImage.customPrompt || selectedImage.prompt}"</p>
+                        ) : selectedImage.metadata?.fullGeneratedPrompt || selectedImage.metadata?.prompt ? (
+                          <p className="text-gray-700 italic">"{selectedImage.metadata.fullGeneratedPrompt || selectedImage.metadata.prompt}"</p>
                         ) : (
                           <p className="text-gray-500 italic">{language === 'de' ? 'Kein Prompt gefunden' : 'No prompt found'}</p>
                         )}
@@ -996,8 +998,23 @@ export default function Closet() {
                   </div>
                   {/* Prompt anzeigen/verstecken - immer sichtbar */}
                   <div className="space-y-2">
-                    {/* Debug: Log image data to console */}
-                    {selectedImage && console.log('Selected Image Data (Modal 2):', selectedImage)}
+                    {/* Debug: Log image data to console with all props */}
+                    {selectedImage && console.log('Selected Image Data (Modal 2):', 
+                      { 
+                        id: selectedImage.id,
+                        hasPrompt: !!selectedImage.prompt, 
+                        hasCustomPrompt: !!selectedImage.customPrompt,
+                        hasFullGeneratedPrompt: !!selectedImage.fullGeneratedPrompt,
+                        promptValue: selectedImage.fullGeneratedPrompt || selectedImage.customPrompt || selectedImage.prompt,
+                        hasClothingItem: !!selectedImage.clothingItem,
+                        clothingItemDetails: selectedImage.clothingItem ? {
+                          hasImage: !!selectedImage.clothingItem.image,
+                          hasLink: !!selectedImage.clothingItem.link,
+                          hasName: !!selectedImage.clothingItem.name
+                        } : null,
+                        allKeys: Object.keys(selectedImage)
+                      }
+                    )}
                     <button
                       onClick={() => setShowPrompt(!showPrompt)}
                       className="flex items-center space-x-2 text-purple-600 hover:text-purple-800 font-medium transition-colors"
@@ -1012,15 +1029,12 @@ export default function Closet() {
                     </button>
                     {showPrompt && (
                       <div className="p-3 bg-white border rounded-lg animate-fadeIn">
-                        {selectedImage.customPrompt || selectedImage.prompt ? (
-                          <p className="text-gray-700 italic">"{selectedImage.customPrompt || selectedImage.prompt}"</p>
+                        {selectedImage.fullGeneratedPrompt || selectedImage.customPrompt || selectedImage.prompt ? (
+                          <p className="text-gray-700 italic">"{selectedImage.fullGeneratedPrompt || selectedImage.customPrompt || selectedImage.prompt}"</p>
+                        ) : selectedImage.metadata?.fullGeneratedPrompt || selectedImage.metadata?.prompt ? (
+                          <p className="text-gray-700 italic">"{selectedImage.metadata.fullGeneratedPrompt || selectedImage.metadata.prompt}"</p>
                         ) : (
-                          <div>
-                            <p className="text-gray-500 italic">{language === 'de' ? 'Kein Prompt gefunden' : 'No prompt found'}</p>
-                            <p className="text-xs text-gray-400 mt-1">
-                              Debug: customPrompt = "{selectedImage.customPrompt}", prompt = "{selectedImage.prompt}"
-                            </p>
-                          </div>
+                          <p className="text-gray-500 italic">{language === 'de' ? 'Kein Prompt gefunden' : 'No prompt found'}</p>
                         )}
                       </div>
                     )}
